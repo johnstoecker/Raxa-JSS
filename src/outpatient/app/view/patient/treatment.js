@@ -31,9 +31,11 @@ Ext.define('RaxaEmr.Outpatient.view.patient.treatment', {
             type: 'card'
         },
         title: 'Treatment',
-        activeItem: 1,
+        activeItem: 0,
         items: [{
             xtype: 'drug-panel'
+        }, {
+            xtype: 'draw-panel'
         }, {
             xtype: 'container',
             items: [{

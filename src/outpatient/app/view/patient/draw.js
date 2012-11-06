@@ -1,30 +1,30 @@
 // TODO: put this in a singleton, so i can create several canvases
 
-Function.prototype.bind = function(scope) {
-  var _function = this;
+// Function.prototype.bind = function(scope) {
+//   var _function = this;
   
-  return function() {
-    return _function.apply(scope, arguments);
-  }
-}
+//   return function() {
+//     return _function.apply(scope, arguments);
+//   }
+// }
 
-window.name = "the window";
+// window.name = "the window";
 
-alice = {
-  name: "Alice"
-}
+// alice = {
+//   name: "Alice"
+// }
 
-eve = {
-  name: "Eve",
+// eve = {
+//   name: "Eve",
   
-  talk: function(greeting) {
-    console.log(greeting + ", my name is " + this.name);
-  }
-}
+//   talk: function(greeting) {
+//     console.log(greeting + ", my name is " + this.name);
+//   }
+// }
 
-eve.talk("yo");
-eve.talk.apply(alice, ["hello"]);
-eve.talk.apply(window, ["hi"]);
+// eve.talk("yo");
+// eve.talk.apply(alice, ["hello"]);
+// eve.talk.apply(window, ["hi"]);
 
 // eve = {
 //   talk: function(greeting) {
@@ -555,6 +555,7 @@ eve.talk.apply(window, ["hi"]);
     
     function drawCircle(x, y) {
         ctx.strokeStyle = currentPenColor;
+        ctx.lineCap = 'round';
         ctx.beginPath();
         if (oldX && oldY) {
             ctx.moveTo(oldX, oldY);
@@ -615,6 +616,7 @@ eve.talk.apply(window, ["hi"]);
 Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
     extend: 'Ext.Container',
     xtype: 'draw-panel',
+    id: 'drawPanel',
     // requires: ['RaxaEmr.Outpatient.view.patient.Grid', 'RaxaEmr.Outpatient.view.patient.medicationhistory', 'RaxaEmr.Outpatient.view.patient.refertodoc', 'RaxaEmr.Outpatient.view.patient.work', 'RaxaEmr.Outpatient.view.patient.labresulthistory'],
     config: {
         // title: 'Outpatient Department',
@@ -641,15 +643,22 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
                 xtype: 'container',
                 id: 'opdPatientDataEntry',
                 width:650,
-                height:760,
+                // height:760,
+                height:200,
+                layout: 'vbox',
                 items: [{
                     scroll: false,
                     html: "<canvas width='100' height='100' id='canvas1'>Canvas not supported.</canvas>"
+                }, {
+                    xtype: 'drug-grid',
+                    id: 'orderedDrugGrid',
+                    height: 250,
+                    border: 10,
                 }],
                 listeners: {
                     painted: function() {
                         console.log("painted");
-                        eve.talk('inside paited');
+                        // eve.talk('inside paited');
                         // var cc = clickableCanvas();
                         // cc.setupCanvas();
                         // cc.canvas.ontouchmove = cc.handleMove;
@@ -679,9 +688,14 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
                     handler: function() {
                         activateEraser();
                     }
-                // }, {
-                //     xtype: 'button',
-                //     text: '+ Drug',
+                }, {
+                    xtype: 'button',
+                    text: '+ Drug',
+                    handler: function () {
+                        Ext.getCmp('drugForm').setHidden(false);
+                        Ext.getCmp('drugaddform').reset();
+                        Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD); // to add more than one treatment
+                    }
                 // }, {
                 //     xtype: 'button',
                 //     text: '+ Lab',

@@ -191,8 +191,14 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
     //this function starts on the load of the module
     init: function () {
-        this.getpatientlist();
+        // this.getpatientlist();
+    }, 
+
+    // TODO: Temp
+    launch: function () {
+        this.onContactSelect();
     },
+
     //fetches patient list who are screened but not not have an OPD encounter
     getpatientlist: function () {
         var d = new Date();
@@ -279,8 +285,10 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             this.showContact = Ext.create('RaxaEmr.Outpatient.view.patient.more');
         }
 
-        this.showContact.setRecord(record);
+        // TODO: Temp
+        // this.showContact.setRecord(record);
         this.getMain().push(this.showContact);
+        return;
 
         // Persist current patient's details
         myRecord = record;
