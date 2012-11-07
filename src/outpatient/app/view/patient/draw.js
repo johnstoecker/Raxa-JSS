@@ -8,6 +8,7 @@
     var canvas, clicked, ctx, coords, offsetX, offsetY, oldX, oldY, lowY, highY;
     // var CANVAS_BG_COLOR = "rgb(204,204,204)";#cccccc
     var CANVAS_BG_COLOR = "rgb(238,238,238)";   // #eeeeee
+    var CANVAS_TRANSPARENT_COLOR = "rgba(255,255,255,)";
     var CANVAS_PEN_COLOR = "rgb(55,55,255)";
     var currentPenColor, currentBgColor;
 
@@ -39,9 +40,14 @@
         console.log("setup canvas");
         
         canvas = document.getElementById('canvas1');
+        canvas2 = document.getElementById('canvas2');
         canvas.width = w;
         canvas.height = h;
+        canvas2.width = w;
+        canvas2.height = h;
+        
         ctx = canvas.getContext("2d");
+        ctx2 = canvas2.getContext("2d");
         coords = getCumulativeOffset(canvas);
         offsetX = coords.x;
         offsetY = coords.y;
@@ -49,29 +55,47 @@
 
         activatePen();
 
-        // TODO: Draw text on bg
-        ctx.font = "bold 12px sans-serif";
-        ctx.strokeStyle = CANVAS_PEN_COLOR;
-        ctx.fillText("x", 248, 43);
-        ctx.fillText("y", 58, 165);
-
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';  // Smoothes drawing considerably        
     }
     
-    function drawBg() {
-        ctx.beginPath();
-        ctx.fillStyle = CANVAS_BG_COLOR;
-    }
+    // function drawBg() {
+    //     ctx.beginPath();
+    //     ctx.fillStyle = CANVAS_BG_COLOR;
+    // }
 
     function activateEraser() {
         currentPenColor = CANVAS_BG_COLOR;
+        currentPenColor = CANVAS_TRANSPARENT_COLOR;
         ctx.lineWidth = 40;
+
+
+        // ctx.globalCompositeOperation
+        // "source-over"
+        // ctx.globalCompositeOperation = 'copy'
+        // "copy"
     }
 
     function activatePen() {
         currentPenColor = CANVAS_PEN_COLOR
         ctx.lineWidth = 5;
+    }
+
+    function drawTextAtLowPoint() {
+        var pxSize = 20;
+        ctx2.font = "bold " + pxSize + "px sans-serif";
+        
+        ctx2 = canvas.getContext("2d");
+        ctx2.strokeStyle = CANVAS_PEN_COLOR;
+        ctx2.fillText("hello world", 1, 1);
+        
+        // update high low values
+        highY += pxSize;
+        lowY -= pxSize; 
+        lowY = Math.max(lowY,0);
+
+        ctx2.fillText("beyond highest y value", 30, highY);
+        ctx2.fillText("beyond lowest y value", 30, lowY);
     }
     
     function drawCircle(x, y) {
@@ -168,7 +192,14 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
                 layout: 'vbox',
                 items: [{
                     scroll: false,
-                    html: "<canvas width='100' height='100' id='canvas1' style='border:1px dotted;'  >Canvas not supported.</canvas>"
+                    html: ["<div style='position: relative;'>",
+                        "<canvas width='100' height='100' id='canvas2'",
+                        " style='z-index:0;position:absolute;left:0px;top:0px;border:1px dotted;'>",
+                        "Canvas not supported.</canvas>",
+                        "<canvas width='100' height='100' id='canvas1'",
+                        " style='z-index:2;position:absolute;left:0px;top:0px;border:1px dotted;'  >",
+                        "Canvas not supported.</canvas>",
+                        "</div>"].join("")
                 }, {
                     xtype: 'drug-grid',
                     id: 'orderedDrugGrid',
@@ -215,6 +246,12 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
                         Ext.getCmp('drugForm').setHidden(false);
                         Ext.getCmp('drugaddform').reset();
                         Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD); // to add more than one treatment
+                    }
+                }, {
+                    xtype: 'button',
+                    text: '+ Text',
+                    handler: function () {
+                        drawTextAtLowPoint();
                     }
                 // }, {
                 //     xtype: 'button',
