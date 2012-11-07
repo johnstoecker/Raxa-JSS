@@ -34,7 +34,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.work', {
         layout: {
             type: 'hbox'
         },
-        height: 490,
+        height: 800,
+        width: 1024,
         items: [
         {
             xtype: 'tabpanel',

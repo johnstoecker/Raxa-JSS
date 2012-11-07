@@ -1,144 +1,537 @@
-// (function () { 
-    var canvasCount = 1;
+                imageCount = 0;
 
-    // TODO: Drawing tutorials
-    // - http://jsfiddle.net/NWBV4/10/
-    // - http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+                var DRAWABLE_X_MIN = 0;
+                var DRAWABLE_X_MAX = 700; // 708 - strict border
+                var DRAWABLE_Y_MIN = 240; // 230 - strict border
+                var DRAWABLE_Y_MAX = 1024;
+                var DEFAULT_MODE = "draw";  // undefined
+                var STAGE_X = 768;  //768
+                var STAGE_Y = 1024; //1024
 
-    var canvas, clicked, ctx, coords, offsetX, offsetY, oldX, oldY, lowY, highY;
-    var CANVAS_BG_COLOR = "rgb(238,238,238)";
-    var CANVAS_TRANSPARENT_COLOR = "rgba(255,255,255,)";
-    var CANVAS_PEN_COLOR = "rgb(55,55,255)";
-    var currentPenColor, currentBgColor;
+                var HISTORY_BASE_X = DRAWABLE_X_MAX;
+                var HISTORY_BASE_Y = DRAWABLE_Y_MIN + 196;
+                var HISTORY_ITEM_DIM = 64;
 
-    function handleMouseMove(e) {
-        var x = e.offsetX,
-            y = e.offsetY;
-        if (clicked) {
-            drawCircle(x, y);
-            updateBounds(y);
-        }
-    }
+                var CONTROL_BASE_X = DRAWABLE_X_MAX + 8;
+                var CONTROL_BASE_Y = DRAWABLE_Y_MIN - 6;
+                var CONTROL_ITEM_SPACING = 3;
+                var CONTROL_ITEM_DIM = 52;
 
-    function updateBounds(y) {
-        // console.log("updatebounds");
-        if (y < lowY || lowY == undefined) { lowY = y; }
-        if (y > highY || highY == undefined) { highY = y; }
-    }
+                function isInDrawableArea(myX, myY) {
+                  up = {
+                    x : myX,
+                    y : myY
+                  };
 
-    function handleMove(e) {
-        var x, y, i;
-        for (i = 0; i < e.targetTouches.length; i++) {
-            x = e.targetTouches[i].clientX - offsetX;
-            y = e.targetTouches[i].clientY - offsetY;
-            drawCircle(x, y);
-        }
-    }
-    
-    function setupCanvas(w, h) {
-        console.log("setup canvas");
-        
-        canvas = document.getElementById('canvas1');
-        canvas2 = document.getElementById('canvas2');
-        canvas.width = w;
-        canvas.height = h;
-        canvas2.width = w;
-        canvas2.height = h;
-        
-        ctx = canvas.getContext("2d");
-        ctx2 = canvas2.getContext("2d");
-        coords = getCumulativeOffset(canvas);
-        offsetX = coords.x;
-        offsetY = coords.y;
-        // drawBg(ctx);
-
-        activatePen();
-
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';  // Smoothes drawing considerably        
-    }
-    
-    // function drawBg() {
-    //     ctx.beginPath();
-    //     ctx.fillStyle = CANVAS_BG_COLOR;
-    // }
-
-    function activateEraser() {
-        currentPenColor = CANVAS_BG_COLOR;
-        currentPenColor = CANVAS_TRANSPARENT_COLOR;
-        ctx.lineWidth = 40;
+                  
+                  if ((DRAWABLE_X_MIN <= up.x && up.x <= DRAWABLE_X_MAX) && (DRAWABLE_Y_MIN <= up.y && up.y <= DRAWABLE_Y_MAX)) {
+                    return true;
+                  } else {
+                    // console.log("not in drawable area: ", up.x, up.y );  
+                    return false;
+                  }
+                }
 
 
-        // ctx.globalCompositeOperation
-        // "source-over"
-        // ctx.globalCompositeOperation = 'copy'
-        // "copy"
-    }
+            window.onload = function() {
 
-    function activatePen() {
-        currentPenColor = CANVAS_PEN_COLOR
-        ctx.lineWidth = 5;
-    }
 
-    function drawTextAtLowPoint() {
-        var pxSize = 20;
-        ctx2.font = "bold " + pxSize + "px sans-serif";
-        
-        ctx2 = canvas.getContext("2d");
-        ctx2.strokeStyle = CANVAS_PEN_COLOR;
-        ctx2.fillText("hello world", 1, 1);
-        
-        // update high low values
-        highY += pxSize;
-        lowY -= pxSize; 
-        lowY = Math.max(lowY,0);
+              var lowY = DRAWABLE_Y_MIN;
+              var highY = DRAWABLE_Y_MIN;
 
-        ctx2.fillText("beyond highest y value", 30, highY);
-        ctx2.fillText("beyond lowest y value", 30, lowY);
-    }
-    
-    function drawCircle(x, y) {
-        ctx.strokeStyle = currentPenColor;
-        ctx.beginPath();
-        if (oldX && oldY) {
-            ctx.moveTo(oldX, oldY);
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.closePath();
-        }
-        oldX = x;
-        oldY = y;
-    }
-    
-    function getCumulativeOffset(obj) {
-        var left, top;
-        left = top = 0;
-        if (obj.offsetParent) {
-            do {
-                left += obj.offsetLeft;
-                top  += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-        }
-        return {
-            x : left,
-            y : top
-        };
-    }
-        
-    // Setup window events
-    // TODO: how is this dealt with if > 1 canvas
-    window.onmousedown = function() {
-        clicked = true;
-    }
-    
-    window.onmouseup = function() {
-        oldX = oldY = clicked = false;
-    }
-    
-    window.ontouchend = function() {
-        oldX = oldY = clicked = false;
-    }
+              var newLine;
+              var newLinePoints = [];
+              var prevPos;
+              var mode = DEFAULT_MODE;
+              
+              var historyYOffset = HISTORY_BASE_Y;
 
+              layer = new Kinetic.Layer();
+              loadedImageLayer = new Kinetic.Layer();  // For re-loaded thumbs
+              linesLayer = new Kinetic.Layer();
+              textLayer = new Kinetic.Layer();
+              controlsLayer = new Kinetic.Layer();
+
+              var simpleText = new Kinetic.Text({
+                x: 190,
+                y: 15,
+                text: "Simple Text",
+                fontSize: 30,
+                fontFamily: "Calibri",
+                textFill: "green"
+              });
+
+              var complexText = new Kinetic.Text({
+                x: 100,
+                y: 60,
+                stroke: '#555',
+                strokeWidth: 5,
+                fill: '#ddd',
+                text: 'COMPLEX TEXT\n\nAll the world\'s a stage, and all the men and women merely players. They have their exits and their entrances.',
+                fontSize: 14,
+                fontFamily: 'Calibri',
+                textFill: '#555',
+                width: 380,
+                padding: 20,
+                align: 'center',
+                fontStyle: 'italic',
+                shadow: {
+                  color: 'black',
+                  blur: 1,
+                  offset: [10, 10],
+                  opacity: 0.2
+                },
+                cornerRadius: 10
+              });
+
+              stage = new Kinetic.Stage({
+                  container: "container",
+                  width: STAGE_X,
+                  height: STAGE_Y
+              });
+              GloStage = stage;
+
+              background = new Kinetic.Rect({
+                  x: 0, 
+                  y: 0, 
+                  width: stage.getWidth(),
+                  height: stage.getHeight(),
+                  fill: "white"
+              });
+  
+              layer.add(background);
+
+              // Load background image for OPD
+              var imageObj = new Image();
+              imageObj.onload = function() {
+                console.log("image loaded");
+                console.log(stage.getWidth(), stage.getHeight());
+                var backgroundImage = new Kinetic.Image({
+                  x: 0,
+                  y: 0,
+                  image: imageObj,
+                  width: stage.getWidth(),
+                  height: stage.getHeight()
+                });
+                layer.add(backgroundImage);
+                layer.draw();
+              }
+              var file = "2012.11.07_OPD-Lite_v1.0.jpg";
+              imageObj.src = file;
+
+              stage.add(layer);
+              stage.add(linesLayer);
+              stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
+              stage.add(loadedImageLayer);
+              stage.add(controlsLayer);
+              
+              moving = false;
+
+              // Drag start
+              stage.on("mousedown", function(){
+                dragStart();
+              });
+
+              stage.on("touchstart", function(){
+                dragStart();
+              });
+
+              function dragStart() {
+                  console.log('dragStart');
+
+                  var up = stage.getUserPosition();
+                  if (! isInDrawableArea(up.x, up.y)) {
+                    return;
+                  }
+                  
+                  if (mode !== 'draw') {
+                    return;
+                  }
+
+                  if (moving){
+                      moving = false;layer.draw();
+                  } else {
+                      newLinePoints = [];
+                      prevPos = stage.getUserPosition();  // Mouse or touch
+                      newLinePoints.push(prevPos);
+                      newLine = new Kinetic.Line({
+                        points: newLinePoints,
+                        stroke: "red",
+                      });
+                      linesLayer.add(newLine);
+
+                      moving = true;    
+                      // linesLayer.drawScene();            
+
+                      // // TODO: Allow erase of lines..
+                      // newLine.on('mouseover', function(evt){
+                      //   console.log('clicked on newline');
+                      //   if (mode == 'erase') {
+                      //     console.log('fake erase');
+                      //   }
+                      // });                        
+                  }
+                }
+
+              // Keep track of current low and high
+              function updateBounds(mousePos) {
+                  var y = mousePos.y;
+                  if (y < lowY || lowY == undefined) { lowY = y; }
+                  if (y > highY || highY == undefined) { highY = y; console.log("hi = " + y)}
+              }
+
+
+              // Drag in progress
+              stage.on("mousemove", function(){ dragMove(); });
+              stage.on("touchmove", function(){ dragMove(); });
+
+              function dragMove(){
+                  var up = stage.getUserPosition();
+                  // console.log(up.x, up.y);
+                  if (! isInDrawableArea(up.x, up.y)) {
+                    return;
+                  }
+
+                  // console.log('dragMove');
+                  if (mode !== 'draw') {
+                    return;
+                  }
+
+                  if (moving) {
+                      var mousePos = stage.getUserPosition();  // Mouse or touch
+                      var x = mousePos.x;
+                      var y = mousePos.y;
+                      newLinePoints.push(mousePos);
+                      updateBounds(mousePos);
+                      prevPos = mousePos;
+                      
+                      moving = true;
+                      linesLayer.drawScene();
+                  }
+              }
+              
+              // Done dragging
+              stage.on("mouseup", function(){dragComplete();});
+              stage.on("touchend", function(){dragComplete();});
+              
+              function dragComplete(){
+                  console.log('drag complete');
+                  
+                  var up = stage.getUserPosition();
+                  if (! isInDrawableArea(up.x, up.y)) {
+                    return;
+                  }
+
+                  if (mode !== 'draw') {
+                    return;
+                  }
+
+                  moving = false; 
+              }
+
+              function onSaveCanvas() {
+                /*
+                 * since the stage toDataURL() method is asynchronous, we need
+                 * to provide a callback
+                 */
+                stage.toDataURL({
+                  callback: function(dataUrl) {
+                    /*
+                     * here you can do anything you like with the data url.
+                     * In this tutorial we'll just open the url with the browser
+                     * so that you can see the result as an image
+                     */
+                    // localStorage.setItem('imageFromVisit' + imageCount, dataUrl);
+                    createThumbnail('thumbImg' + imageCount, dataUrl);
+                    imageCount++;
+                  }
+                });
+              }
+
+              // Creating thumbnails..
+              // 'canvasImg'
+              function createThumbnail(imgId, dataUrl) {
+                // var dim = 64;
+                // img = document.getElementById(imgId);
+                // img.height = dim;
+                // img.width = dim;
+                // img.src = dataUrl;
+                // // img.setAttribute('onclick', 'loadImageFromPriorVisit("' + dataUrl + '");')
+
+                addHistoryItem('','yellow', dataUrl);
+              }
+
+              // Load 
+              function addHistoryItem(name, color, dataUrl) {
+                if (! dataUrl ) {
+                  var box = new Kinetic.Rect({
+                    x: DRAWABLE_X_MAX,
+                    y: historyYOffset,
+                    width: HISTORY_ITEM_DIM,
+                    height: HISTORY_ITEM_DIM,
+                    fill: color,  // Today
+                    stroke: "black",
+                    strokeWidth: 4,
+                    draggable: false,
+                    // name: 'thumb'
+                  });
+                  updateHistoryBar(box, '');
+                  addText(name);
+                  return;
+                }
+
+                // If there is a dataUrl, then use that image to do fun stuff like create thumbz
+                var imageObj = new Image();
+                imageObj.onload = function() {
+                  var box = createHistoryLink(imageObj);
+                  updateHistoryBar(box, dataUrl);
+                }
+                imageObj.src = dataUrl;
+
+                function createHistoryLink(img) {
+                  var box = new Kinetic.Image({
+                    x: DRAWABLE_X_MAX,
+                    y: historyYOffset,
+                    width: HISTORY_ITEM_DIM,
+                    height: HISTORY_ITEM_DIM,
+                    stroke: "black",
+                    strokeWidth: 4,
+                    image: img
+                    // name: 'thumb'
+                  });
+                  return box;
+                }
+
+                function updateHistoryBar(box, dataUrl) {
+                  controlsLayer.add(box);
+                  controlsLayer.draw();
+                  box.on('click touchstart', function() {
+                    // Reset to current visit
+                    loadImageFromPriorVisit(dataUrl);
+                  });
+                  // box.on('touchstart', function() {
+                  //   // Reset to current visit
+                  //   loadImageFromPriorVisit(dataUrl);
+                  // });
+                  
+                  historyYOffset += HISTORY_ITEM_DIM + (HISTORY_ITEM_DIM / 2);
+                }
+
+                function addText(text) {
+                  console.log('add some text');
+                  var text = new Kinetic.Text({
+                    x: DRAWABLE_X_MAX + 8,
+                    y: historyYOffset - (HISTORY_ITEM_DIM + (HISTORY_ITEM_DIM / 2)) + HISTORY_ITEM_DIM / 3,
+                    fontSize: HISTORY_ITEM_DIM /3,
+                    fontFamily: "ComicSans",
+                    textFill: "white",
+                    text: name
+                  });
+                  text.on('click touchstart', function() {
+                    // Reset to current visit
+                    console.log('tap text');
+                    loadImageFromPriorVisit('');    // TODO: Careful. loads no visit if tapping text.
+                      // Hack just to get this working for "new" button, for now
+                  });
+                  controlsLayer.add(text);
+                  controlsLayer.draw();
+                }
+              }
+
+              addHistoryItem('new', 'green', '');
+
+              function loadImageFromPriorVisit(dataUrl) {
+                console.log('loadImageFromPriorVisit');
+                if (! dataUrl) {
+                  console.log('no data url');
+                  // Reset to draw mode
+                  // console.log(loadedImageLayer.getChildren());
+                  // loadedImageLayer.removeChildren();
+                  // loadedImageLayer.clear();
+                  loadedImageLayer.hide();
+                  // loadedImageLayer.draw();
+
+                  // For now, reset the drawing layers..
+                  // TODO: There may be times when we want to persist ('today in progress') and look
+                  //   back at history
+                  linesLayer.removeChildren();
+                  textLayer.removeChildren();
+                  
+                  highY = DRAWABLE_Y_MIN; // Also reset highY, so that text will appear in correct place relative to doctor handwriting
+                  stage.draw();
+                  return;
+                }
+                
+                
+                var imageObj = new Image();
+                imageObj.onload = function() {
+                  console.log("image loaded");
+                  
+                  var priorVisitImage = new Kinetic.Image({
+                    x: 0,
+                    y: 0,
+                    image: imageObj,
+                    width: stage.getWidth(),
+                    height: stage.getHeight()
+                  });
+                  
+                  loadedImageLayer.add(priorVisitImage);
+                  loadedImageLayer.draw();
+                }
+                imageObj.src = dataUrl;
+
+                loadedImageLayer.show();
+              }
+
+
+              ////////////////////////////////////////////
+              // Add Controls... Pencil, eraser, save   //
+              ////////////////////////////////////////////
+
+              // If there is a dataUrl, then use that image to do fun stuff like create thumbz
+              var pencilImageObj = new Image();
+              pencilImageObj.onload = function() {
+                var box = new Kinetic.Image({
+                  x: CONTROL_BASE_X,
+                  y: CONTROL_BASE_Y,
+                  width: CONTROL_ITEM_DIM,
+                  height: CONTROL_ITEM_DIM,
+                  stroke: "black",
+                  strokeWidth: 1,
+                  image: pencilImageObj
+                });
+                box.on('click touchstart', function() {
+                  mode = "draw";
+                });
+                controlsLayer.add(box);
+                controlsLayer.draw();       
+              }
+              pencilImageObj.src = 'pencil.png';
+
+              var eraserImgObj = new Image();
+              eraserImgObj.onload = function() {
+                var box = new Kinetic.Image({
+                  x: CONTROL_BASE_X,
+                  y: CONTROL_BASE_Y + CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING,
+                  width: CONTROL_ITEM_DIM,
+                  height: CONTROL_ITEM_DIM,
+                  stroke: "black",
+                  strokeWidth: 1,
+                  image: eraserImgObj
+                });
+                box.on('click touchstart', function() {
+                  console.log('disabled, for now, since eraser isnt working');
+                  // mode = "erase";
+                });
+                controlsLayer.add(box);
+                controlsLayer.draw();
+              }
+              eraserImgObj.src = 'eraser.png';
+
+              // var keyboardImgObj = new Image();
+              // keyboardImgObj.onload = function() {
+              //   // var box = createHistoryLink(imageObj);
+              //   // function createHistoryLink(img) {
+              //   var box = new Kinetic.Image({
+              //     x: CONTROL_BASE_X,
+              //     y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*2 + CONTROL_ITEM_SPACING*2,
+              //     width: CONTROL_ITEM_DIM,
+              //     height: CONTROL_ITEM_DIM,
+              //     stroke: "black",
+              //     strokeWidth: 1,
+              //     image: keyboardImgObj
+              //   });
+              //   box.on('click touchstart', function() {
+              //     onAddDiagnosis();
+              //   });
+              //   controlsLayer.add(box);
+              //   controlsLayer.draw();
+              //   // updateHistoryBar(box, handler);
+              // }
+              // keyboardImgObj.src = 'keyboard.png';
+
+              var saveImgObj = new Image();
+              saveImgObj.onload = function() {
+                var box = new Kinetic.Image({
+                  x: CONTROL_BASE_X,
+                  y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*2 + CONTROL_ITEM_SPACING*2,
+                  width: CONTROL_ITEM_DIM,
+                  height: CONTROL_ITEM_DIM,
+                  stroke: "black",
+                  strokeWidth: 1,
+                  image: saveImgObj
+                });
+                box.on('click touchstart', function() {
+                    console.log('tapped save button');
+                  onSaveCanvas();
+                });
+                controlsLayer.add(box);
+                controlsLayer.draw();
+              }
+              saveImgObj.src = 'save.png';
+
+              // // Overlaps with "new" history item. just to help make it easier to understand
+              // var newImgObj = new Image();
+              // newImgObj.onload = function() {
+              //   var box = new Kinetic.Image({
+              //     x: CONTROL_BASE_X,
+              //     y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
+              //     width: CONTROL_ITEM_DIM,
+              //     height: CONTROL_ITEM_DIM,
+              //     stroke: "black",
+              //     strokeWidth: 1,
+              //     image: newImgObj
+              //   });
+              //   box.on('click touchstart', function() {
+              //     onSaveCanvas();
+              //   });
+              //   controlsLayer.add(box);
+              //   controlsLayer.draw();
+              // }
+              // newImgObj.src = 'new.png';
+
+              var plusDiagnosisImgObj = new Image();
+              plusDiagnosisImgObj.onload = function() {
+                var box = new Kinetic.Image({
+                  x: 200,
+                  y: DRAWABLE_Y_MIN - 40,
+                  width: 128,
+                  height: 30,
+                  stroke: "black",
+                  strokeWidth: 2,
+                  image: plusDiagnosisImgObj
+                });
+                box.on('click touchstart', function() {
+                  onAddDiagnosis();
+                });
+                controlsLayer.add(box);
+                controlsLayer.draw();
+              }
+              plusDiagnosisImgObj.src = 'plus_diagnosis.png';
+
+              function onAddDiagnosis() {
+                // Get user input
+                console.log("add diagnosis")
+                // var input = window.prompt("What's the diagnosis?","Tuberculosis");
+                
+                function drawTextAtLowPoint(text) {
+                  console.log("drawTextAtLowPoint");
+                  
+                  // add the shapes to the layer
+                  simpleText.setAttrs({y: highY});
+                  console.log(simpleText);
+                  console.log(simpleText.y);
+                  textLayer.add(simpleText);
+                  complexText.setAttrs({y: highY + 45});
+                  textLayer.add(complexText);
+                  stage.draw();
+                } 
+
+                // inserts a dianosis wherever there's untouched space on canvas
+                drawTextAtLowPoint("FAKE DIAGNOSIS 123");
+                // drawTextAtLowPoint(input);
+              }
+          };
 
 /**
  * Copyright 2012, Raxa
@@ -162,63 +555,27 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
     id: 'drawPanel',
     // requires: ['RaxaEmr.Outpatient.view.patient.Grid', 'RaxaEmr.Outpatient.view.patient.medicationhistory', 'RaxaEmr.Outpatient.view.patient.refertodoc', 'RaxaEmr.Outpatient.view.patient.work', 'RaxaEmr.Outpatient.view.patient.labresulthistory'],
     config: {
-        // title: 'Outpatient Department',
-        // border: true,
-        // cls: 'x-show-contact',
-        // ui: 'round',
-        // id: 'more',
-        // layout: 'vbox',
-        // record: null,
-        // items: [{
-        //     id: 'content',
-        //     tpl: ['<div class="top">', '<div style="float:left;width:50%;">', '<div class="headshot" style="float:left;background-image:url({image});">', '</div>', '<div class="name" style="float:left;width:80%;">', '{display}', '</br>', '<span>From : -- </span>', '</br>', '</div>', '</div>', '<div style="float:left;width:50%;">', '<div class="name_small" style="float:left;width:50%;">', '<span> Age : {age} </span>', '<span>ID : --</span>', '</br>', '</div>', '<div class="name_right" style="float:left;width:50%;">', '<h3>--</h3>', '<span></span>', '</div>', '</div>', '</div>'].join('')
-        // },
-        // {
-        //     xtype: 'vitalsGrid',
-        //     height: 84
-        //     /*border: 10,*/
-        // }, {
-        //     // Canvas area
-        //     xtype: 'container',
             layout: 'hbox',
             // scroll: true,
             items: [{
                 xtype: 'container',
                 id: 'opdPatientDataEntry',
-                width:650,
+                width:STAGE_X,
                 // height:760,
-                height:400,
+                height:STAGE_Y,
                 layout: 'vbox',
                 items: [{
                     scroll: false,
-                    html: ["<div style='position: relative;'>",
-                        "<canvas width='100' height='100' id='canvas2'",
-                        " style='z-index:0;position:absolute;left:0px;top:0px;border:1px dotted;'>",
-                        "Canvas not supported.</canvas>",
-                        "<canvas width='100' height='100' id='canvas1'",
-                        " style='z-index:2;position:absolute;left:0px;top:0px;border:1px dotted;'  >",
-                        "Canvas not supported.</canvas>",
-                        "</div>"].join("")
-                }, {
-                    xtype: 'drug-grid',
-                    id: 'orderedDrugGrid',
-                    height: 250,
-                    border: 10,
+                    html: '<div id="container" ></div>'
+                // }, {
+                //     xtype: 'drug-grid',
+                //     id: 'orderedDrugGrid',
+                //     height: 250,
+                //     border: 10,
                 }],
                 listeners: {
                     painted: function() {
                         console.log("painted");
-                        // eve.talk('inside paited');
-                        // var cc = clickableCanvas();
-                        // cc.setupCanvas();
-                        // cc.canvas.ontouchmove = cc.handleMove;
-                        // cc.canvas.onmousemove = cc.handleMouseMove;
-                        // var cc = clickableCanvas();
-                        var size = Ext.getCmp("opdPatientDataEntry").getSize();
-                        console.log("width", size.width, "height", size.height);
-                        setupCanvas(size.width, size.height);
-                        canvas.ontouchmove = handleMove;
-                        canvas.onmousemove = handleMouseMove;
                     }
                 },
             }, {
@@ -228,72 +585,12 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
                 width: 118,
                 items: [{
                     xtype: 'button',
-                    text: 'Draw',
-                    handler: function() {
-                        activatePen();
-                    }
-                }, {
-                    xtype: 'button',
-                    text: 'Erase',
-                    handler: function() {
-                        activateEraser();
-                    }
-                }, {
-                    xtype: 'button',
                     text: '+ Drug',
                     handler: function () {
                         Ext.getCmp('drugForm').setHidden(false);
                         Ext.getCmp('drugaddform').reset();
                         Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD); // to add more than one treatment
                     }
-                }, {
-                    xtype: 'button',
-                    text: '+ Text',
-                    handler: function () {
-                        drawTextAtLowPoint();
-                    }
-                // }, {
-                //     xtype: 'button',
-                //     text: '+ Lab',
-                // }, {
-                //     xtype: 'button',
-                //     text: 'Drug Hist',
-                // }, {
-                //     xtype: 'button',
-                //     text: 'Lab Hist',
-                // }, {
-                //     // Spacer
-                //     xtype: 'button',
-                //     text: '-',
-                //     disabled: true
-                // }, {
-                //     xtype: 'button',
-                //     text: 'Submit',
-                //     handler: function(b, e) {
-                //         var c = Ext.getCmp('opdPatientDataEntry');
-                //         canvasCount++;
-                //         c.insert(Ext.create('Ext.Container'), {
-                //             scroll: false,
-                //             html: "<canvas id='canvas" +canvasCount + "' width='100' height='100'>Canvas not supported.</canvas>"
-                //         });
-                //         // setupCanvas();
-                //         // canvas.ontouchmove = handleMove;
-                //         // canvas.onmousemove = handleMouseMove;
-
-                //         // var img = canvas.toDataURL();
-
-                //         // alert("Saving to file....not really.");
-                //         /*
-                //         Ext.Ajax.request({
-                //             url: 'canvas-upload.php',
-                //             method: 'POST',
-                //             params: {
-                //                 img: img
-                //             }
-                //         });
-                //         */
-                    // },
-                    // scope: this
                 }]
             }]
         // }],
