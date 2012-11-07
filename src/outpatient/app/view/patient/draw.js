@@ -494,6 +494,10 @@
     // };
 */
 
+    // TODO: Drawing tutorials
+    // - http://jsfiddle.net/NWBV4/10/
+    // - http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+
     var canvas, clicked, ctx, coords, offsetX, offsetY, oldX, oldY, lowY, highY;
     // var CANVAS_BG_COLOR = "rgb(204,204,204)";#cccccc
     var CANVAS_BG_COLOR = "rgb(238,238,238)";   // #eeeeee
@@ -535,7 +539,11 @@
         offsetX = coords.x;
         offsetY = coords.y;
         drawBg(ctx);
+
         activatePen();
+
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';  // Smoothes drawing considerably        
     }
     
     function drawBg() {
@@ -545,7 +553,7 @@
 
     function activateEraser() {
         currentPenColor = CANVAS_BG_COLOR;
-        ctx.lineWidth = 30;
+        ctx.lineWidth = 40;
     }
 
     function activatePen() {
@@ -555,7 +563,6 @@
     
     function drawCircle(x, y) {
         ctx.strokeStyle = currentPenColor;
-        ctx.lineCap = 'round';
         ctx.beginPath();
         if (oldX && oldY) {
             ctx.moveTo(oldX, oldY);
@@ -648,7 +655,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
                 layout: 'vbox',
                 items: [{
                     scroll: false,
-                    html: "<canvas width='100' height='100' id='canvas1'>Canvas not supported.</canvas>"
+                    html: "<canvas width='100' height='100' id='canvas1' style='border:1px dotted;'>Canvas not supported.</canvas>"
                 }, {
                     xtype: 'drug-grid',
                     id: 'orderedDrugGrid',

@@ -41,6 +41,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.work', {
             style: 'background-color: #0f0',
             animation: 'flip',
             flex: 1,
+            activeItem: 1, 
             id: 'maintabs',
             tabBar: {
                 docked: 'left',
