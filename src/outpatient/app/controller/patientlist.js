@@ -1,3 +1,4 @@
+var TEMP_TEST_THINGY = false;
 /**
  * Copyright 2012, Raxa
  *
@@ -191,12 +192,19 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
     //this function starts on the load of the module
     init: function () {
-        // this.getpatientlist();
+        // TODO: Temp
+        if (! TEMP_TEST_THINGY)
+        {
+           this.getpatientlist();
+        }
     }, 
 
     // TODO: Temp
     launch: function () {
-        this.onContactSelect();
+        if (TEMP_TEST_THINGY)
+        {
+            this.onContactSelect();
+        }
     },
 
     //fetches patient list who are screened but not not have an OPD encounter
@@ -286,7 +294,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         }
 
         // TODO: Temp
-        // this.showContact.setRecord(record);
+        if (! TEMP_TEST_THINGY) {
+            this.showContact.setRecord(record);
+        }
         this.getMain().push(this.showContact);
         return;
 
