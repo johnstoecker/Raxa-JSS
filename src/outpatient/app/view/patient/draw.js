@@ -6,8 +6,7 @@
     // - http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
 
     var canvas, clicked, ctx, coords, offsetX, offsetY, oldX, oldY, lowY, highY;
-    // var CANVAS_BG_COLOR = "rgb(204,204,204)";#cccccc
-    var CANVAS_BG_COLOR = "rgb(238,238,238)";   // #eeeeee
+    var CANVAS_BG_COLOR = "rgb(238,238,238)";
     var CANVAS_TRANSPARENT_COLOR = "rgba(255,255,255,)";
     var CANVAS_PEN_COLOR = "rgb(55,55,255)";
     var currentPenColor, currentBgColor;
