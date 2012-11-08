@@ -26,16 +26,39 @@ Ext.define('RaxaEmr.Outpatient.view.patient.more', {
         layout: 'vbox',
         items: [{
             xtype: 'container',
+            height: 96,
             layout: 'hbox',
             items: [{
                 id: 'content',
-                tpl: ['<div class="top">', '<div style="float:left;width:50%;">', '<div class="headshot" style="float:left;background-image:url({image});">', '</div>', '<div class="name" style="float:left;width:80%;">', '{display}', '</br>', '<span>From : -- </span>', '</br>', '</div>', '</div>', '<div style="float:left;width:50%;">', '<div class="name_small" style="float:left;width:50%;">', '<span> Age : {age} </span>', '<span>ID : --</span>', '</br>', '</div>', '<div class="name_right" style="float:left;width:50%;">', '<h3>--</h3>', '<span></span>', '</div>', '</div>', '</div>'].join(''),
+                height: 60,
+                tpl: [
+                    '<div class="top">', 
+                        '<div style="float:left;width:30%;">', 
+                            '<span class="headshot" style="float:left;background-image:url({image});">', 
+                            '</span>', 
+
+                        '</div>', 
+                        '<div style="float:left;width:40%;">', 
+                            '<span class="name" style="float:left;">', 
+                                '{display}', 
+                            '</span>', 
+                        '</div>', 
+                        '<div style="float:left;width:30%;">', 
+                            '<div class="name_small" style="float:left;">', 
+                                '<span>ID : --</span>', 
+                                '<span>Age : {age} </span>', 
+                                '<span>From : -- </span>', 
+                                '</br>', 
+                            '</div>', 
+                        '</div>', 
+                    '</div>'
+                    ].join(''),
                 flex: 1,
                 border: 1,
             }, {
                 xtype: 'vitalsGrid',
                 flex: 1,
-                height: 84,
+                height: 60,
                 border: 1,
             }]
         }, {

@@ -30,7 +30,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
         columns: [{
             header: 'Height',
             dataIndex: 'height',
-            width: '10%',
+            // width: '10%',
             cls: 'centered-cell',
             renderer: function (value, values) {
                 if(value == undefined) {
@@ -42,7 +42,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
         }, {
             header: 'Weight',
             dataIndex: 'weight',
-            width: '10%',
+            // width: '17%',
             cls: 'centered-cell',
             renderer: function (value , values) {
                 if(value == undefined)  {
@@ -55,7 +55,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
         {
             header: 'BMI',
             dataIndex: 'bmi',
-            width: '10%',
+            // width: '17%',
             cls: 'centered-cell',
             renderer: function (value ) {
                 if(value == undefined) {    
@@ -64,9 +64,9 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
             }
         }, 
         {
-            header: 'Blood Pressure',
+            header: 'BP',
             dataIndex: 'bp',
-            width: '20%',
+            // width: '17%',
             cls: 'centered-cell',
             renderer: function (value ) {
                 // TODO: Determine how to pass 2 BMI values into one grid panel
@@ -81,22 +81,22 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
         }, {
             header: 'Pulse',
             dataIndex: 'pulse',
-            width: '20%',
+            // width: '17%',
             cls: 'centered-cell'
         }, {
-            header: 'Respiratory Rate',
+            header: 'RespRate',
             dataIndex: 'resrate',
-            width: '20%',
+            // width: '17%',
             cls: 'centered-cell'
         }, {
-            header: 'Temperature',
+            header: 'Temp',
             dataIndex: 'temp',
-            width: '20%',
+            // width: '17%',
             cls: 'centered-cell'
         }, {
-            header: 'Oxygen Saturation',
+            header: 'O2Sat',
             dataIndex: 'oxysat',
-            width: '20%',
+            // width: '17%',
             cls: 'centered-cell'
         }]
     }
