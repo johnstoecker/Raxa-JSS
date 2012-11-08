@@ -541,8 +541,31 @@ var setupCanvas = function() {
           width: 128,
           height: 30,
           stroke: "black",
-          strokeWidth: 2,
+          strokeWidth: 1,
           image: plusDiagnosisImgObj
+        });
+        box.on('click touchstart', function() {
+            console.log("+ Diagnosis Button is NOT WIRED to the appropriate popup in Sencha.. yet")
+            // TODO: Rewrire to pull up diagnosis window.
+            //  NOTE... there's some naming confusion because i originally wired up the diagnosis
+            //  button to open the medications/prescriptions window
+          // onAddDiagnosis();
+        });
+        controlsLayer.add(box);
+        controlsLayer.draw();
+    }        
+    plusDiagnosisImgObj.src = 'plus_diagnosis.png';
+
+    var plusMedicationImgObj = new Image();
+    plusMedicationImgObj.onload = function() {
+        var box = new Kinetic.Image({
+          x: 350,
+          y: DRAWABLE_Y_MIN - 40,
+          width: 150,
+          height: 30,
+          stroke: "black",
+          strokeWidth: 1,
+          image: plusMedicationImgObj
         });
         box.on('click touchstart', function() {
           onAddDiagnosis();
@@ -550,7 +573,7 @@ var setupCanvas = function() {
         controlsLayer.add(box);
         controlsLayer.draw();
     }        
-    plusDiagnosisImgObj.src = 'plus_diagnosis.png';
+    plusMedicationImgObj.src = 'plus_medication.png';
 
     function onAddDiagnosis() {
         // Get user input

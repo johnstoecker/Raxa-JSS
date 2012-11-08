@@ -48,7 +48,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.more', {
                                 '<span>ID : --</span>', 
                                 '<span>Age : {age} </span>', 
                                 '<span>From : -- </span>', 
-                                '</br>', 
                             '</div>', 
                         '</div>', 
                     '</div>'
