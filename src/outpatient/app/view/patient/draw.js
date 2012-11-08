@@ -16,6 +16,46 @@ Ext.define('KineticToSencha', {
 
   addDiagnosis: function() {
     this.fireEvent('clickAddDiagnosis');
+  },
+
+  saveLoadMask: function() {
+    var mask = function () {
+      console.log('mask off');
+      Ext.getCmp('opdPatientDataEntry').setMasked(false)  
+    }
+    
+    console.log('mask on');
+    Ext.getCmp('opdPatientDataEntry').setMasked({
+      xtype: 'loadmask',
+      message: 'Saving...',
+      modal: true
+    });
+
+    setTimeout (mask, 3000 );
+
+  //   console.log('saveLoadMask');
+
+  //   var p = new Ext.ProgressBar({
+  //      renderTo: 'opdPatientDataEntry'
+  //   });
+
+  //   //Wait for 5 seconds, then update the status el (progress bar will auto-reset)
+  //   var p = Ext.create('Ext.ProgressBar', {
+  //      renderTo: Ext.getBody(),
+  //      width: 300
+  //   });
+
+  //   //Wait for 5 seconds, then update the status el (progress bar will auto-reset)
+  //   p.wait({
+  //      interval: 500, //bar will move fast!
+  //      duration: 30000,
+  //      increment: 15,
+  //      text: 'Saving...',
+  //      scope: this,
+  //      fn: function(){
+  //         p.updateText('Done!');
+  //      }
+  //   });
   }
 });
 
@@ -267,6 +307,7 @@ var setupCanvas = function() {
 
     function onSaveCanvas() {
       // Callback, since the stage toDataURL() method is asynchronous, 
+      k2s.saveLoadMask();
       stage.toDataURL({
         callback: function(dataUrl) {
           addHistoryItem('', 'yellow', dataUrl)
