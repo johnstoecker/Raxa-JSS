@@ -34,7 +34,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.more', {
                 tpl: [
                     '<div class="top">', 
                         '<div style="float:left;width:30%;">', 
-                            '<span class="headshot" style="float:left;background-image:url({image});">', 
+                            '<span class="headshot" style="float:left;background-image:url(headshot.png);">', 
                             '</span>', 
 
                         '</div>', 
@@ -56,9 +56,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.more', {
                 border: 1,
             }, {
                 xtype: 'vitalsGrid',
+                margin: 4,
                 flex: 1,
-                height: 60,
-                border: 1,
+                // border: 1,
+                
             }]
         }, {
             xtype: 'container',

@@ -183,7 +183,7 @@ var setupCanvas = function() {
       console.log('dragStart');
 
       var up = stage.getUserPosition();
-      if (! isInDrawableArea(up.x, up.y)) {
+      if (! up || ! isInDrawableArea(up.x, up.y)) {
         return;
       }
       
@@ -231,7 +231,7 @@ var setupCanvas = function() {
     function dragMove(){
       var up = stage.getUserPosition();
       // console.log(up.x, up.y);
-      if (! isInDrawableArea(up.x, up.y)) {
+      if (! up || ! isInDrawableArea(up.x, up.y)) {
         return;
       }
 
@@ -261,7 +261,7 @@ var setupCanvas = function() {
       console.log('drag complete');
       
       var up = stage.getUserPosition();
-      if (! isInDrawableArea(up.x, up.y)) {
+      if (! up || ! isInDrawableArea(up.x, up.y)) {
         return;
       }
 

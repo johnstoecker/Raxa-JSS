@@ -298,7 +298,12 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             this.showContact.setRecord(record);
         }
         this.getMain().push(this.showContact);
-        return;
+        
+
+        if (TEMP_TEST_THINGY) {
+            return;
+        }
+
 
         // Persist current patient's details
         myRecord = record;
