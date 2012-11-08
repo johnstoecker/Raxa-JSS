@@ -34,7 +34,7 @@ Ext.define('KineticToSencha', {
       modal: true
     });
 
-    setTimeout (mask, 3000 );
+    setTimeout (mask, 4000 );
 
   //   console.log('saveLoadMask');
 
