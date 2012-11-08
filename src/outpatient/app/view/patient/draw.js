@@ -17,7 +17,10 @@ Ext.define('KineticToSencha', {
   addDiagnosis: function() {
     this.fireEvent('clickAddDiagnosis');
   },
-
+  clickDiagnosis: function() {
+      this.fireEvent('clickOnDiagnosis');
+  },
+  
   saveLoadMask: function() {
     var mask = function () {
       console.log('mask off');
@@ -60,6 +63,7 @@ Ext.define('KineticToSencha', {
 });
 
 g_diagnosis_text = "";
+g_diagnosis_list= "";
 
 var k2s = Ext.create('KineticToSencha', {
   listeners: {
@@ -115,7 +119,40 @@ var k2s = Ext.create('KineticToSencha', {
       Ext.getCmp('drugForm').setHidden(false);
       Ext.getCmp('drugaddform').reset();
       Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
-    }
+    },
+    clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
+      // By default, "this" will be the object that fired the event.
+      console.log("k2s: clickOnDiagnosis");
+      // Ext.getCmp('plusDrugButton').fireEvent('tap'); // hack to press a real button and launch its dialog
+      console.log("k2s: NOTE ADDING DIAGNOSES FOR NOW");
+      // Print store. I'll have to pull info from this to print in Canvas
+      // TODO: let's start with just the drug's name..
+      var displayText = "";
+
+      var store = Ext.getStore('diagnosedDisease');
+      var data = store.getData();
+      var itemCount = data.getCount();
+      if(itemCount > 0) {
+        displayText += "Diagnoses: \n";
+      }
+
+      for(var i = 0; i < itemCount; i++) {
+        var itemData = data.getAt(i).getData();
+        console.log(itemData);
+        console.log(itemData.complain || "");
+        displayText += ('* ' + itemData.complain + '\n');
+
+        // return itemData.drugname || "";
+      }
+      console.log('display...', displayText);
+
+      // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
+      g_diagnosis_list = displayText;
+      store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
+      Ext.getCmp('diagnosis-panel').setHidden(false);
+//      Ext.getCmp('drugaddform').reset();
+//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
+    }    
   }
 });
 
@@ -559,11 +596,11 @@ var setupCanvas = function() {
         image: plusDiagnosisImgObj
       });
       box.on('click touchstart', function() {
-        console.log("+ Diagnosis Button is NOT WIRED to the appropriate popup in Sencha.. yet")
+        console.log("Bringing diagnoses modal window.")
         // TODO: Rewrire to pull up diagnosis window.
         //  NOTE... there's some naming confusion because i originally wired up the diagnosis
         //  button to open the medications/prescriptions window
-        // onAddDiagnosis();
+         onClickDiagnosis();
       });
       controlsLayer.add(box);
       controlsLayer.draw();
@@ -588,6 +625,12 @@ var setupCanvas = function() {
       controlsLayer.draw();
     }
     plusMedicationImgObj.src = 'plus_medication.png';
+
+    function onClickDiagnosis() {
+        console.log("add diagnosis");
+        k2s.clickDiagnosis();
+        drawDiagnosis(g_diagnosis_list);
+    }
 
     function onAddDiagnosis() {
       // Get user input
@@ -615,12 +658,19 @@ var setupCanvas = function() {
       // console.log(simpleText);
       // console.log(simpleText.y);
       // textLayer.add(simpleText);
+      if (text.indexOf('Medications')>=0) {
+        bgFill = '#44f';
+      } else if (text.indexOf('Diagnoses')>=0) {
+        bgFill = '#f44';
+      } else {
+        bgFill = '#eee';
+      }
       var complexText = new Kinetic.Text({
         x: 20,
         // y: 60,
-        // stroke: '#555',
-        // strokeWidth: 3,
-        // fill: '#eee',
+        stroke: '#555',
+        strokeWidth: 3,
+        fill: bgFill,
         // text: 'DIAGNOSIS: Tuberculosis',
         // text: 'Medication: \n* Acetominophan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n',
         text: '',
@@ -632,21 +682,25 @@ var setupCanvas = function() {
         // align: 'center',
         align: 'left',
         fontStyle: 'italic',
-        // shadow: {
-        //   color: 'black',
-        //   blur: 1,
-        //   offset: [10, 10],
-        //   opacity: 0.2
-        // },
-        // cornerRadius: 10
+        shadow: {
+            color: 'black',
+            blur: 1,
+            offset: [10, 10],
+            opacity: 0.2
+        },
+        cornerRadius: 10
       });
 
       complexText.setAttrs({
         y: highY,
-        text: text
+        text: text,
+        fill: bgFill
       });
+      console.log(complexText);
       textLayer.add(complexText);
       stage.draw();
+      highY += (complexText.textHeight*complexText.textArr.length+1)+30;
+      
     }
   };
 

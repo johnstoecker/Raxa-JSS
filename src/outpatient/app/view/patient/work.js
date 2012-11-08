@@ -36,30 +36,15 @@ Ext.define('RaxaEmr.Outpatient.view.patient.work', {
         },
         height: 768,
         width: 1024,
-        items: [
-        {
-            xtype: 'tabpanel',
-            // style: 'background-color: #0f0',
-            // animation: 'flip',
-            flex: 1,
-            activeItem: 1, 
-            id: 'maintabs',
-            tabBar: {
-                docked: 'bottom',   // TODO: "hiding this at bottom for now"
-            },
-            items: [{
-                // xtype: 'draw-panel',
-                // title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Notes</div>',
-            // }, {
-            //     xtype: 'examination-panel',
-            //     title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Examination</div>', 
-            // }, {
-            //     xtype: 'diagnosis-panel',
-            //     title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Diagnosis</div>', 
-            // }, {
-                xtype: 'treatment-panel',
-                // title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Treatment</div>', 
-            }],
+        items: [{
+            // xtype: 'draw-panel',
+        // }, {
+        //     xtype: 'examination-panel',
+        // }, {
+             xtype: 'diagnosis-panel',
+             id: 'diagnosis-panel'
+         }, {
+            xtype: 'treatment-panel',
            
         },
         ]

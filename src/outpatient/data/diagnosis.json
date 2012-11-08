@@ -1,16 +1,16 @@
 [
 	{
-		"sign": "DERMATITIS",
+		"sign": "Dermatits",
 		"id": "151700AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "ABSCESS",
+		"sign": "Abscess",
 		"id": "150632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "ANEMIA",
+		"sign": "Anemia",
 		"id": "3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -35,12 +35,12 @@
 		"type": "all"
 	},
 	{
-		"sign": "DEPRESSION",
+		"sign": "Depression",
 		"id": "207AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "HEART DISEASE",
+		"sign": "Heart Disease",
 		"id": "139071AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -70,17 +70,17 @@
 		"type": "all"
 	},	
 	{
-		"sign": "MALARIA",
+		"sign": "Malaria",
 		"id": "906AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "MEASLES",
+		"sign": "Measles",
 		"id": "134561AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "seropositive rheumatoid arthritis, unspecified site",
+		"sign": "Seropositive rheumatoid arthritis, unspecified site",
 		"id": "158794AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -105,23 +105,23 @@
 		"type": "all"
 	},
 	{
-		"sign": "TINEA CORPORIS",
+		"sign": "Tinea Corporis",
 		"id": "835AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	//ABDOMINAL PAIN is in FINDING
 	{
-	        "sign": "ABDOMINAL PAIN",
+	        "sign": "Abdominal Pain",
 		"id": "151AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "CHICKEN POX",
+		"sign": "Chicken Pox",
 		"id": "892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "PREGNANCY",
+		"sign": "Pregnancy",
 		"id": "110896AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -166,7 +166,7 @@
 		"type": "all"
 	},
 	{
-		"sign": "EYE PROBLEM OTHER",
+		"sign": "Eye Problem, Other",
 		"id": "118AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -176,7 +176,7 @@
 		"type": "all"
 	},
 	{
-		"sign": "increased mucus in stool",
+		"sign": "Increased mucus in stool",
 		"id": "156768AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -196,22 +196,22 @@
 		"type": "all"
 	},
 	{
-		"sign": "chronic anemia",
+		"sign": "Chronic anemia",
 		"id": "155551AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "preterm premature rupture of membranes",
+		"sign": "Preterm premature rupture of membranes",
 		"id": "158511AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "headache",
+		"sign": "Headache",
 		"id": "139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "BULLOUS IMPETIGO",
+		"sign": "Bullous Impetigo",
 		"id": "137692AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
@@ -221,12 +221,12 @@
 		"type": "all"
 	},
 	{
-		"sign": "CERVICAL CANCER",
+		"sign": "Cervical Cancer",
 		"id": "116023AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},
 	{
-		"sign": "HANSEN'S DISEASE",
+		"sign": "Hansen's Disease",
 		"id": "890AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
 	},

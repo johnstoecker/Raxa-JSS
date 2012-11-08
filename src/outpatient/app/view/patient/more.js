@@ -71,6 +71,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.more', {
             activeItem: 0,
             items: [{
                 xtype: 'treatment-panel',
+            },{
+                xtype: 'diagnosis-panel'
             }]
         }],
         record: null
