@@ -100,6 +100,7 @@ var CONTROL_BASE_X = DRAWABLE_X_MAX + 8;
 var CONTROL_BASE_Y = DRAWABLE_Y_MIN - 6;
 var CONTROL_ITEM_SPACING = 3;
 var CONTROL_ITEM_DIM = 52;
+var HIGH_Y_OFFSET = 5;  // a little extra space
 
 function isInDrawableArea(myX, myY) {
   up = {
@@ -255,7 +256,7 @@ var setupCanvas = function() {
         lowY = y;
       }
       if(y > highY || highY == undefined) {
-        highY = y;
+        highY = y + HIGH_Y_OFFSET;
         console.log("hi = " + y)
       }
     }
