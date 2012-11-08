@@ -834,16 +834,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         if (Ext.getCmp('drugfilterbysearchfield').getValue()) {
             druglist.getStore().add({
                 drugname: Ext.getCmp('drugfilterbysearchfield').getValue(), //Ext.getCmp('drug-name').getValue(),
-                // strength: Ext.getCmp('drug-strength').getValue(),
-                // instruction: Ext.getCmp('drug-instruction').getValue(),
-                // frequency: Ext.getCmp('drug-frequency').getValue(),
-                // duration: Ext.getCmp('drug-duration').getValue(),
-                // routeofadministration: Ext.getCmp('drug-routeofadministration').getValue()
-                strength: 'fake mg',
-                instruction: 'fake ins',
-                frequency: 'fake freq',
-                duration: 'fake dur',
-                routeofadministration: 'fake route'
+                strength: Ext.getCmp('drug-strength').getValue(),
+                instruction: Ext.getCmp('drug-instruction').getValue(),
+                frequency: Ext.getCmp('drug-frequency').getValue(),
+                duration: Ext.getCmp('drug-duration').getValue(),
+                routeofadministration: Ext.getCmp('drug-routeofadministration').getValue()
+                // strength: 'fake mg',
+                // instruction: 'fake ins',
+                // frequency: 'fake freq',
+                // duration: 'fake dur',
+                // routeofadministration: 'fake route'
             });
 	 
 	    //Drug Form is reset after drug data is pushed into code

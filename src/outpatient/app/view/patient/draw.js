@@ -42,7 +42,28 @@ var k2s = Ext.create('KineticToSencha', {
       for(var i = 0; i < itemCount; i++) {
         var itemData = data.getAt(i).getData();
         console.log(itemData.drugname || "");
-        displayText += ('* ' + itemData.drugname + '\n');
+        
+        if (! itemData.drugname) { continue; }
+
+        displayText += ('* ' + itemData.drugname);
+        var duration = itemData.duration;
+        if(duration) {
+          displayText += (' - ' + duration);
+        }
+
+        var strength = itemData.strength;
+        if(strength) {displayText += (' - ' +strength);}
+        
+        var quantity = itemData.duration;
+        if(quantity) {displayText += (' - ' +quantity);}
+
+        var frequency = itemData.frequency;
+        if(frequency) {displayText += (' - ' +frequency);}
+        
+        var instruction = itemData.instruction;
+        if(instruction) {displayText += (' - ' +instruction);}
+
+        displayText += '\n';
 
         // return itemData.drugname || "";
       }
@@ -555,9 +576,9 @@ var setupCanvas = function() {
       var complexText = new Kinetic.Text({
         x: 20,
         // y: 60,
-        stroke: '#555',
-        strokeWidth: 3,
-        fill: '#eee',
+        // stroke: '#555',
+        // strokeWidth: 3,
+        // fill: '#eee',
         // text: 'DIAGNOSIS: Tuberculosis',
         // text: 'Medication: \n* Acetominophan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n',
         text: '',
@@ -569,13 +590,13 @@ var setupCanvas = function() {
         // align: 'center',
         align: 'left',
         fontStyle: 'italic',
-        shadow: {
-          color: 'black',
-          blur: 1,
-          offset: [10, 10],
-          opacity: 0.2
-        },
-        cornerRadius: 10
+        // shadow: {
+        //   color: 'black',
+        //   blur: 1,
+        //   offset: [10, 10],
+        //   opacity: 0.2
+        // },
+        // cornerRadius: 10
       });
 
       complexText.setAttrs({
