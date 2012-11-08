@@ -150,15 +150,15 @@ var setupCanvas = function() {
     console.log(stage.getWidth(), stage.getHeight());
     var backgroundImage = new Kinetic.Image({
       x: 0,
-      y: 0,
+      y: 1024-880,
       image: imageObj,
       width: stage.getWidth(),
-      height: stage.getHeight()
+      height: 880
     });
     layer.add(backgroundImage);
     layer.draw();
     }
-    var file = "2012.11.07_OPD-Lite_v1.0.jpg";
+    var file = "background-768x880.png";
     imageObj.src = file;
 
     stage.add(layer);
