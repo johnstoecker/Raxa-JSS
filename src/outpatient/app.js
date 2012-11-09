@@ -13,7 +13,7 @@ Ext.application({
     
     models: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign','diagnosis','diagnosedDisease','druglist','Observation', 'PostList'],
     stores: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign','diagnosis','diagnosedDisease','druglist', 'PostLists', 'PatientsList', 'obs'],
-    views: ['Main', 'Viewport'], 
+    views: ['Viewport'], 
     controllers: ['patientlist'],
     
     // views: ['Main'],
