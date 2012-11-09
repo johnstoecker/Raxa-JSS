@@ -33,7 +33,7 @@ Ext.define('Screener.store.Doctors', {
         model: 'Screener.model.Doctor',
         proxy: {
             type: 'ajax',
-            url: 'data/doctors.json',
+            url: 'resources/data/doctors.json',
             reader: 'json'
         },
         autoLoad: true

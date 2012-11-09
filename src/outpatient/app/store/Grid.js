@@ -21,7 +21,7 @@ Ext.define('RaxaEmr.Outpatient.store.Grid', {
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: 'data/property.json'
+            url: 'resources/data/property.json'
         }
     }
 });

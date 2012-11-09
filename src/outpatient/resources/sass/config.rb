@@ -1,21 +1,14 @@
-# $ext_path: This should be the path of where the Sencha touch SDK is installed
-# Generally this will be in a lib/touch folder in your applications root
-# <root>/lib/touch
-$ext_path = "../../../lib/touch"
+# Get the directory that this configuration file exists in
+dir = File.dirname(__FILE__)
 
-# sass_path: the directory the Sass files are in. 
-sass_path = File.dirname(__FILE__)
+# Load the sencha-touch framework automatically.
+load File.join(dir, '..', '..', 'sdk', 'resources', 'themes')
 
-# css_path: the directory you want your CSS files to be.
-css_path = File.join(sass_path, "..", "css")
+# Compass configurations
+sass_path = dir
+css_path = File.join(dir, "..", "css")
 
-# Delinate the images directory
-images_dir = File.join(sass_path, "..", "img")
-
-# output_style: The output style for your compiled CSS
-# nested, expanded, compact, compressed
-output_style = :expanded
-environment = :development
-
-# We need to load in the Ext4 themes folder, which includes all it's default styling, images, variables and mixins
-load File.join(File.dirname(__FILE__), $ext_path, 'resources', 'themes')
+# Require any additional compass plugins here.
+images_dir = File.join(dir, "..", "images")
+output_style = :compressed
+environment = :production

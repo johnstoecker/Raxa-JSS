@@ -23,7 +23,7 @@ Ext.define('RaxaEmr.Outpatient.store.patientlist', {
         sorters: 'firstName',
         proxy: {
             type: 'ajax',
-            url: 'data/patient.json'
+            url: 'resources/data/patient.json'
         }
     }
 });

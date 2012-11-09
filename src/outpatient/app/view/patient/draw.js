@@ -510,7 +510,7 @@ var setupCanvas = function() {
       layer.add(backgroundImage);
       layer.draw();
     }
-    var file = "background-768x880.png";
+    var file = "resources/images/background-768x880.png";
     imageObj.src = file;
 
     // History - Add "Today" to the history list
@@ -521,24 +521,24 @@ var setupCanvas = function() {
         console.log('mode = draw');
         mode = "draw";
       },
-      image: 'pencil.png'
+      image: 'resources/images/pencil.png'
     }, {
       handler: function() {
         console.log('disabled, for now, since eraser isnt working');
         // mode = "erase";
       },
-      image: 'eraser.png'
+      image: 'resources/images/eraser.png'
     },
     // {
     //   handler: function() { console.log('keyboard not implemented');},
-    //   image: 'keyboard.png'
+    //   image: 'resources/images/keyboard.png'
     // },
     {
       handler: function() {
         console.log('tapped save button');
         onSaveCanvas();
       },
-      image: 'save.png'
+      image: 'resources/images/save.png'
     }];
 
     function createControlItem(item, offset) {
@@ -583,7 +583,7 @@ var setupCanvas = function() {
     //   controlsLayer.add(box);
     //   controlsLayer.draw();
     // }
-    // newImgObj.src = 'new.png';
+    // newImgObj.src = 'resources/images/new.png';
     var plusDiagnosisImgObj = new Image();
     plusDiagnosisImgObj.onload = function() {
       var box = new Kinetic.Image({
@@ -605,7 +605,7 @@ var setupCanvas = function() {
       controlsLayer.add(box);
       controlsLayer.draw();
     }
-    plusDiagnosisImgObj.src = 'plus_diagnosis.png';
+    plusDiagnosisImgObj.src = 'resources/images/plus_diagnosis.png';
 
     var plusMedicationImgObj = new Image();
     plusMedicationImgObj.onload = function() {
@@ -624,7 +624,7 @@ var setupCanvas = function() {
       controlsLayer.add(box);
       controlsLayer.draw();
     }
-    plusMedicationImgObj.src = 'plus_medication.png';
+    plusMedicationImgObj.src = 'resources/images/plus_medication.png';
 
     function onClickDiagnosis() {
         console.log("add diagnosis");

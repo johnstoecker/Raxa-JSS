@@ -34,7 +34,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.more', {
                 tpl: [
                     '<div class="top">', 
                         '<div style="float:left;width:30%;">', 
-                            '<span class="headshot" style="float:left;background-image:url(headshot.png);">', 
+                            '<span class="headshot" style="float:left;background-image:url(resources/images/headshot.png);">', 
                             '</span>', 
 
                         '</div>', 
