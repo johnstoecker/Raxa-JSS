@@ -22,7 +22,7 @@ Ext.define('RaxaEmr.Outpatient.store.medicationhistory', {
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: 'data/medicationhistory.json'
+            url: 'resources/data/medicationhistory.json'
         }
     }
 });

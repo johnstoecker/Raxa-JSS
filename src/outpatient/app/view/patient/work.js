@@ -29,36 +29,22 @@ var TABS = {
 Ext.define('RaxaEmr.Outpatient.view.patient.work', {
     extend: 'Ext.Container',
     xtype: 'work',
-    requires: ['RaxaEmr.Outpatient.view.patient.history', 'RaxaEmr.Outpatient.view.patient.examination', 'RaxaEmr.Outpatient.view.patient.dataPanel', 'RaxaEmr.Outpatient.view.patient.treatment', 'RaxaEmr.Outpatient.view.patient.diagnosis'],
+    requires: ['RaxaEmr.Outpatient.view.patient.history', 'RaxaEmr.Outpatient.view.patient.examination', 'RaxaEmr.Outpatient.view.patient.dataPanel', 'RaxaEmr.Outpatient.view.patient.treatment', 'RaxaEmr.Outpatient.view.patient.diagnosis', 'RaxaEmr.Outpatient.view.patient.draw'],
     config: {
         layout: {
             type: 'hbox'
         },
-        height: 490,
-        items: [
-        {
-            xtype: 'tabpanel',
-            style: 'background-color: #0f0',
-            animation: 'flip',
-            flex: 1,
-            id: 'maintabs',
-            tabBar: {
-                docked: 'left',
-            },
-            items: [{
-                xtype: 'history-panel',
-                style: 'background-color:red;',
-                title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">History</div>',
-            }, {
-                xtype: 'examination-panel',
-                title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Examination</div>', 
-            }, {
-                xtype: 'diagnosis-panel',
-                title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Diagnosis</div>', 
-            }, {
-                xtype: 'treatment-panel',
-                title : '<div style ="height:105px;-webkit-transform:rotate(270deg);-moz-transform:rotate(90deg);-o-transform: rotate(90deg);">Treatment</div>', 
-            }],
+        height: 768,
+        width: 1024,
+        items: [{
+            // xtype: 'draw-panel',
+        // }, {
+        //     xtype: 'examination-panel',
+        // }, {
+             xtype: 'diagnosis-panel',
+             id: 'diagnosis-panel'
+         }, {
+            xtype: 'treatment-panel',
            
         },
         ]
