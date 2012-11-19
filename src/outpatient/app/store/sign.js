@@ -20,7 +20,7 @@ Ext.define('RaxaEmr.Outpatient.store.sign', {
         model: 'RaxaEmr.Outpatient.model.sign',
         proxy: {
             type: 'ajax',
-            url: 'data/sign.json',
+            url: 'resources/data/sign.json',
         }
     }
 });
