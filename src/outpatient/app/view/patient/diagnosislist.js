@@ -23,7 +23,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosislist', {
     config: {
         cls: 'x-exam',
         id: 'diagnosisList',
-        hidden: true,
         store: 'diagnosis',
         itemTpl: ['<div id="{id}">', '<strong>{sign}{duration}</strong>', '</div>']
     },

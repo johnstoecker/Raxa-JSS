@@ -22,7 +22,7 @@ Ext.define('RaxaEmr.Outpatient.store.refertodoc', {
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: 'data/refertodoc.json'
+            url: 'resources/data/refertodoc.json'
         }
     }
 });

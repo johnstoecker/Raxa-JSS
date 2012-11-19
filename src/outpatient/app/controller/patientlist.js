@@ -1,3 +1,5 @@
+// TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
+var TEMP_TEST_THINGY = false;
 /**
  * Copyright 2012, Raxa
  *
@@ -191,8 +193,21 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
     //this function starts on the load of the module
     init: function () {
-        this.getpatientlist();
+        // TODO: Temp
+        if (! TEMP_TEST_THINGY)
+        {
+           this.getpatientlist();
+        }
+    }, 
+
+    // TODO: Temp
+    launch: function () {
+        if (TEMP_TEST_THINGY)
+        {
+            this.onContactSelect();
+        }
     },
+
     //fetches patient list who are screened but not not have an OPD encounter
     getpatientlist: function () {
         var d = new Date();
@@ -241,9 +256,17 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             storeId: 'patientStore'
         });
         store_patientList.getProxy().setUrl(this.getPatientListUrl(store_scrEncounter.getData().getAt(0).getData().uuid, store_outEncounter.getData().getAt(0).getData().uuid, localStorage.screenerUuidencountertype));
-        store_patientList.load();
-        store_patientList.on('load', function () {}, this);
-        Ext.getCmp('contact').setStore(store_patientList); //setting store for the patient list
+        store_patientList.load({
+            scope: this,
+            callback: function(records, operation, success){
+                if(success){
+                    Ext.getCmp('contact').setStore(store_patientList);//setting store for the patient list
+                }
+                else{
+                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                }
+            }
+        });
         return store_patientList;
     },
     //for setting the url of the store
@@ -271,8 +294,17 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             this.showContact = Ext.create('RaxaEmr.Outpatient.view.patient.more');
         }
 
-        this.showContact.setRecord(record);
+        // TODO: Temp
+        if (! TEMP_TEST_THINGY) {
+            this.showContact.setRecord(record);
+        }
         this.getMain().push(this.showContact);
+        
+
+        if (TEMP_TEST_THINGY) {
+            return;
+        }
+
 
         // Persist current patient's details
         myRecord = record;
@@ -305,50 +337,56 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         obsStore.getProxy().setUrl(HOST + '/ws/rest/v1/obs?patient=' + myRecord.data.uuid);
         var that = this;
         obsStore.load({
-                callback: function() {
-                    // wait for store to load
-                    console.log(obsStore); 
-                    var obsTypes = ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE'];
-                    item = {};
-                    item.pulse = '-';
-                    item.temp = '-';
-                    item.oxysat = '-';
-                    item.sbp = '-';
-                    item.dbp = '-';
-                    item.resrate = '-';
-                    for (var i=0; i < obsTypes.length; i++) {
-                        var val = getMostRecentObsValue(obsTypes[i], obsStore)
-                        console.log(obsTypes[i] + " is " + val);
-                        // TODO: Will show undefined if no value is found
-                        switch (obsTypes[i]){
-                            case 'PULSE':
-                                item.pulse = val;
-                                break;
-                            case 'TEMPERATURE (C)':
-                                item.temp = val;
-                                break;
-                            case 'BLOOD OXYGEN SATURATION':
-                                item.oxysat = val;
-                                break;
-                            case 'DIASTOLIC BLOOD PRESSURE': 
-                                item.dbp = val;
-                                break;
-                            case 'SYSTOLIC BLOOD PRESSURE':
-                                item.sbp = val;
-                                break;
-                            case 'RESPIRATORY RATE':
-                                item.resrate = val;
-                                break;
-                            default:
-                                break;
+            callback: function(records, operation, success){
+                if(success){
+                        // wait for store to load
+                        console.log(obsStore); 
+                        var obsTypes = ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE'];
+                        item = {};
+                        item.pulse = '-';
+                        item.temp = '-';
+                        item.oxysat = '-';
+                        item.sbp = '-';
+                        item.dbp = '-';
+                        item.resrate = '-';
+                        for (var i=0; i < obsTypes.length; i++) {
+                            var val = getMostRecentObsValue(obsTypes[i], obsStore)
+                            console.log(obsTypes[i] + " is " + val);
+                            // TODO: Will show undefined if no value is found
+                            switch (obsTypes[i]){
+                                case 'PULSE':
+                                    item.pulse = val;
+                                    break;
+                                case 'TEMPERATURE (C)':
+                                    item.temp = val;
+                                    break;
+                                case 'BLOOD OXYGEN SATURATION':
+                                    item.oxysat = val;
+                                    break;
+                                case 'DIASTOLIC BLOOD PRESSURE': 
+                                    item.dbp = val;
+                                    break;
+                                case 'SYSTOLIC BLOOD PRESSURE':
+                                    item.sbp = val;
+                                    break;
+                                case 'RESPIRATORY RATE':
+                                    item.resrate = val;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                    }
-                    item.bp = Ext.String.format('{0} / {1}', item.sbp, item.dbp);
-                    
-                    var vitalsGridStore = Ext.getStore("Grid");
-                    vitalsGridStore.clearData();
-                    vitalsGridStore.add(item);
+                        item.bp = Ext.String.format('{0} / {1}', item.sbp, item.dbp);
+
+                        var vitalsGridStore = Ext.getStore("Grid");
+                        vitalsGridStore.clearData();
+                        vitalsGridStore.add(item);
+                    //do the things here
                 }
+                else{
+                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                }
+            }
         });
     },
 
@@ -428,13 +466,31 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         var docList = Ext.create('Screener.store.Doctors', {
             storeId: 'docStore'
         });
-        docList.load();
-        Ext.getCmp('refToDocPanel').setStore(docList);
+        docList.load({
+            scope: this,
+            callback: function(records, operation, success){
+                if(success){
+                    Ext.getCmp('refToDocPanel').setStore(docList);
+                }
+                else{
+                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                }
+            }
+        });
     },
     //for shorting the patient list
     sortBy: function (obj, listStore) {
         listStore.setSorters(obj);
-        listStore.load();
+        listStore.load({
+            scope: this,
+            callback: function(records, operation, success){
+                if(success){
+                }
+                else{
+                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                }
+            }
+        });
     },
 
     sortByName: function () {
@@ -454,7 +510,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
     
     refreshList: function () {
-        this.getContact().getStore().load();
+        this.getContact().getStore().load({
+            scope: this,
+            callback: function(records, operation, success){
+                if(success){
+                }
+                else{
+                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                }
+            }
+        });
     },
     // for sorting the medication history
     medicationHistorySortByDrugName: function () {
@@ -588,7 +653,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     //for searching in the signlist
     signFilterByOnSearchKeyUp: function (field) {
         Ext.getCmp('signList').setHidden(false);
-        Ext.getCmp('signList').getStore().load();
+        Ext.getCmp('signList').getStore().load({
+            scope: this,
+            callback: function(records, operation, success){
+                if(success){
+                }
+                else{
+                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                }
+            }
+        });
         this.onSearchKeyUp(Ext.getCmp('signList').getStore(), field, 'sign', 'type');
         this.signFilter();
     },
@@ -757,7 +831,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         druglist = Ext.getCmp('orderedDrugGrid');
 	
 	//Drug Form details are pushed to druglist store after validation of fields
-        if (Ext.getCmp('drugfilterbysearchfield').getValue() && Ext.getCmp('drug-strength').getValue() && Ext.getCmp('drug-instruction').getValue() && Ext.getCmp('drug-frequency').getValue() && Ext.getCmp('drug-duration').getValue() && Ext.isNumeric(Ext.getCmp('drug-duration').getValue()) && Ext.getCmp('drug-routeofadministration')) {
+        // if (Ext.getCmp('drugfilterbysearchfield').getValue() && Ext.getCmp('drug-strength').getValue() && Ext.getCmp('drug-instruction').getValue() && Ext.getCmp('drug-frequency').getValue() && Ext.getCmp('drug-duration').getValue() && Ext.isNumeric(Ext.getCmp('drug-duration').getValue()) && Ext.getCmp('drug-routeofadministration')) {
+        if (Ext.getCmp('drugfilterbysearchfield').getValue()) {
             druglist.getStore().add({
                 drugname: Ext.getCmp('drugfilterbysearchfield').getValue(), //Ext.getCmp('drug-name').getValue(),
                 strength: Ext.getCmp('drug-strength').getValue(),
@@ -765,6 +840,11 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 frequency: Ext.getCmp('drug-frequency').getValue(),
                 duration: Ext.getCmp('drug-duration').getValue(),
                 routeofadministration: Ext.getCmp('drug-routeofadministration').getValue()
+                // strength: 'fake mg',
+                // instruction: 'fake ins',
+                // frequency: 'fake freq',
+                // duration: 'fake dur',
+                // routeofadministration: 'fake route'
             });
 	 
 	    //Drug Form is reset after drug data is pushed into code
@@ -783,6 +863,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.getCmp('searchedDrugList').setHidden(true);
         }
     },
+    
     // to submit the drug order
     submitdrugs: function () {
         concept = new Array();
@@ -825,37 +906,44 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             })
             if (order[i].instructions == "") order[i].instructions = "-"
             // here it makes the get call for concept of related drug
-            concept[i].load();
-            // added a counter k which increment as a concept load successfully, after all the concept are loaded
-            // value of k should be equal to the no. of drug forms
-            concept[i].on('load', function () {
-                k = k + 1;
-                // value of k is compared with the no of drug forms
-                if (k == drug_num + 1) {
-                    for (var j = 0; j <= drug_num; j++) {
-                        order[j].concept = concept[j].getAt(0).data.uuid
-                    }
-                    var time = Util.Datetime(startdate, Util.getUTCGMTdiff());
-                    // model for posting the encounter for given drug orders
-                    var encounter = Ext.create('RaxaEmr.Outpatient.model.drugEncounter', {
-                        patient: myRecord.data.uuid,
-                        // this is the encounter for the prescription encounterType
-                        encounterType: localStorage.prescriptionUuidencountertype,
-                        encounterDatetime: time,
-                        provider: localStorage.loggedInUser,
-                        orders: order
-                    })
-                    var encounterStore = Ext.create('RaxaEmr.Outpatient.store.drugEncounter')
-                    encounterStore.add(encounter)
-                    // make post call for encounter
-                    encounterStore.sync()
-                    encounterStore.on('write', function () {
-                        Ext.Msg.alert('successfull')
-                        //Note- if we want add a TIMEOUT it shown added somewhere here
-                    }, this)
+            concept[i].load({
+                scope: this,
+                callback: function(records, operation, success){
+                    if(success){
+                        // added a counter k which increment as a concept load successfully, after all the concept are loaded
+                        // value of k should be equal to the no. of drug forms
+                        k = k + 1;
+                        // value of k is compared with the no of drug forms
+                        if (k == drug_num + 1) {
+                            for (var j = 0; j <= drug_num; j++) {
+                                order[j].concept = concept[j].getAt(0).data.uuid
+                            }
+                            var time = Util.Datetime(startdate, Util.getUTCGMTdiff());
+                            // model for posting the encounter for given drug orders
+                            var encounter = Ext.create('RaxaEmr.Outpatient.model.drugEncounter', {
+                                patient: myRecord.data.uuid,
+                                // this is the encounter for the prescription encounterType
+                                encounterType: localStorage.prescriptionUuidencountertype,
+                                encounterDatetime: time,
+                                provider: localStorage.loggedInUser,
+                                orders: order
+                            })
+                            var encounterStore = Ext.create('RaxaEmr.Outpatient.store.drugEncounter')
+                            encounterStore.add(encounter)
+                            // make post call for encounter
+                            encounterStore.sync()
+                            encounterStore.on('write', function () {
+                                Ext.Msg.alert('successfull')
+                                //Note- if we want add a TIMEOUT it shown added somewhere here
+                            }, this)
 
+                        }
+                    }
+                    else{
+                        Ext.Msg.alert("Error", Util.getMessageLoadError());
+                    }
                 }
-            }, this);
+            });
         }
         druglist.removeAll();
     },

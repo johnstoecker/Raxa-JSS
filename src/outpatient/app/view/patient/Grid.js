@@ -14,7 +14,7 @@
  * the License.
  */
 
- //info about the patient when we click on a patient like weight, height etc. is shown by this grid
+//info about the patient when we click on a patient like weight, height etc. is shown by this grid
  
 Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
     extend: 'Ext.ux.touch.grid.View',
@@ -28,51 +28,77 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
         store: 'Grid',
         scrollable: 'false',
         columns: [{
-                /*header: 'Height',*/
-                /*dataIndex: 'height',*/
-                /*width: '10%',*/
-                /*cls: 'centered-cell',*/
-                /*renderer: function (value, values) {*/
-                /*return '<span>' + value + ' cm' + '</span>';// to change the view of the data feched*/
-                /*}*/
-                /*}, {*/
-                /*header: 'Weight',*/
-                /*dataIndex: 'weight',*/
-                /*width: '10%',*/
-                /*cls: 'centered-cell',*/
-                /*renderer: function (value, values) {*/
-                /*return '<span>' + value + ' kg' + '</span>';// to change the view of the data feched*/
-                /*}*/
-                /*}, {*/
-                /*header: 'BMI',*/
-                /*dataIndex: 'bmi',*/
-                /*width: '10%',*/
-                /*cls: 'centered-cell',*/
-                /*}, {*/
-                header: 'Blood Pressure',
+        //     header: 'Height',
+        //     dataIndex: 'height',
+        //     width: '17%',
+        //     cls: 'centered-cell',
+        //     renderer: function (value, values) {
+        //         if(value == undefined) {
+        //             return '<span>' + "-" + '</span>';
+        //         } else {
+        //             return '<span>' + value + ' cm' + '</span>';
+        //         }// to change the view of the data feched
+        //     }
+        // }, {
+        //     header: 'Weight',
+        //     dataIndex: 'weight',
+        //     width: '17%',
+        //     cls: 'centered-cell',
+        //     renderer: function (value , values) {
+        //         if(value == undefined)  {
+        //             return '<span>' + "-" +'</span>';  
+        //         } else {
+        //             return '<span>' + value + ' kg' + '</span>';
+        //         }// to change the view of the data feched
+        //     }
+        // }, 
+        // {
+        //     header: 'BMI',
+        //     dataIndex: 'bmi',
+        //     width: '17%',
+        //     cls: 'centered-cell',
+        //     renderer: function (value ) {
+        //         if(value == undefined) {    
+        //             return "-";
+        //         }
+        //     }
+        // }, 
+        // {
+            header: 'BP',
             dataIndex: 'bp',
-            width: '20%',
+            width: '25%',
             cls: 'centered-cell',
+            renderer: function (value ) {
+                // TODO: Determine how to pass 2 BMI values into one grid panel
+                if(value == "- / -" || value == undefined ) {
+                    return "-";
+                }
+                else {
+                    // var bmi = 68;
+                    // return Ext.String.format('{0}/{1}', value);
+                    return value;
+                }// to change the view of the data feched
+            }
         }, {
             header: 'Pulse',
             dataIndex: 'pulse',
-            width: '20%',
-            cls: 'centered-cell',
+            width: '17%',
+            cls: 'centered-cell'
         }, {
-            header: 'Respiratory Rate',
+            header: 'RespRate',
             dataIndex: 'resrate',
-            width: '20%',
-            cls: 'centered-cell',
+            width: '25%',
+            cls: 'centered-cell'
         }, {
-            header: 'Temperature',
+            header: 'Temp',
             dataIndex: 'temp',
-            width: '20%',
-            cls: 'centered-cell',
+            width: '17%',
+            cls: 'centered-cell'
         }, {
-            header: 'Oxygen Saturation',
+            header: 'O2Sat',
             dataIndex: 'oxysat',
-            width: '20%',
-            cls: 'centered-cell',
+            width: '16%',
+            cls: 'centered-cell'
         }]
     }
 });

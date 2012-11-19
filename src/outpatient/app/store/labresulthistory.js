@@ -22,7 +22,7 @@ Ext.define('RaxaEmr.Outpatient.store.labresulthistory', {
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: 'data/labresulthistory.json'
+            url: 'resources/data/labresulthistory.json'
         }
     }
 });
