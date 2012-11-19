@@ -6,6 +6,7 @@
 // Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
 Ext.define('KineticToSencha', {
   mixins: ['Ext.mixin.Observable'],
+  id: 'k2s',
   config: {
     fullName: ''
   },
@@ -19,6 +20,7 @@ Ext.define('KineticToSencha', {
   },
   clickDiagnosis: function() {
       this.fireEvent('clickOnDiagnosis');
+      console.log(this);
   },
   
   saveLoadMask: function() {
@@ -65,11 +67,198 @@ Ext.define('KineticToSencha', {
 g_diagnosis_text = "";
 g_diagnosis_list= "";
 
+var order ;
+var obs;
+var DoctorOrderStore;
+var DoctorOrderModel;
+
 var k2s = Ext.create('KineticToSencha', {
+  
+  addOrder: function() {    
+    //set persist of order true as Doctor may not always have a order
+    RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist= true; //6th field in orders (sorted)
+    var drugPanel = Ext.getStore('drugpanel');   
+
+    lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
+
+    for(var i = 0 ; i < lengthOfDrugOrder ; i++)
+    {      
+      var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
+      
+      //Drug Orders here
+      var OrderModel = Ext.create('RaxaEmr.Pharmacy.model.drugOrder', {
+     			patient: myRecord.data.uuid,  //need to set selected patient uuid in localStorage
+			drug: drugPanel.uuid,
+			startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+			autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
+			concept: '---',//   drugPanel.data.uuid, uuid is not currently stored, need to work on how Drug order is added to store
+			dose: drugPanel.frequency,
+			quantity: drugPanel.routeofadministration
+//			type: 
+//			instruction:
+		    });
+      DoctorOrderModel.data.obs.push(OrderModel.data);  
+    }       
+  },
+    
+  addObs: function() {
+    //TODO set persit TRUE if first order 
+ //0   RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
+
+    //TODO set persist FALSE if no item in list
+
+    DoctorOrderModel.data.obs = [];
+    
+    lengthOfDiagnosis = Ext.getCmp('diagnosedList').getStore().data.length;
+
+    for(var i = 0 ; i < lengthOfDiagnosis ; i++)
+    {
+      console.log(Ext.getCmp('diagnosedList').getStore().data.all[i]);
+      
+      var ObsModel = Ext.create('RaxaEmr.Outpatient.model.Observation', {
+			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+			person: myRecord.data.uuid,  //need to set selected patient uuid in localStuiorage
+			concept: Ext.getCmp('diagnosedList').getStore().data.all[i].data.id,
+		    });
+      DoctorOrderModel.data.obs.push(ObsModel.data);  
+    }      
+
+  console.log(DoctorOrderModel);
+    
+  },
+  
+  addDoctorRecordImage: function() {
+  
+    // TODO UNABLE TO access ControlsLayer here
+    // children till 7 are already there and rest goes into 
+    // console.log(controlsLayer.children[8].attrs.image.src)
+
+   // DoctorOrderModel.data.obs = [];
+    //    (document.getElementById('id-of-doctor-form').src)
+    //TODO check all objects of canvas which are saved and then push it as obs 
+    // OR store an array of image which can be sent
+ 
+    //set Image in obs json
+    
+    console.log('checking patient records in stage and copying to DoctorOrder store');
+    
+    for ( var i=0 ; i < stage.getChildren().length ; i++)
+    {  
+      for (var j =0 ; j < stage.getChildren()[i].children.length ; j++)  //j is always 4, but not now.
+      {
+	if(stage.getChildren()[i].children[j].attrs.id=="PatientRecord")
+	{
+	    console.log( stage.getChildren()[i].children[j].attrs.image);
+	 
+	     var ObsModel = Ext.create('RaxaEmr.Outpatient.model.Observation', {
+			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+			person:  myRecord.data.uuid,  //need to set selected patient uuid in localStorage
+			concept: localStorage.patientRecordImageUuidconcept,
+			value: stage.getChildren()[i].children[j].attrs.image.src
+		    });
+	    DoctorOrderModel.data.obs.push(ObsModel.data);  
+	}  
+     }  
+    }
+    console.log(Ext.getStore('DoctorOrder'));
+    
+  },
+  
+  sendDoctorOrderEncounter: function() {
+  
+    // this.addDoctorRecordImage();
+    
+    //sync store after addObs , addDoctorRecordImage and addOrder
+
+    console.log(Ext.getStore('DoctorOrder'));
+    
+  },
+  
+  
+  initStore: function() {
+    
+		DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
+			    
+		DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
+			    uuid: null, 		//need to get myRecord variable of patientlist accessible here, so made it global variable
+							//may need to set it later if new patient is created using DoctorOrder view (currently view/patient/draw.js)
+							//other way is to create method in Controller which returns myRecord.data.uuid
+			    encounterType: localStorage.outUuidencountertype,
+			    encounterDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),   //Should encounterDatetime be time encounter starts or ends?
+			    provider: localStorage.loggedInProvider,
+        });
+				    
+				    
+
+			    DoctorOrderModel.data.obs = [];
+			    DoctorOrderModel.data.orders = [];
+			    console.log(DoctorOrderStore);
+    
+//    this.sendDoctorOrderEncounter();
+  },
+  addDiagnosisTo: function() {
+    
+    
+  },
+  
+
+      printDiagnosis: function() {
+  
+	      // By default, "this" will be the object that fired the event.
+      console.log("k2s: clickOnDiagnosis");
+      // Ext.getCmp('plusDrugButton').fireEvent('tap'); // hack to press a real button and launch its dialog
+      console.log("k2s: NOTE ADDING DIAGNOSES FOR NOW");
+      // Print store. I'll have to pull info from this to print in Canvas
+      // TODO: let's start with just the drug's name..
+      var displayText = "";
+
+      var store = Ext.getStore('diagnosedDisease');
+      var data = store.getData();
+      var itemCount = data.getCount();
+      if(itemCount > 0) {
+        displayText += "Diagnoses: \n";
+      }
+
+      for(var i = 0; i < itemCount; i++) {
+        var itemData = data.getAt(i).getData();
+        console.log(itemData);
+        console.log(itemData.complain || "");
+        displayText += ('* ' + itemData.complain + '\n');
+      }
+      console.log('display...', displayText);
+	
+
+      // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
+      g_diagnosis_list = displayText;
+
+ /*     TODO UI Designers want prev Diagnosis to be showed (with different color ) 
+      store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
+*/
+      Ext.getCmp('diagnosis-panel').setHidden(false);
+//      Ext.getCmp('drugaddform').reset();
+//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
+      
+      console.log(g_diagnosis_list);
+      
+      console.log(this);
+      
+      console.log(drawTextAtLowPoint);
+
+	//drawDiagnosis('text');
+	
+this.drawTextAtLowPoint('Hi');
+      
+    },
+  
+    
+    
+  
+  
   listeners: {
+
     clickAddDiagnosis: function() { // This function will be called when the 'quit' event is fired
       // By default, "this" will be the object that fired the event.
-      console.log("k2s: clickAddDiagnosis");
+      console.log("k2s: clickAddDiagnosis");     console.log(myRecord);
       // Ext.getCmp('plusDrugButton').fireEvent('tap'); // hack to press a real button and launch its dialog
       console.log("k2s: NOTE ADDING DRUGS FOR NOW");
       // Print store. I'll have to pull info from this to print in Canvas
@@ -115,7 +304,12 @@ var k2s = Ext.create('KineticToSencha', {
 
       // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
       g_diagnosis_text = displayText;
+      
+ /*   
+  * 	TODO UI Designers want prev Diagnosis to be showed (with different color    
       store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
+  
+*/      
       Ext.getCmp('drugForm').setHidden(false);
       Ext.getCmp('drugaddform').reset();
       Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
@@ -148,7 +342,10 @@ var k2s = Ext.create('KineticToSencha', {
 
       // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
       g_diagnosis_list = displayText;
+
+ /*     TODO UI Designers want prev Diagnosis to be showed (with different color ) 
       store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
+*/
       Ext.getCmp('diagnosis-panel').setHidden(false);
 //      Ext.getCmp('drugaddform').reset();
 //      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
@@ -193,6 +390,7 @@ function isInDrawableArea(myX, myY) {
   }
 }
 
+stage = new Object;
 
 var setupCanvas = function() {
 
@@ -214,12 +412,12 @@ var setupCanvas = function() {
 
     // Setup stage, upon which all layers are built.
     stage = new Kinetic.Stage({
+      id: "stage",
       container: "container",
       width: STAGE_X,
       height: STAGE_Y
     });
     GloStage = stage;
-
     // Layers
     stage.add(layer);
     stage.add(linesLayer);
@@ -228,7 +426,16 @@ var setupCanvas = function() {
     stage.add(controlsLayer);
 
     moving = false;
-
+    
+    //To allow using stage from outside
+    function getStage() {
+      
+      console.log('accessing getStage function in setupCanvas');
+      
+      return stage;
+      
+    }
+    
     ////////////////////////
     // Event Listeners 
     ////////////////////////
@@ -346,7 +553,7 @@ var setupCanvas = function() {
       // Callback, since the stage toDataURL() method is asynchronous, 
       k2s.saveLoadMask();
       stage.toDataURL({
-        callback: function(dataUrl) {
+        callback: function(dataUrl) { 
           addHistoryItem('', 'yellow', dataUrl)
         }
       });
@@ -400,7 +607,6 @@ var setupCanvas = function() {
 
         // Generates an image from the dataUrl
 
-
         function createHistoryLink(img) {
           var box = new Kinetic.Image({
             x: DRAWABLE_X_MAX,
@@ -409,7 +615,9 @@ var setupCanvas = function() {
             height: HISTORY_ITEM_DIM,
             stroke: "black",
             strokeWidth: 4,
-            image: img
+            image: img,
+	    id: 'PatientRecord'
+            
           });
           return box;
         }
@@ -752,6 +960,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
         painted: function() {
           console.log("painted");
           setupCanvas();
+	  k2s.config.initStore();
         }
       },
       // }, {
