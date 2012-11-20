@@ -4,6 +4,7 @@
 //  - bridges via firing Ext events
 ///////////////////////////////////////////////////////////
 // Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
+var SAVE_LOAD_MASK_MAX_WAIT_TIME = 2000;
 Ext.define('KineticToSencha', {
   mixins: ['Ext.mixin.Observable'],
   id: 'k2s',
@@ -36,7 +37,7 @@ Ext.define('KineticToSencha', {
       modal: true
     });
 
-    setTimeout(mask, 4000);
+    setTimeout(mask, SAVE_LOAD_MASK_MAX_WAIT_TIME);
   }
 });
 
@@ -511,7 +512,6 @@ var setupCanvas = function() {
       }
       if(y > highY || highY == undefined) {
         highY = y + HIGH_Y_OFFSET;
-        console.log("hi = " + y)
       }
     }
 
@@ -559,7 +559,7 @@ var setupCanvas = function() {
               console.log('callback for dataUrl');
             },
           });
-          window.open(dataUrl);
+          // window.open(dataUrl);
           temp_layer.remove();
           // TODO: delete kineticImage?
           addHistoryItem('', 'yellow', dataUrl);
@@ -613,22 +613,13 @@ var setupCanvas = function() {
         // Allows user to load history via Sencha UI
         var visitHistoryStore = Ext.getStore('visitHistoryStore');
         visitHistoryStore.add({
-          title: 'Visit PUSHED',
+          title: 'Visit <x>',
           // date: today
           uuid: 'FAKE-UUID-PUSHED', // TODO: need to save/retrieve from OpenMRS
           diagnosisCount: 0,
           treatmentCount: 0,
-          imagePreview: dataUrl
+          imgSrc: dataUrl
         });
-
-        // TODO: Remove. No longer adding to canvas view. just view sencha modal.
-        // imageObj.onload = function() {
-        //   var box = createHistoryLink(imageObj);
-        //   updateHistoryBar(box, dataUrl);
-        // }
-        // imageObj.src = dataUrl;
-
-        // Generates an image from the dataUrl
 
         function createHistoryLink(img) {
           var box = new Kinetic.Image({
@@ -851,7 +842,7 @@ var setupCanvas = function() {
         // TODO: Rewrire to pull up diagnosis window.
         //  NOTE... there's some naming confusion because i originally wired up the diagnosis
         //  button to open the medications/prescriptions window
-        onClickHistory();
+        // onClickHistory();
       });
       controlsLayer.add(box);
       controlsLayer.draw();
@@ -941,11 +932,11 @@ var setupCanvas = function() {
       drawDiagnosis(g_diagnosis_text);
     }
 
-    function onClickHistory() {
-      // Get user input
-      console.log("history modal")
-      Ext.getCmp('visitHistory').show();
-    }
+    // function onClickHistory() {
+    //   // Get user input
+    //   console.log("history modal")
+    //   Ext.getCmp('visitHistory').show();
+    // }
 
     function drawDiagnosis(text) {
       if(text) {
@@ -956,11 +947,7 @@ var setupCanvas = function() {
     function drawTextAtLowPoint(text) {
       console.log("drawTextAtLowPoint");
 
-      // add the shapes to the layer
-      // simpleText.setAttrs({y: highY});
-      // console.log(simpleText);
-      // console.log(simpleText.y);
-      // textLayer.add(simpleText);
+      // Set background color of text box according to type of text
       if(text.indexOf('Medications') >= 0) {
         bgFill = '#44f';
       } else if(text.indexOf('Diagnoses') >= 0) {
@@ -968,21 +955,17 @@ var setupCanvas = function() {
       } else {
         bgFill = '#eee';
       }
+      
       var complexText = new Kinetic.Text({
         x: 20,
-        // y: 60,
         stroke: '#555',
         strokeWidth: 3,
         fill: bgFill,
-        // text: 'DIAGNOSIS: Tuberculosis',
-        // text: 'Medication: \n* Acetominophan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n',
         text: '',
         fontSize: 14,
         fontFamily: 'Calibri',
         textFill: '#000',
-        // width: 380,
         padding: 10,
-        // align: 'center',
         align: 'left',
         fontStyle: 'italic',
         shadow: {
@@ -1011,45 +994,22 @@ var setupCanvas = function() {
 // Sencha code
 //  - well, it's a glorified canvas, wrapped in Sencha
 ///////////////////////////////////////////////////////////
-/**
- * Copyright 2012, Raxa
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-//the view after clicking one of the patient in the patient list
+
 Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
   extend: 'Ext.Container',
   xtype: 'draw-panel',
   id: 'drawPanel',
-  // requires: ['RaxaEmr.Outpatient.view.patient.Grid', 'RaxaEmr.Outpatient.view.patient.medicationhistory', 'RaxaEmr.Outpatient.view.patient.refertodoc', 'RaxaEmr.Outpatient.view.patient.work', 'RaxaEmr.Outpatient.view.patient.labresulthistory'],
   config: {
     layout: 'hbox',
-    // scroll: true,
     items: [{
       xtype: 'container',
       id: 'opdPatientDataEntry',
       width: STAGE_X,
-      // height:760,
       height: STAGE_Y,
       layout: 'vbox',
       items: [{
         scroll: false,
         html: '<div id="container" ></div>'
-        // }, {
-        //     xtype: 'drug-grid',
-        //     id: 'orderedDrugGrid',
-        //     height: 250,
-        //     border: 10,
       }],
       listeners: {
         painted: function() {
@@ -1058,30 +1018,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
           k2s.config.initStore();
         }
       },
-      // }, {
-      //     // Buttons to navigate while using OPD 
-      //     xtype: 'container',
-      //     id: 'opdPatientDataEntryControls',
-      //     width: 118,
-      //     items: [{
-      //         xtype: 'button',
-      //         text: '+ Drug',
-      //         id: 'plusDrugButton',
-      //         handler: function () {
-      //             Ext.getCmp('drugForm').setHidden(false);
-      //             Ext.getCmp('drugaddform').reset();
-      //             Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD); // to add more than one treatment
-      //         },
-      //     }],
+
     }]
-    // }],
   },
-
-  // updateRecord: function (newRecord) {
-  //     if (newRecord) {
-  //         this.down('#content').setData(newRecord.data);
-  //     }
-  // }
 });
-
-// }());
