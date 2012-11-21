@@ -54,6 +54,7 @@ var k2s = Ext.create('KineticToSencha', {
   addOrder: function() {
     //set persist of order true as Doctor may not always have a order
     RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist = true; //6th field in orders (sorted)
+    // RaxaEmr.Outpatient.model.DoctorOrder.getFields().get('orders').setPersist(true); //6th field in orders (sorted)
     var drugPanel = Ext.getStore('drugpanel');
 
     lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
@@ -596,8 +597,13 @@ var setupCanvas = function() {
           text: name
         });
         text.on('click touchstart', function() {
-          // Reset to current visit
-          loadImageFromPriorVisit('');
+          // Reset the drawable canvas to be blank
+          // Also reset highY, so that text will appear in correct place relative to doctor handwriting
+          // loadedImageLayer.hide();
+          linesLayer.removeChildren();
+          textLayer.removeChildren();
+          highY = DRAWABLE_Y_MIN;
+          stage.draw();
         });
 
         controlsLayer.add(text);
@@ -647,56 +653,6 @@ var setupCanvas = function() {
           });
           historyYOffset += HISTORY_ITEM_DIM + (HISTORY_ITEM_DIM / 2);
         }
-      }
-    }
-
-    // Load - restore image from a previous visit
-    //
-    // Note that this canvas is "in front", so the draw line or text actions can still happen
-    // but they update a layer behind the 'loadedImageLayer'. When we go back, we reset 
-    // the content of the linesLayer and textLayer, so the user doesn't realize that they were 
-    // writing on layers in the background.
-
-    function loadImageFromPriorVisit(dataUrl) {
-      console.log('loadImageFromPriorVisit');
-
-      // Same idea as function addHistoryItem() ... 
-      // if No data URL, then it's the "special" case for "new"
-      if(!dataUrl) {
-        console.log('no data url');
-        
-        // Reset to draw mode
-        loadedImageLayer.hide();
-
-        // TODO: For now, reset the drawing layers.. However, there may be times when we want 
-        //  to persist ('today in progress') and flip back-and-forth between today and history
-        linesLayer.removeChildren();
-        textLayer.removeChildren();
-
-        // Also reset highY, so that text will appear in correct place relative to doctor handwriting
-        highY = DRAWABLE_Y_MIN;
-
-        stage.draw();
-        return;
-      } else {
-        var imageObj = new Image();
-        imageObj.onload = function() {
-          console.log("image loaded");
-
-          var priorVisitImage = new Kinetic.Image({
-            x: 0,
-            y: 0,
-            image: imageObj,
-            width: stage.getWidth(),
-            height: stage.getHeight()
-          });
-
-          loadedImageLayer.add(priorVisitImage);
-          loadedImageLayer.draw();
-        }
-        imageObj.src = dataUrl;
-
-        loadedImageLayer.show();
       }
     }
 
