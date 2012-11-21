@@ -18,6 +18,7 @@ Ext.define('KineticToSencha', {
   addDiagnosis: function() {
     this.fireEvent('clickAddDiagnosis');
   },
+  
   clickDiagnosis: function() {
       this.fireEvent('clickOnDiagnosis');
       console.log(this);
@@ -71,7 +72,7 @@ var order ;
 var obs;
 var DoctorOrderStore;
 var DoctorOrderModel;
-
+var DiagnosisPrinted = 0;
 var k2s = Ext.create('KineticToSencha', {
   
   addOrder: function() {    
@@ -85,7 +86,7 @@ var k2s = Ext.create('KineticToSencha', {
     {      
       var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
       
-      //Drug Orders here
+      //Drug Orders here, TODO: we need to change way drug list is loaded as raxadrug resource pass concept as well as drug uuid
       var OrderModel = Ext.create('RaxaEmr.Pharmacy.model.drugOrder', {
      			patient: myRecord.data.uuid,  //need to set selected patient uuid in localStorage
 			drug: drugPanel.uuid,
@@ -97,7 +98,7 @@ var k2s = Ext.create('KineticToSencha', {
 //			type: 
 //			instruction:
 		    });
-      DoctorOrderModel.data.obs.push(OrderModel.data);  
+      DoctorOrderModel.data.obs.push(OrderModel.data); 
     }       
   },
     
@@ -113,14 +114,15 @@ var k2s = Ext.create('KineticToSencha', {
 
     for(var i = 0 ; i < lengthOfDiagnosis ; i++)
     {
-      console.log(Ext.getCmp('diagnosedList').getStore().data.all[i]);
-      
-      var ObsModel = Ext.create('RaxaEmr.Outpatient.model.Observation', {
+      console.log(Ext.getCmp('diagnosedList').getStore().data.all[i].data);
+      var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
 			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
 			person: myRecord.data.uuid,  //need to set selected patient uuid in localStuiorage
 			concept: Ext.getCmp('diagnosedList').getStore().data.all[i].data.id,
+//			value: Ext.getCmp('diagnosedList').getStore().data.all[i].data.complain
 		    });
-      DoctorOrderModel.data.obs.push(ObsModel.data);  
+      DoctorOrderModel.data.obs.push(ObsModel.raw);  
+      console.log(ObsModel);
     }      
 
   console.log(DoctorOrderModel);
@@ -148,16 +150,23 @@ var k2s = Ext.create('KineticToSencha', {
       {
 	if(stage.getChildren()[i].children[j].attrs.id=="PatientRecord")
 	{
-	    console.log( stage.getChildren()[i].children[j].attrs.image);
+//	  if( stage.getChildren()[i].children[j].attrs.image.src < 65000){    
+	      console.log( stage.getChildren()[i].children[j].attrs.image);
 	 
-	     var ObsModel = Ext.create('RaxaEmr.Outpatient.model.Observation', {
+	     var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
 			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
 			person:  myRecord.data.uuid,  //need to set selected patient uuid in localStorage
-			concept: localStorage.patientRecordImageUuidconcept,
+			concept: localStorage.patientRecordImageUuidconcept, 
 			value: stage.getChildren()[i].children[j].attrs.image.src
 		    });
-	    DoctorOrderModel.data.obs.push(ObsModel.data);  
-	}  
+	    
+	    DoctorOrderModel.data.obs.push(ObsModel.raw);  
+//	}
+//		else {
+//	  Ext.Msg.alert('Error','Can\'t save data on server');
+//		}
+	}
+
      }  
     }
     console.log(Ext.getStore('DoctorOrder'));
@@ -165,12 +174,33 @@ var k2s = Ext.create('KineticToSencha', {
   },
   
   sendDoctorOrderEncounter: function() {
-  
-    // this.addDoctorRecordImage();
     
-    //sync store after addObs , addDoctorRecordImage and addOrder
+    this.addObs();    
+    this.addDoctorRecordImage();
+    //this.addOrder();  //Sending DoctorOrder is not working not
+    
+  //  DoctorOrderModel.data.orders = [];
+    console.log(DoctorOrderStore);
 
+    DoctorOrderModel.data.patient = myRecord.data.uuid;
+    
     console.log(Ext.getStore('DoctorOrder'));
+    
+        DoctorOrderStore.add(DoctorOrderModel);
+	console.log(DoctorOrderStore);
+	
+        //makes the post call for creating the patient
+        DoctorOrderStore.sync({
+            success: function(response, records) {
+	      console.log(arguments);
+	      
+	    },
+            failure: function(response, records) {
+	      console.log(arguments);
+	      
+	    }
+        });
+    
     
   },
   
@@ -180,79 +210,16 @@ var k2s = Ext.create('KineticToSencha', {
 		DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
 			    
 		DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
-			    uuid: null, 		//need to get myRecord variable of patientlist accessible here, so made it global variable
+			   //uuid: 			//need to get myRecord variable of patientlist accessible here, so made it global variable
 							//may need to set it later if new patient is created using DoctorOrder view (currently view/patient/draw.js)
 							//other way is to create method in Controller which returns myRecord.data.uuid
-			    encounterType: localStorage.outUuidencountertype,
+			    encounterType: localStorage.outUuidencountertype,// TODO figure out if should be prescription fill ?
 			    encounterDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),   //Should encounterDatetime be time encounter starts or ends?
 			    provider: localStorage.loggedInProvider,
-        });
+        });				    
 				    
-				    
-
 			    DoctorOrderModel.data.obs = [];
-			    DoctorOrderModel.data.orders = [];
-			    console.log(DoctorOrderStore);
-    
-//    this.sendDoctorOrderEncounter();
   },
-  addDiagnosisTo: function() {
-    
-    
-  },
-  
-
-      printDiagnosis: function() {
-  
-	      // By default, "this" will be the object that fired the event.
-      console.log("k2s: clickOnDiagnosis");
-      // Ext.getCmp('plusDrugButton').fireEvent('tap'); // hack to press a real button and launch its dialog
-      console.log("k2s: NOTE ADDING DIAGNOSES FOR NOW");
-      // Print store. I'll have to pull info from this to print in Canvas
-      // TODO: let's start with just the drug's name..
-      var displayText = "";
-
-      var store = Ext.getStore('diagnosedDisease');
-      var data = store.getData();
-      var itemCount = data.getCount();
-      if(itemCount > 0) {
-        displayText += "Diagnoses: \n";
-      }
-
-      for(var i = 0; i < itemCount; i++) {
-        var itemData = data.getAt(i).getData();
-        console.log(itemData);
-        console.log(itemData.complain || "");
-        displayText += ('* ' + itemData.complain + '\n');
-      }
-      console.log('display...', displayText);
-	
-
-      // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
-      g_diagnosis_list = displayText;
-
- /*     TODO UI Designers want prev Diagnosis to be showed (with different color ) 
-      store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
-*/
-      Ext.getCmp('diagnosis-panel').setHidden(false);
-//      Ext.getCmp('drugaddform').reset();
-//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
-      
-      console.log(g_diagnosis_list);
-      
-      console.log(this);
-      
-      console.log(drawTextAtLowPoint);
-
-	//drawDiagnosis('text');
-	
-this.drawTextAtLowPoint('Hi');
-      
-    },
-  
-    
-    
-  
   
   listeners: {
 
@@ -329,13 +296,13 @@ this.drawTextAtLowPoint('Hi');
       if(itemCount > 0) {
         displayText += "Diagnoses: \n";
       }
-
-      for(var i = 0; i < itemCount; i++) {
+      console.log(DiagnosisPrinted);
+      for(var i = DiagnosisPrinted; i < itemCount; i++) {
         var itemData = data.getAt(i).getData();
         console.log(itemData);
         console.log(itemData.complain || "");
         displayText += ('* ' + itemData.complain + '\n');
-
+	DiagnosisPrinted++;
         // return itemData.drugname || "";
       }
       console.log('display...', displayText);
@@ -409,6 +376,14 @@ var setupCanvas = function() {
     linesLayer = new Kinetic.Layer();
     textLayer = new Kinetic.Layer();
     controlsLayer = new Kinetic.Layer();
+    
+    
+ 
+  /* Recreates stage saved in JSON
+	var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
+        // create node using json string
+        var stage = Kinetic.Node.create(json, 'container');
+*/
 
     // Setup stage, upon which all layers are built.
     stage = new Kinetic.Stage({
@@ -424,17 +399,11 @@ var setupCanvas = function() {
     stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
     stage.add(loadedImageLayer);
     stage.add(controlsLayer);
-
     moving = false;
+
+   
     
-    //To allow using stage from outside
-    function getStage() {
-      
-      console.log('accessing getStage function in setupCanvas');
-      
-      return stage;
-      
-    }
+    
     
     ////////////////////////
     // Event Listeners 
@@ -450,6 +419,14 @@ var setupCanvas = function() {
     });
     stage.on("touchend", function() {
       dragComplete();
+    });
+    stage.on("paintDiagnosis", function() {
+      console.log('printing Diagnosis');
+      k2s.fireEvent('clickOnDiagnosis');
+      Ext.getCmp('diagnosis-panel').setHidden(true);
+      drawDiagnosis(g_diagnosis_list);
+      
+      
     });
 
     ////////////////////////
@@ -555,7 +532,9 @@ var setupCanvas = function() {
       stage.toDataURL({
         callback: function(dataUrl) { 
           addHistoryItem('', 'yellow', dataUrl)
-        }
+        },
+	mimeType : 'image/jpeg',
+	quality  : .3         //Images greater than 50 KB cant be sent as value of a concept
       });
     }
 
@@ -747,6 +726,12 @@ var setupCanvas = function() {
         onSaveCanvas();
       },
       image: 'resources/images/save.png'
+    },{
+      handler: function() {
+        console.log('End OPD VISIT');
+        k2s.config.sendDoctorOrderEncounter();
+      },
+      image: 'resources/images/EndOfOPD.png'
     }];
 
     function createControlItem(item, offset) {
@@ -755,7 +740,7 @@ var setupCanvas = function() {
       pencilImageObj.onload = function() {
         var box = new Kinetic.Image({
           x: CONTROL_BASE_X,
-          y: CONTROL_BASE_Y + offset * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+          y: CONTROL_BASE_Y + offset * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) - 30,
           width: CONTROL_ITEM_DIM,
           height: CONTROL_ITEM_DIM,
           stroke: "black",
@@ -768,13 +753,13 @@ var setupCanvas = function() {
       }
       pencilImageObj.src = item.image;
     }
-
+ 
     createControlItem(controlItems[0], 0);
     createControlItem(controlItems[1], 1);
     createControlItem(controlItems[2], 2);
-
+    createControlItem(controlItems[3], 3);
     // // Overlaps with "new" history item. just to help make it easier to understand
-    // var newImgObj = new Image();
+	// var newImgObj = new Image();
     // newImgObj.onload = function() {
     //   var box = new Kinetic.Image({
     //     x: CONTROL_BASE_X,
@@ -837,7 +822,7 @@ var setupCanvas = function() {
     function onClickDiagnosis() {
         console.log("add diagnosis");
         k2s.clickDiagnosis();
-        drawDiagnosis(g_diagnosis_list);
+//        drawDiagnosis(g_diagnosis_list);
     }
 
     function onAddDiagnosis() {
