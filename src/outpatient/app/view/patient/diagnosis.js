@@ -89,7 +89,14 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                         xtype: 'Diagnosed-List',
                     }]
                 }]
-            }]
+            },{
+			xtype: 'button',
+			text: 'Save',
+			ui: 'confirm',
+			handler: function () {
+					stage.fire('paintDiagnosis');
+				}}
+		]
         }
 //        , {// side buttons for refer to doc nad to add another diagnosis
 //            xtype: 'container',
