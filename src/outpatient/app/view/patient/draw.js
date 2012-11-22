@@ -1,35 +1,32 @@
-// TODO: must be captured in a setupCanvas method, else will try to affect DOM before it's loaded
 ///////////////////////////////////////////////////////////
 // Connection: Kinetic to Sencha
 //  - bridges via firing Ext events
 ///////////////////////////////////////////////////////////
+
 // Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
+var SAVE_LOAD_MASK_MAX_WAIT_TIME = 2000;
 Ext.define('KineticToSencha', {
   mixins: ['Ext.mixin.Observable'],
   id: 'k2s',
   config: {
     fullName: ''
   },
-
   constructor: function(config) {
     this.initConfig(config); // We need to initialize the config options when the class is instantiated
   },
-
-  addDiagnosis: function() {
-    this.fireEvent('clickAddDiagnosis');
+  addMedication: function() {
+    this.fireEvent('clickAddMedication');
   },
   
   clickDiagnosis: function() {
-      this.fireEvent('clickOnDiagnosis');
-      console.log(this);
+    this.fireEvent('clickOnDiagnosis');
   },
-  
   saveLoadMask: function() {
-    var mask = function () {
-      console.log('mask off');
-      Ext.getCmp('opdPatientDataEntry').setMasked(false)  
-    }
-    
+    var mask = function() {
+        console.log('mask off');
+        Ext.getCmp('opdPatientDataEntry').setMasked(false)
+      }
+
     console.log('mask on');
     Ext.getCmp('opdPatientDataEntry').setMasked({
       xtype: 'loadmask',
@@ -37,80 +34,57 @@ Ext.define('KineticToSencha', {
       modal: true
     });
 
-    setTimeout (mask, 4000 );
-
-  //   console.log('saveLoadMask');
-
-  //   var p = new Ext.ProgressBar({
-  //      renderTo: 'opdPatientDataEntry'
-  //   });
-
-  //   //Wait for 5 seconds, then update the status el (progress bar will auto-reset)
-  //   var p = Ext.create('Ext.ProgressBar', {
-  //      renderTo: Ext.getBody(),
-  //      width: 300
-  //   });
-
-  //   //Wait for 5 seconds, then update the status el (progress bar will auto-reset)
-  //   p.wait({
-  //      interval: 500, //bar will move fast!
-  //      duration: 30000,
-  //      increment: 15,
-  //      text: 'Saving...',
-  //      scope: this,
-  //      fn: function(){
-  //         p.updateText('Done!');
-  //      }
-  //   });
+    setTimeout(mask, SAVE_LOAD_MASK_MAX_WAIT_TIME);
   }
 });
 
-g_diagnosis_text = "";
-g_diagnosis_list= "";
-
-var order ;
+// TODO: take these out of global scope
+var g_diagnosis_text = "";
+var g_diagnosis_list = "";
+var order;
 var obs;
 var DoctorOrderStore;
 var DoctorOrderModel;
 var DiagnosisPrinted = 0;
 var k2s = Ext.create('KineticToSencha', {
-  
-  addOrder: function() {    
+
+  addOrder: function() {
     //set persist of order true as Doctor may not always have a order
-    RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist= true; //6th field in orders (sorted)
-    var drugPanel = Ext.getStore('drugpanel');   
+    RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist = true; //6th field in orders (sorted)
+    // RaxaEmr.Outpatient.model.DoctorOrder.getFields().get('orders').setPersist(true); //6th field in orders (sorted)
+    var drugPanel = Ext.getStore('drugpanel');
 
     lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
 
-    for(var i = 0 ; i < lengthOfDrugOrder ; i++)
-    {      
+    for(var i = 0; i < lengthOfDrugOrder; i++) {
       var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
-      
-      //Drug Orders here, TODO: we need to change way drug list is loaded as raxadrug resource pass concept as well as drug uuid
+
+      //Drug Orders here
       var OrderModel = Ext.create('RaxaEmr.Pharmacy.model.drugOrder', {
-     			patient: myRecord.data.uuid,  //need to set selected patient uuid in localStorage
-			drug: drugPanel.uuid,
-			startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
-			concept: '---',//   drugPanel.data.uuid, uuid is not currently stored, need to work on how Drug order is added to store
-			dose: drugPanel.frequency,
-			quantity: drugPanel.routeofadministration
-//			type: 
-//			instruction:
-		    });
-      DoctorOrderModel.data.obs.push(OrderModel.data); 
-    }       
+        patient: myRecord.data.uuid,
+        //need to set selected patient uuid in localStorage
+        drug: drugPanel.uuid,
+        startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+        autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
+        concept: '---',
+        //   drugPanel.data.uuid, uuid is not currently stored, need to work on how Drug order is added to store
+        dose: drugPanel.frequency,
+        quantity: drugPanel.routeofadministration
+        //      type: 
+        //      instruction:
+      });
+      DoctorOrderModel.data.obs.push(OrderModel.data);
+    }
   },
-    
+
   addObs: function() {
     //TODO set persit TRUE if first order 
- //0   RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
-
+    // RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
     //TODO set persist FALSE if no item in list
-
     DoctorOrderModel.data.obs = [];
-    
+
     lengthOfDiagnosis = Ext.getCmp('diagnosedList').getStore().data.length;
+
 
     for(var i = 0 ; i < lengthOfDiagnosis ; i++)
     {
@@ -127,39 +101,35 @@ var k2s = Ext.create('KineticToSencha', {
 
   console.log(DoctorOrderModel);
     
+
   },
-  
+
   addDoctorRecordImage: function() {
-  
+
     // TODO UNABLE TO access ControlsLayer here
     // children till 7 are already there and rest goes into 
     // console.log(controlsLayer.children[8].attrs.image.src)
-
-   // DoctorOrderModel.data.obs = [];
+    // DoctorOrderModel.data.obs = [];
     //    (document.getElementById('id-of-doctor-form').src)
     //TODO check all objects of canvas which are saved and then push it as obs 
     // OR store an array of image which can be sent
- 
     //set Image in obs json
-    
     console.log('checking patient records in stage and copying to DoctorOrder store');
-    
-    for ( var i=0 ; i < stage.getChildren().length ; i++)
-    {  
-      for (var j =0 ; j < stage.getChildren()[i].children.length ; j++)  //j is always 4, but not now.
+  
+    var PatientRecordHistory = Ext.getStore('visitHistoryStore').getData();
+
+      for(var j = 0; j < Ext.getStore('visitHistoryStore').getData().all.length; j++) //j is always 4, but not now.
       {
-	if(stage.getChildren()[i].children[j].attrs.id=="PatientRecord")
+	if(PatientRecordHistory.all[j].data.id=="PatientRecord")
 	{
-//	  if( stage.getChildren()[i].children[j].attrs.image.src < 65000){    
-	      console.log( stage.getChildren()[i].children[j].attrs.image);
+//	  if( PatientRecordHistory.all[j].imgSrc.length < 65000){   
 	 
 	     var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
 			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
 			person:  myRecord.data.uuid,  //need to set selected patient uuid in localStorage
 			concept: localStorage.patientRecordImageUuidconcept, 
-			value: stage.getChildren()[i].children[j].attrs.image.src
-		    });
-	    
+			value: PatientRecordHistory.all[j].data.imgSrc
+		    });	    
 	    DoctorOrderModel.data.obs.push(ObsModel.raw);  
 //	}
 //		else {
@@ -168,12 +138,14 @@ var k2s = Ext.create('KineticToSencha', {
 	}
 
      }  
-    }
+
     console.log(Ext.getStore('DoctorOrder'));
-    
+
   },
-  
+
+  // <Comment describing>
   sendDoctorOrderEncounter: function() {
+//<<<<<<< HEAD
     
     this.addObs();    
     this.addDoctorRecordImage();
@@ -203,9 +175,10 @@ var k2s = Ext.create('KineticToSencha', {
     
     
   },
-  
-  
+
+  // <Comment describing>
   initStore: function() {
+
     
 		DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
 			    
@@ -221,17 +194,14 @@ var k2s = Ext.create('KineticToSencha', {
 			    DoctorOrderModel.data.obs = [];
   },
   
+
+
   listeners: {
-
-    clickAddDiagnosis: function() { // This function will be called when the 'quit' event is fired
+    clickAddMedication: function() { // This function will be called when the 'quit' event is fired
       // By default, "this" will be the object that fired the event.
-      console.log("k2s: clickAddDiagnosis");     console.log(myRecord);
-      // Ext.getCmp('plusDrugButton').fireEvent('tap'); // hack to press a real button and launch its dialog
-      console.log("k2s: NOTE ADDING DRUGS FOR NOW");
-      // Print store. I'll have to pull info from this to print in Canvas
-      // TODO: let's start with just the drug's name..
-      var displayText = "";
+      console.log("k2s: clickAddMedication");
 
+      var displayText = "";
       var store = Ext.getStore('drugpanel');
       var data = store.getData();
       var itemCount = data.getCount();
@@ -241,27 +211,39 @@ var k2s = Ext.create('KineticToSencha', {
 
       for(var i = 0; i < itemCount; i++) {
         var itemData = data.getAt(i).getData();
-        console.log(itemData.drugname || "");
-        
-        if (! itemData.drugname) { continue; }
 
-        displayText += ('* ' + itemData.drugname);
+        // TODO: Consolidate following code into loop
+        if(!itemData.drugname) {
+          // If no drug name, skip to next loop iteration
+          continue;
+        } else {
+          displayText += ('* ' + itemData.drugname);
+        }
+
         var duration = itemData.duration;
         if(duration) {
           displayText += (' - ' + duration);
         }
 
         var strength = itemData.strength;
-        if(strength) {displayText += (' - ' +strength);}
-        
+        if(strength) {
+          displayText += (' - ' + strength);
+        }
+
         var quantity = itemData.duration;
-        if(quantity) {displayText += (' - ' +quantity);}
+        if(quantity) {
+          displayText += (' - ' + quantity);
+        }
 
         var frequency = itemData.frequency;
-        if(frequency) {displayText += (' - ' +frequency);}
-        
+        if(frequency) {
+          displayText += (' - ' + frequency);
+        }
+
         var instruction = itemData.instruction;
-        if(instruction) {displayText += (' - ' +instruction);}
+        if(instruction) {
+          displayText += (' - ' + instruction);
+        }
 
         displayText += '\n';
 
@@ -271,25 +253,20 @@ var k2s = Ext.create('KineticToSencha', {
 
       // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
       g_diagnosis_text = displayText;
-      
- /*   
-  * 	TODO UI Designers want prev Diagnosis to be showed (with different color    
-      store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
-  
-*/      
+
+
+      //TODO UI Designers want prev Diagnosis to be showed (with different color    
+      // store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
+
       Ext.getCmp('drugForm').setHidden(false);
       Ext.getCmp('drugaddform').reset();
-      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
+      // Ext.getCmp('treatment-panel').setActiveItem(0);
     },
-    clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
-      // By default, "this" will be the object that fired the event.
-      console.log("k2s: clickOnDiagnosis");
-      // Ext.getCmp('plusDrugButton').fireEvent('tap'); // hack to press a real button and launch its dialog
-      console.log("k2s: NOTE ADDING DIAGNOSES FOR NOW");
-      // Print store. I'll have to pull info from this to print in Canvas
-      // TODO: let's start with just the drug's name..
-      var displayText = "";
 
+    clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
+      console.log("k2s: clickOnDiagnosis");
+      // Print store. I'll have to pull info from this to print in Canvas
+      var displayText = "";
       var store = Ext.getStore('diagnosedDisease');
       var data = store.getData();
       var itemCount = data.getCount();
@@ -299,10 +276,9 @@ var k2s = Ext.create('KineticToSencha', {
       console.log(DiagnosisPrinted);
       for(var i = DiagnosisPrinted; i < itemCount; i++) {
         var itemData = data.getAt(i).getData();
-        console.log(itemData);
-        console.log(itemData.complain || "");
         displayText += ('* ' + itemData.complain + '\n');
 	DiagnosisPrinted++;
+
         // return itemData.drugname || "";
       }
       console.log('display...', displayText);
@@ -310,13 +286,13 @@ var k2s = Ext.create('KineticToSencha', {
       // TODO: Trigger refresh of Kinetic UI ... drug list should be updated
       g_diagnosis_list = displayText;
 
- /*     TODO UI Designers want prev Diagnosis to be showed (with different color ) 
+      /*     TODO UI Designers want prev Diagnosis to be showed (with different color ) 
       store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
 */
       Ext.getCmp('diagnosis-panel').setHidden(false);
-//      Ext.getCmp('drugaddform').reset();
-//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
-    }    
+      //      Ext.getCmp('drugaddform').reset();
+      //      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
+    }
   }
 });
 
@@ -341,7 +317,7 @@ var CONTROL_BASE_X = DRAWABLE_X_MAX + 8;
 var CONTROL_BASE_Y = DRAWABLE_Y_MIN - 6;
 var CONTROL_ITEM_SPACING = 3;
 var CONTROL_ITEM_DIM = 52;
-var HIGH_Y_OFFSET = 5;  // a little extra space
+var HIGH_Y_OFFSET = 5; // a little extra space
 
 function isInDrawableArea(myX, myY) {
   up = {
@@ -371,7 +347,7 @@ var setupCanvas = function() {
 
     var historyYOffset = HISTORY_BASE_Y;
 
-    layer = new Kinetic.Layer();
+    backgroundLayer = new Kinetic.Layer();
     loadedImageLayer = new Kinetic.Layer(); // For re-loaded thumbs
     linesLayer = new Kinetic.Layer();
     textLayer = new Kinetic.Layer();
@@ -392,19 +368,15 @@ var setupCanvas = function() {
       width: STAGE_X,
       height: STAGE_Y
     });
-    GloStage = stage;
+
     // Layers
-    stage.add(layer);
+    stage.add(backgroundLayer);
     stage.add(linesLayer);
     stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
     stage.add(loadedImageLayer);
     stage.add(controlsLayer);
     moving = false;
 
-   
-    
-    
-    
     ////////////////////////
     // Event Listeners 
     ////////////////////////
@@ -432,9 +404,8 @@ var setupCanvas = function() {
     ////////////////////////
     // Event Handlers
     ////////////////////////
+
     // First touch or click starts a drag event
-
-
     function dragStart() {
       // console.log('dragStart');
       var up = stage.getUserPosition();
@@ -444,7 +415,7 @@ var setupCanvas = function() {
 
       if(moving) {
         moving = false;
-        layer.draw();
+        backgroundLayer.draw();
       } else {
         newLinePoints = [];
         prevPos = stage.getUserPosition(); // Mouse or touch
@@ -460,8 +431,6 @@ var setupCanvas = function() {
     }
 
     // While user holding down the mouse clicker or touch, continue dragging
-
-
     function dragMove() {
       var up = stage.getUserPosition();
       // console.log(up.x, up.y);
@@ -488,8 +457,6 @@ var setupCanvas = function() {
     }
 
     // On release of mouse or touch, done dragging
-
-
     function dragComplete() {
       console.log('drag complete');
 
@@ -509,8 +476,6 @@ var setupCanvas = function() {
     // has already added content onto the canvas. The idea is that we want to add
     // structured data (diagnoses, prescriptions, ...) into blank areas on the 
     // canvas where the user hasn't yet written.
-
-
     function updateBounds(mousePos) {
       var y = mousePos.y;
       if(y < lowY || lowY == undefined) {
@@ -518,152 +483,83 @@ var setupCanvas = function() {
       }
       if(y > highY || highY == undefined) {
         highY = y + HIGH_Y_OFFSET;
-        console.log("hi = " + y)
       }
     }
 
     // SAVING 
+
     // Save - event handler
-
-
     function onSaveCanvas() {
       // Callback, since the stage toDataURL() method is asynchronous, 
       k2s.saveLoadMask();
-      stage.toDataURL({
-        callback: function(dataUrl) { 
-          addHistoryItem('', 'yellow', dataUrl)
-        },
-	mimeType : 'image/jpeg',
-	quality  : .3         //Images greater than 50 KB cant be sent as value of a concept
-      });
+      saveDrawableCanvas();
     }
 
-    // Save - helper, creates history bar items one-by-one
+    // Save - saves just "drawable" portion of canvas
+    function saveDrawableCanvas() {
+      // TODO: Hide/show paper layer when creating dataURL "screenshot"?
+      // backgroundLayer.hide();
 
-
-    function addHistoryItem(name, color, dataUrl) {
-      // if No data URL, then it's the "special" case for "today"
-      if(!dataUrl) {
-        var box = new Kinetic.Rect({
-          x: DRAWABLE_X_MAX,
-          y: historyYOffset,
-          width: HISTORY_ITEM_DIM,
-          height: HISTORY_ITEM_DIM,
-          fill: color,
-          stroke: "black",
-          strokeWidth: 4,
-          draggable: false,
-        });
-        updateHistoryBar(box, '');
-
-        // Add text that says "Today"
-        var text = new Kinetic.Text({
-          x: DRAWABLE_X_MAX + 8,
-          y: historyYOffset - (HISTORY_ITEM_DIM + (HISTORY_ITEM_DIM / 2)) + HISTORY_ITEM_DIM / 3,
-          fontSize: HISTORY_ITEM_DIM / 3,
-          fontFamily: "ComicSans",
-          textFill: "white",
-          text: name
-        });
-        text.on('click touchstart', function() {
-          // Reset to current visit
-          loadImageFromPriorVisit('');
-        });
-
-        controlsLayer.add(text);
-        controlsLayer.draw();
-
-        return;
-      } else {
-        // TODO: This code is slow. Generating fns in-line is inefficient? DataUrl is slow?
-        // If there is a dataUrl, then use that image to create thumb, linking to previous visit
-        var imageObj = new Image();
-        imageObj.onload = function() {
-          var box = createHistoryLink(imageObj);
-          updateHistoryBar(box, dataUrl);
-        }
-        imageObj.src = dataUrl;
-
-        // Generates an image from the dataUrl
-
-        function createHistoryLink(img) {
-          var box = new Kinetic.Image({
-            x: DRAWABLE_X_MAX,
-            y: historyYOffset,
-            width: HISTORY_ITEM_DIM,
-            height: HISTORY_ITEM_DIM,
-            stroke: "black",
-            strokeWidth: 4,
-            image: img,
-	    id: 'PatientRecord'
-            
-          });
-          return box;
-        }
-
-        // Takes image from the dataUrl
-
-
-        function updateHistoryBar(box, dataUrl) {
-          controlsLayer.add(box);
-          controlsLayer.draw();
-          box.on('click touchstart', function() {
-            // Reset to current visit
-            loadImageFromPriorVisit(dataUrl);
-          });
-          historyYOffset += HISTORY_ITEM_DIM + (HISTORY_ITEM_DIM / 2);
-        }
-      }
-    }
-
-    // Load - restore image from a previous visit
-    //
-    // Note that this canvas is "in front", so the draw line or text actions can still happen
-    // but they update a layer behind the 'loadedImageLayer'. When we go back, we reset 
-    // the content of the linesLayer and textLayer, so the user doesn't realize that they were 
-    // writing on layers in the background.
-
-
-    function loadImageFromPriorVisit(dataUrl) {
-      console.log('loadImageFromPriorVisit');
-
-      // Same idea as function addHistoryItem() ... 
-      // if No data URL, then it's the "special" case for "today"
-      if(!dataUrl) {
-        console.log('no data url');
-        // Reset to draw mode
-        loadedImageLayer.hide();
-
-        // 
-        // TODO: For now, reset the drawing layers.. However, there may be times when we want 
-        //  to persist ('today in progress') and flip back-and-forth between today and history
-        linesLayer.removeChildren();
-        textLayer.removeChildren();
-
-        // Also reset highY, so that text will appear in correct place relative to doctor handwriting
-        highY = DRAWABLE_Y_MIN;
-
-        stage.draw();
-        return;
-      } else {
-        var imageObj = new Image();
-        imageObj.onload = function() {
-          console.log("image loaded");
-
-          var priorVisitImage = new Kinetic.Image({
+      // Convert stage to image. From image, create KineticImage and crop to "drawable" portion
+      stage.toImage({
+        callback: function(i) { i.id= "PatientRecord" ; console.log(i);
+          kineticImage = new Kinetic.Image({
+            image: i,
             x: 0,
             y: 0,
-            image: imageObj,
-            width: stage.getWidth(),
-            height: stage.getHeight()
+	    id : 'PatientRecord',
+            crop: {
+              x: DRAWABLE_X_MIN,
+              y: DRAWABLE_Y_MIN,
+              width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+              height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+            }
           });
 
-          loadedImageLayer.add(priorVisitImage);
-          loadedImageLayer.draw();
+          // Create a temp layer and add the "screenshot" image. If it's not added to a layer,
+          // or added to the stage, then Kinetic won't allow you to call toDataUrl() on it.
+          var temp_layer = new Kinetic.Layer();
+          temp_layer.add(kineticImage);
+          stage.add(temp_layer);
+          var dataUrl = kineticImage.toDataURL({
+            callback: function(dataUrl) {
+              console.log('callback for dataUrl');
+            },
+	    mimeType : 'image/jpeg',
+	    quality  : .3  
+          });
+          
+          // Delete temp layer
+          temp_layer.remove();
+          addHistoryItem('', 'yellow', dataUrl);
+          // TODO: delete kineticImage?
+          // backgroundLayer.show();
         }
-        imageObj.src = dataUrl;
+      });
 
-        loadedImageLayer.show();
+    }
+
+    // Save - helper, adds items to history store (list is visible in history view)
+
+    function addHistoryItem(name, color, dataUrl) {
+      // if No data URL, then it's the "special" case for "new"
+      if(!dataUrl) {
+        return ;
+      } else {
+        
+        // If there is a dataUrl, then use that image to create thumb, linking to previous visit
+        // Keep track of all history Images; allows user to load history via Sencha UI
+        var visitHistoryStore = Ext.getStore('visitHistoryStore');
+        visitHistoryStore.add({
+          title: 'Visit <x>',
+          // date: today
+          uuid: 'FAKE-UUID-PUSHED',
+          // TODO: need to save/retrieve from OpenMRS
+          diagnosisCount: 0,
+          treatmentCount: 0,
+          imgSrc: dataUrl,
+	  id: 'PatientRecord'
+        }); console.log(visitHistoryStore);
       }
     }
 
@@ -680,7 +576,7 @@ var setupCanvas = function() {
       height: stage.getHeight(),
       fill: "white"
     });
-    layer.add(background);
+    backgroundLayer.add(background);
 
     // Background - image of OPD-lite: paper, inactive (currently) buttons, etc
     var imageObj = new Image();
@@ -694,57 +590,221 @@ var setupCanvas = function() {
         width: stage.getWidth(),
         height: 880
       });
-      layer.add(backgroundImage);
-      layer.draw();
+      backgroundLayer.add(backgroundImage);
+      backgroundLayer.draw();
     }
     var file = "resources/images/background-768x880.png";
     imageObj.src = file;
-
-    // History - Add "Today" to the history list
-    addHistoryItem('new', 'green', '');
-
+/*
     var controlItems = [{
+      // Pencil (Draw mode)
+      image: 'resources/images/pencil.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 0 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
       handler: function() {
         console.log('mode = draw');
         mode = "draw";
-      },
-      image: 'resources/images/pencil.png'
+      }
     }, {
+      // Eraser (Erase mode)
+      image: 'resources/images/eraser.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 1 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
       handler: function() {
         console.log('disabled, for now, since eraser isnt working');
         // mode = "erase";
-      },
-      image: 'resources/images/eraser.png'
-    },
-    // {
-    //   handler: function() { console.log('keyboard not implemented');},
-    //   image: 'resources/images/keyboard.png'
-    // },
-    {
+      }
+    }, {
+
+      //   handler: function() { console.log('keyboard not implemented');},
+      //   image: 'resources/images /keyboard.png'
+      // }, {
+      // Save
+      image: 'resources/images/save.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 2 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
       handler: function() {
         console.log('tapped save button');
         onSaveCanvas();
       },
       image: 'resources/images/save.png'
     },{
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
       handler: function() {
-        console.log('End OPD VISIT');
+	console.log('End OPD VISIT');
         k2s.config.sendDoctorOrderEncounter();
       },
       image: 'resources/images/EndOfOPD.png'
+    }, {
+      // Add diagnosis
+      image: 'resources/images/plus_diagnosis.png',
+      x: 200,
+      y: DRAWABLE_Y_MIN - 40,
+      width: 128,
+      height: 30,
+      handler: function() {
+        console.log("Bringing diagnoses modal window.")
+        onClickDiagnosis();
+      }
+    }, {
+      // Add medication
+      image: 'resources/images/plus_medication.png',
+      x: 350,
+      y: DRAWABLE_Y_MIN - 40,
+      width: 150,
+      height: 30,
+      handler: function() {
+        onClickMedication();
+      }
+    }, {
+      // Add investigation
+      image: 'resources/images/plus_investigation.png',
+      x: 514,
+      y: DRAWABLE_Y_MIN - 40,
+      width: 182,
+      height: 30,
+      handler: function() {
+        console.log('INVESTIGATIONS: TODO');
+      }
+    }, {
+      // New
+      image: 'resources/images/new.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+          // Reset the drawable canvas to be blank
+          // Also reset highY, so that text will appear in correct place relative to doctor handwriting
+          // loadedImageLayer.hide();
+          linesLayer.removeChildren();
+          textLayer.removeChildren();
+          highY = DRAWABLE_Y_MIN;
+          stage.draw();
+      }
+    }];
+ */   
+
+        var controlItems = [{
+      // Pencil (Draw mode)
+      image: 'resources/images/pencil.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 0 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+        console.log('mode = draw');
+        mode = "draw";
+      }
+    }, {
+      // Eraser (Erase mode)
+      image: 'resources/images/eraser.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 1 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+        console.log('disabled, for now, since eraser isnt working');
+        // mode = "erase";
+      }
+    }, {
+
+      //   handler: function() { console.log('keyboard not implemented');},
+      //   image: 'resources/images /keyboard.png'
+      // }, {
+      // Save
+      image: 'resources/images/save.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 2 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+        console.log('tapped save button');
+        onSaveCanvas();
+      },
+    } , {
+      //Temp: Sending OPD Encounter
+      image: 'resources/images/EndOfOPD.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + 4 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+        console.log('sending Doctor Encounter');
+        k2s.config.sendDoctorOrderEncounter();
+	//TODO Move to patientlist and clear canvas
+      },
+    }, {
+      // Add diagnosis
+      image: 'resources/images/plus_diagnosis.png',
+      x: 200,
+      y: DRAWABLE_Y_MIN - 40,
+      width: 128,
+      height: 30,
+      handler: function() {
+        console.log("Bringing diagnoses modal window.")
+        onClickDiagnosis();
+      }
+    }, {
+      // Add medication
+      image: 'resources/images/plus_medication.png',
+      x: 350,
+      y: DRAWABLE_Y_MIN - 40,
+      width: 150,
+      height: 30,
+      handler: function() {
+        onClickMedication();
+      }
+    }, {
+      // Add investigation
+      image: 'resources/images/plus_investigation.png',
+      x: 514,
+      y: DRAWABLE_Y_MIN - 40,
+      width: 182,
+      height: 30,
+      handler: function() {
+        console.log('INVESTIGATIONS: TODO');
+      }
+    }, {
+      // New
+      image: 'resources/images/new.png',
+      x: CONTROL_BASE_X,
+      y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+          // Reset the drawable canvas to be blank
+          // Also reset highY, so that text will appear in correct place relative to doctor handwriting
+          // loadedImageLayer.hide();
+          linesLayer.removeChildren();
+          textLayer.removeChildren();
+          highY = DRAWABLE_Y_MIN;
+          stage.draw();
+      }
     }];
 
-    function createControlItem(item, offset) {
+    // Creates a 'clickable' item with a touch handler.
+    // requires parameters for item: x,y,width,height,src,handler
+    function createControlItem(item) {
       console.log(item)
       var pencilImageObj = new Image();
       pencilImageObj.onload = function() {
         var box = new Kinetic.Image({
-          x: CONTROL_BASE_X,
-          y: CONTROL_BASE_Y + offset * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) - 30,
-          width: CONTROL_ITEM_DIM,
-          height: CONTROL_ITEM_DIM,
-          stroke: "black",
-          strokeWidth: 1,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          // stroke: "black",
+          // strokeWidth: 1,
           image: pencilImageObj
         });
         box.on('click touchstart', item.handler);
@@ -753,12 +813,18 @@ var setupCanvas = function() {
       }
       pencilImageObj.src = item.image;
     }
+    
+        for(var i = 0; i < controlItems.length; i++) {
+      createControlItem(controlItems[i]); console.log(i);
+    
+/*<<<<<<< HEAD
  
     createControlItem(controlItems[0], 0);
     createControlItem(controlItems[1], 1);
     createControlItem(controlItems[2], 2);
     createControlItem(controlItems[3], 3);
-    // // Overlaps with "new" history item. just to help make it easier to understand
+*/
+// // Overlaps with "new" history item. just to help make it easier to understand
 	// var newImgObj = new Image();
     // newImgObj.onload = function() {
     //   var box = new Kinetic.Image({
@@ -816,8 +882,15 @@ var setupCanvas = function() {
       });
       controlsLayer.add(box);
       controlsLayer.draw();
+/*=======
+*/
+
+//>>>>>>> 107bd663c7b8fde13e0675aa823a35e49c78ce9b
     }
-    plusMedicationImgObj.src = 'resources/images/plus_medication.png';
+    }
+    //
+    // Handlers
+    //
 
     function onClickDiagnosis() {
         console.log("add diagnosis");
@@ -825,12 +898,12 @@ var setupCanvas = function() {
 //        drawDiagnosis(g_diagnosis_list);
     }
 
-    function onAddDiagnosis() {
+    function onClickMedication() {
       // Get user input
       console.log("add diagnosis")
       // var input = window.prompt("What's the diagnosis?","Tuberculosis");
       // Trigger launch of modal dialog in Sencha
-      k2s.addDiagnosis();
+      k2s.addMedication();
 
       // inserts a dianosis wherever there's untouched space on canvas
       // drawTextAtLowPoint(input);
@@ -846,40 +919,32 @@ var setupCanvas = function() {
     function drawTextAtLowPoint(text) {
       console.log("drawTextAtLowPoint");
 
-      // add the shapes to the layer
-      // simpleText.setAttrs({y: highY});
-      // console.log(simpleText);
-      // console.log(simpleText.y);
-      // textLayer.add(simpleText);
-      if (text.indexOf('Medications')>=0) {
+      // Set background color of text box according to type of text
+      if(text.indexOf('Medications') >= 0) {
         bgFill = '#44f';
-      } else if (text.indexOf('Diagnoses')>=0) {
+      } else if(text.indexOf('Diagnoses') >= 0) {
         bgFill = '#f44';
       } else {
         bgFill = '#eee';
       }
+
       var complexText = new Kinetic.Text({
         x: 20,
-        // y: 60,
         stroke: '#555',
         strokeWidth: 3,
         fill: bgFill,
-        // text: 'DIAGNOSIS: Tuberculosis',
-        // text: 'Medication: \n* Acetominophan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n* Acetominopan - 100mg - 2x Daily \n',
         text: '',
         fontSize: 14,
         fontFamily: 'Calibri',
         textFill: '#000',
-        // width: 380,
         padding: 10,
-        // align: 'center',
         align: 'left',
         fontStyle: 'italic',
         shadow: {
-            color: 'black',
-            blur: 1,
-            offset: [10, 10],
-            opacity: 0.2
+          color: 'black',
+          blur: 1,
+          offset: [10, 10],
+          opacity: 0.2
         },
         cornerRadius: 10
       });
@@ -889,11 +954,10 @@ var setupCanvas = function() {
         text: text,
         fill: bgFill
       });
-      console.log(complexText);
       textLayer.add(complexText);
       stage.draw();
-      highY += (complexText.textHeight*complexText.textArr.length+1)+30;
-      
+      highY += (complexText.textHeight * complexText.textArr.length + 1) + 30;
+
     }
   };
 
@@ -901,77 +965,30 @@ var setupCanvas = function() {
 // Sencha code
 //  - well, it's a glorified canvas, wrapped in Sencha
 ///////////////////////////////////////////////////////////
-/**
- * Copyright 2012, Raxa
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-//the view after clicking one of the patient in the patient list
 Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
   extend: 'Ext.Container',
   xtype: 'draw-panel',
   id: 'drawPanel',
-  // requires: ['RaxaEmr.Outpatient.view.patient.Grid', 'RaxaEmr.Outpatient.view.patient.medicationhistory', 'RaxaEmr.Outpatient.view.patient.refertodoc', 'RaxaEmr.Outpatient.view.patient.work', 'RaxaEmr.Outpatient.view.patient.labresulthistory'],
   config: {
     layout: 'hbox',
-    // scroll: true,
     items: [{
       xtype: 'container',
       id: 'opdPatientDataEntry',
       width: STAGE_X,
-      // height:760,
       height: STAGE_Y,
       layout: 'vbox',
       items: [{
         scroll: false,
         html: '<div id="container" ></div>'
-        // }, {
-        //     xtype: 'drug-grid',
-        //     id: 'orderedDrugGrid',
-        //     height: 250,
-        //     border: 10,
       }],
       listeners: {
         painted: function() {
           console.log("painted");
           setupCanvas();
-	  k2s.config.initStore();
+          k2s.config.initStore();
         }
       },
-      // }, {
-      //     // Buttons to navigate while using OPD 
-      //     xtype: 'container',
-      //     id: 'opdPatientDataEntryControls',
-      //     width: 118,
-      //     items: [{
-      //         xtype: 'button',
-      //         text: '+ Drug',
-      //         id: 'plusDrugButton',
-      //         handler: function () {
-      //             Ext.getCmp('drugForm').setHidden(false);
-      //             Ext.getCmp('drugaddform').reset();
-      //             Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD); // to add more than one treatment
-      //         },
-      //     }],
+
     }]
-    // }],
   },
-
-  // updateRecord: function (newRecord) {
-  //     if (newRecord) {
-  //         this.down('#content').setData(newRecord.data);
-  //     }
-  // }
 });
-
-// }());
