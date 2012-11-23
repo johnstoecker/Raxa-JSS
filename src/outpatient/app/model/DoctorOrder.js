@@ -42,7 +42,7 @@ Ext.define('RaxaEmr.Outpatient.model.DoctorOrder', {
         },{
             name: 'orders',
             model: 'RaxaEmr.Pharmacy.model.drugOrder',
-            persist: false
+//            persist: false
         }]
     }
 });
