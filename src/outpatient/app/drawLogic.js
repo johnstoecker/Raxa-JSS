@@ -40,8 +40,6 @@ Ext.define('KineticToSencha', {
 
 	// Saves just "drawable" portion of canvas
 	saveDrawableCanvas: function() {
-		// TODO: Hide/show paper layer when creating dataURL "screenshot"?
-		// backgroundLayer.hide();
 		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
 		stage.toImage({
 			callback: function(i) {
@@ -88,9 +86,6 @@ Ext.define('KineticToSencha', {
 					imgSrc: dataUrl,
 					id: 'PatientRecord'
 				});
-
-				// TODO: delete kineticImage?
-				// backgroundLayer.show();
 			}
 		});
 	}
@@ -309,15 +304,11 @@ var k2s = Ext.create('KineticToSencha', {
 			var store = Ext.getStore('diagnosedDisease');
 			var data = store.getData();
 			var itemCount = data.getCount();
-			// if(itemCount > 0) {
-				// displayText += "Diagnoses: \n";
-			// }
-			console.log(DiagnosisPrinted);
+		
 			for(var i = DiagnosisPrinted; i < itemCount; i++) {
 				var itemData = data.getAt(i).getData();
 				displayText += (itemData.complain + '\n');
 				DiagnosisPrinted++;
-				// return itemData.drugname || "";
 			}
 			console.log('display...', displayText);
 			g_diagnosis_list = displayText;
@@ -710,6 +701,8 @@ var setupCanvas = function() {
 	}
 
 	function drawDiagnosis(text) {
+		console.log('drawDiagnosis');
+		console.log(text);
 		if(text) {
 			drawTextAtLowPoint(text);
 		}
