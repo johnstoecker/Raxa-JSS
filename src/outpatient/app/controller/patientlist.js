@@ -1,5 +1,5 @@
 // TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
-var TEMP_TEST_THINGY = true;
+var TEMP_TEST_THINGY = false;
 
 /**
  * Copyright 2012, Raxa
