@@ -699,9 +699,8 @@ var setupCanvas = function() {
 	// Creates a 'clickable' item with a touch handler.
 	// requires parameters for item: x,y,width,height,src,handler
 	function createControlItem(item) {
-		console.log(item)
-		var pencilImageObj = new Image();
-		pencilImageObj.onload = function() {
+		var imageObj = new Image();
+		imageObj.onload = function() {
 			var box = new Kinetic.Image({
 				x: item.x,
 				y: item.y,
@@ -709,13 +708,13 @@ var setupCanvas = function() {
 				height: item.height,
 				// stroke: "black",
 				// strokeWidth: 1,
-				image: pencilImageObj
+				image: imageObj
 			});
 			box.on('click touchstart', item.handler);
 			controlsLayer.add(box);
 			controlsLayer.draw();
 		}
-		pencilImageObj.src = item.image;
+		imageObj.src = item.image;
 	}
 
 	for(var i = 0; i < controlItems.length; i++) {
