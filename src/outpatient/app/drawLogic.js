@@ -288,6 +288,9 @@ var CONTROL_BASE_X = 2;
 var CONTROL_BASE_Y = 2;
 var CONTROL_ITEM_SPACING = 3;
 var CONTROL_ITEM_DIM = 50;
+var TOOLBAR_ITEM_DIM = 40;
+var TOOLBAR_ITEM_BASE_X = 4;
+var TOOLBAR_ITEM_BASE_Y = 6;
 var HIGH_Y_OFFSET = 5; // a little extra space
 
 function isInDrawableArea(myX, myY) {
@@ -548,12 +551,19 @@ var setupCanvas = function() {
 	backgroundLayer.add(background);
 
 	toolbarBackground = new Kinetic.Rect({
-		x: 2,
-		y: 2,
+		// x: 2,
+		// y: 2,
 		// width: stage.getWidth(),
-		width: 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) + 2,
+		// width: 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) + 2,
+		// height: DRAWABLE_Y_MIN - 4,
+		
+		x: 0,
+		y: 0,
+		width: stage.getWidth(),
+		// width: 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) + 2,
 		height: DRAWABLE_Y_MIN - 4,
-		fill: "#2c7cb9"
+		// fill: "#2c7cb9" // Dark Blue
+		fill: "#82b0e1"	// <- Light Blue. "#2c7cb9" <- Dark Blue		
 	});
 	backgroundLayer.add(toolbarBackground);
 
@@ -595,10 +605,10 @@ var setupCanvas = function() {
 	var controlItems = [{
 		// Pencil (Draw mode)
 		image: 'resources/images/icons/pen_on.png',
-		x: CONTROL_BASE_X,
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
+		x: TOOLBAR_ITEM_BASE_X,
+		y: TOOLBAR_ITEM_BASE_Y,
+		width: TOOLBAR_ITEM_DIM,
+		height: TOOLBAR_ITEM_DIM,
 		handler: function() {
 			console.log('mode = draw');
 			mode = "draw";
@@ -606,10 +616,10 @@ var setupCanvas = function() {
 	}, {
 		// Eraser (Erase mode)
 		image: 'resources/images/icons/eraser_off.png',
-		x: CONTROL_BASE_X + 1 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
+		x: TOOLBAR_ITEM_BASE_X + 1 * (TOOLBAR_ITEM_DIM),
+		y: TOOLBAR_ITEM_BASE_Y,
+		width: TOOLBAR_ITEM_DIM,
+		height: TOOLBAR_ITEM_DIM,
 		handler: function() {
 			console.log('ERASER: TODO');
 			// mode = "erase";
@@ -617,10 +627,10 @@ var setupCanvas = function() {
 	}, {
 		// Keyboard (typed text input)
 		image: 'resources/images/icons/text_off.png',
-		x: CONTROL_BASE_X + 2 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
+		x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
+		y: TOOLBAR_ITEM_BASE_Y,
+		width: TOOLBAR_ITEM_DIM,
+		height: TOOLBAR_ITEM_DIM,
 		handler: function() {
 			console.log('KEYBOARD: TODO');
 			// mode = "keyboard";

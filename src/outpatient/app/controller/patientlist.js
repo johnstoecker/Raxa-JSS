@@ -1,5 +1,5 @@
 // TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
-var TEMP_TEST_THINGY = false;
+var TEMP_TEST_THINGY = true;
 
 function g_fetchObs(uuid, resource, obsStore) {
     var myUrl;
@@ -8,7 +8,7 @@ function g_fetchObs(uuid, resource, obsStore) {
     } else if (resource == 'patient') {
         myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/obs?patient=' + uuid;
     } else if (resource == 'encounter') {
-        myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/obs?encounter=' + uuid;
+        myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/obs?encounter=' + uuid + '&v=full';
     } else {
         return;
     }
@@ -23,8 +23,6 @@ function g_fetchObs(uuid, resource, obsStore) {
                 obsStore.add(r[i]);
                 console.log(obsStore.getCount());
             }
-            // callback
-            // if (handler) { handler(); }
         },
         headers: Util.getBasicAuthHeaders(),
     });
@@ -33,7 +31,7 @@ function g_fetchObs(uuid, resource, obsStore) {
 function g_fetchSomeEncounters() {
         var store = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
         // Insert proper patient's UUID
-        store.getProxy().setUrl(HOST + '/ws/rest/v1/encounter' + '?patient=75d93e0c-8596-4afb-88a9-dcf07a1b487f');
+        store.getProxy().setUrl(HOST + '/ws/rest/v1/encounter' + '?patient=75d93e0c-8596-4afb-88a9-dcf07a1b487f&v=full');
         //store.getProxy().getReader().setRootProperty('results');
         store.load();
         store.sync();
