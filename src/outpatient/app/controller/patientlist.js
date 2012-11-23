@@ -1,6 +1,103 @@
 // TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
 var TEMP_TEST_THINGY = false;
 
+// TODO: This code is to help fetch history items. once we have history views can implement better.
+function g_fetchObs(uuid, resource, obsStore) {
+    var myUrl;
+    if (resource == 'obs') {
+        myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/obs/' + uuid;
+    } else if (resource == 'patient') {
+        myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/obs?patient=' + uuid;
+    } else if (resource == 'encounter') {
+        myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/obs?encounter=' + uuid + '&v=full';
+    } else {
+        return;
+    }
+
+    Ext.Ajax.request({
+        url: myUrl,
+        success: function(response) {
+            var r = JSON.parse(response.responseText).results;
+            
+            for (var i = 0; i < r.length; i++) {
+                console.log(r[i]);
+                obsStore.add(r[i]);
+                console.log(obsStore.getCount());
+            }
+        },
+        headers: Util.getBasicAuthHeaders(),
+    });
+}
+
+function g_fetchSomeEncounters() {
+        var store = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
+        // Insert proper patient's UUID
+        store.getProxy().setUrl(HOST + '/ws/rest/v1/encounter' + '?patient=75d93e0c-8596-4afb-88a9-dcf07a1b487f&v=full');
+        //store.getProxy().getReader().setRootProperty('results');
+        store.load();
+        store.sync();
+        return store;
+}
+var g_encounterStore = g_fetchSomeEncounters();
+
+var g_obsStore = Ext.create('RaxaEmr.Outpatient.store.opdObs');
+
+//  1. All diagnoses
+function g_getAllDiagnoses() {
+    console.log('g_getAllDiagnoses');
+    // TODO: Should I directly just fetch all observations? filter on diagnoses? too many?
+
+    // Obs
+    // var obsStore = Ext.create('RaxaEmr.Outpatient.store.opdObs');
+    var obsStore = Ext.getStore('opdObservations');
+    console.log(obsStore.getCount());
+    var obsCount = 0;
+    // Get each Outpatient encounter
+    for (var i=0; i < g_encounterStore.getCount(); i++) {
+        
+        var encounterData = g_encounterStore.getAt(i).getData();
+        console.log(encounterData);
+        var display = encounterData.display;
+        var obs = encounterData.obs;
+        
+        console.log('Encounter #', (i+1), display);
+        g_fetchObs(encounterData.uuid,'encounter', obsStore);
+        // Get the obs from each encounter and add to store
+
+        // var handler = function () {
+        //     for (var j=0; j < obs.length; j++) {
+        //         console.log('\t', 'Obs #', (j+1), obs[j].display);
+
+        //         // TODO: Ensure we're copying all necessary fields
+        //         // obsStore.add(obs[j])
+        //     }
+        // }
+    }
+    console.log(obsStore.getCount());
+    // obsStore.sync();
+    
+    // TODO: Copy all obs into an obs store, just to try it.. good for grid and list displays
+    return obsStore;
+}
+
+//  2. All height / weights
+        // TODO: proof of concept for retrieving and visualizing info. 
+        // display a "growth chart" using height/weight vs datetime measures taken
+        // http://www.cdc.gov/growthcharts/ ... http://www.cdc.gov/growthcharts/who_charts.htm#The WHO Growth Charts
+
+function g_getGrowthChart() {
+
+}
+
+//  3. All medications ordered
+function g_getAllMedications() {
+    
+}
+
+//  4. All investigations ordered (ideally, with results tagged on to them)
+function g_getAllInvestigations() {
+}
+
 /**
  * Copyright 2012, Raxa
  *
