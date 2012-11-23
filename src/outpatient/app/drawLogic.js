@@ -60,21 +60,23 @@ var k2s = Ext.create('KineticToSencha', {
 			var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
 
 			//Drug Orders here
-			var OrderModel = Ext.create('RaxaEmr.Pharmacy.model.drugOrder', {
+			var OrderModel = Ext.create('RaxaEmr.Outpatient.model.drugOrder', {
+				type: 'drugorder',
 				patient: myRecord.data.uuid,
-				//need to set selected patient uuid in localStorage
+				concept: drugPanel.concept,
 				drug: drugPanel.uuid,
 				startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
 				autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
-				concept: '---',
-				//   drugPanel.data.uuid, uuid is not currently stored, need to work on how Drug order is added to store
-				dose: drugPanel.frequency,
-				quantity: drugPanel.routeofadministration
-				//      type: 
-				//      instruction:
+				instructions:drugPanel.routeofadministration,
+				quantity : drugPanel.duration,
+				//TODO Figure out why dose is creating problem while sending
+				//dose: drugPanel.frequency,
+
+				//Pharmacy is using dose. Remove inconsistency
+				frequency: drugPanel.frequency
 			});
-			DoctorOrderModel.data.obs.push(OrderModel.data);
-		}
+			DoctorOrderModel.data.orders.push(OrderModel.raw);
+		} 
 	},
 
 	// <TODO: Add Comment describing>
@@ -138,8 +140,8 @@ var k2s = Ext.create('KineticToSencha', {
 	sendDoctorOrderEncounter: function() {
 		this.addObs();
 		this.addDoctorRecordImage();
-		//this.addOrder();  //Sending DoctorOrder is not working not    
-		//  DoctorOrderModel.data.orders = [];
+		this.addOrder();    
+		  
 		console.log(DoctorOrderStore);
 		DoctorOrderModel.data.patient = myRecord.data.uuid;
 		console.log(Ext.getStore('DoctorOrder'));
@@ -171,6 +173,7 @@ var k2s = Ext.create('KineticToSencha', {
 		});
 
 		DoctorOrderModel.data.obs = [];
+		DoctorOrderModel.data.orders = [];
 	},
 
 	listeners: {
