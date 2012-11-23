@@ -1,5 +1,5 @@
 // TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
-var TEMP_TEST_THINGY = true;
+var TEMP_TEST_THINGY = false;
 
 /**
  * Copyright 2012, Raxa
@@ -16,7 +16,7 @@ var TEMP_TEST_THINGY = true;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-var myRecord; // for the record of current patient
+myRecord = new Object(); // for the record of current patient
 var opd_observations = new Array(); //contains the observations of different tabs
 
 Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
@@ -192,8 +192,10 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             }
         }
     },
+
     //this function starts on the load of the module
     init: function () {
+
         // TODO: Temp
         if (! TEMP_TEST_THINGY)
         {
@@ -694,12 +696,13 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     //This function calls on selection of Diagnosis list and adds to Diagnosed List
     onDiagnosisListSelect: function (list, index, node, record) {
-        var sign = record.data.sign;
+ //       var sign = record.data.sign;
+        var diagnosis = record.data;
         list.getStore().remove(record);
         diagnosislist = Ext.getCmp('diagnosedList');
         diagnosislist.getStore().add({
-            complain: sign,
-            id: sign,
+            complain: diagnosis.sign,
+            id: diagnosis.id,
         });
     },
 
