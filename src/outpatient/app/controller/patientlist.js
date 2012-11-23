@@ -872,6 +872,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     onDrugListSelect: function (list, index, node, record) {
         Ext.getCmp('drugfilterbysearchfield').setValue(record.data.drug);
+        Ext.getCmp('drug-routeofadministration').getStore().add({value: record.data.dosageForm,title: record.data.dosageForm});
+        Ext.getCmp('drug-routeofadministration').setValue(record.data.dosageForm);
         Ext.getCmp('searchedDrugList').setHidden(true);
     },
 
@@ -931,17 +933,19 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     // to add the drug order in the drug list and drug panel
     adddruginlist: function (obj) {
         druglist = Ext.getCmp('orderedDrugGrid');
-	
+        drugStore = Ext.getStore('drugpanel');	
 	//Drug Form details are pushed to druglist store after validation of fields
         // if (Ext.getCmp('drugfilterbysearchfield').getValue() && Ext.getCmp('drug-strength').getValue() && Ext.getCmp('drug-instruction').getValue() && Ext.getCmp('drug-frequency').getValue() && Ext.getCmp('drug-duration').getValue() && Ext.isNumeric(Ext.getCmp('drug-duration').getValue()) && Ext.getCmp('drug-routeofadministration')) {
         if (Ext.getCmp('drugfilterbysearchfield').getValue()) {
-            druglist.getStore().add({
+            drugStore.add({
                 drugname: Ext.getCmp('drugfilterbysearchfield').getValue(), //Ext.getCmp('drug-name').getValue(),
                 strength: Ext.getCmp('drug-strength').getValue(),
                 instruction: Ext.getCmp('drug-instruction').getValue(),
                 frequency: Ext.getCmp('drug-frequency').getValue(),
                 duration: Ext.getCmp('drug-duration').getValue(),
-                routeofadministration: Ext.getCmp('drug-routeofadministration').getValue()
+                routeofadministration: Ext.getCmp('drug-routeofadministration').getValue(),
+                concept: Ext.getCmp('drugList').selected.items[0].data.concept,
+                uuid: Ext.getCmp('drugList').selected.items[0].data.uuid
                 // strength: 'fake mg',
                 // instruction: 'fake ins',
                 // frequency: 'fake freq',
