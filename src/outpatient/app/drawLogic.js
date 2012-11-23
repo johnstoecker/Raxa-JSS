@@ -1,3 +1,6 @@
+// TODO: Unwind this spaghetti code. 
+// Move controlling logic somewhere else, just fire events and listen to updates in view
+
 // ///////////////////////////////////////////////////////////
 // Connection: Kinetic to Sencha
 //  - bridges via firing Ext events
@@ -16,7 +19,6 @@ Ext.define('KineticToSencha', {
 	addMedication: function() {
 		this.fireEvent('clickAddMedication');
 	},
-
 	clickDiagnosis: function() {
 		this.fireEvent('clickOnDiagnosis');
 	},
@@ -34,6 +36,63 @@ Ext.define('KineticToSencha', {
 		});
 
 		setTimeout(mask, SAVE_LOAD_MASK_MAX_WAIT_TIME);
+	},
+
+	// Saves just "drawable" portion of canvas
+	saveDrawableCanvas: function() {
+		// TODO: Hide/show paper layer when creating dataURL "screenshot"?
+		// backgroundLayer.hide();
+		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
+		stage.toImage({
+			callback: function(i) {
+				i.id = "PatientRecord";
+				console.log(i);
+				kineticImage = new Kinetic.Image({
+					image: i,
+					x: 0,
+					y: 0,
+					id: 'PatientRecord',
+					crop: {
+						x: DRAWABLE_X_MIN,
+						y: DRAWABLE_Y_MIN,
+						width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+						height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+					}
+				});
+
+				// Create a temp layer and add the "screenshot" image. If it's not added to a layer,
+				// or added to the stage, then Kinetic won't allow you to call toDataUrl() on it.
+				var temp_layer = new Kinetic.Layer();
+				temp_layer.add(kineticImage);
+				stage.add(temp_layer);
+				var dataUrl = kineticImage.toDataURL({
+					callback: function(dataUrl) {
+						console.log('callback for dataUrl');
+					},
+					mimeType: 'image/jpeg',
+					quality: .3
+				});
+
+				// Delete temp layer
+				temp_layer.remove();
+				
+				// Adds items to history store (list is visible in history view)
+				var visitHistoryStore = Ext.getStore('visitHistoryStore');
+				visitHistoryStore.add({
+					title: 'Visit <x>',
+					// date: today
+					uuid: 'FAKE-UUID-PUSHED',
+					// TODO: need to save/retrieve from OpenMRS
+					diagnosisCount: 0,
+					treatmentCount: 0,
+					imgSrc: dataUrl,
+					id: 'PatientRecord'
+				});
+
+				// TODO: delete kineticImage?
+				// backgroundLayer.show();
+			}
+		});
 	}
 });
 
@@ -46,6 +105,9 @@ var DoctorOrderStore;
 var DoctorOrderModel;
 var DiagnosisPrinted = 0;
 var k2s = Ext.create('KineticToSencha', {
+
+	// TODO: Move all of these functions to the define() statement for k2s, and you can call via
+	//	k2s.method() instead of k2s.config.method()
 
 	// <TODO: Add Comment describing>
 	addOrder: function() {
@@ -247,13 +309,13 @@ var k2s = Ext.create('KineticToSencha', {
 			var store = Ext.getStore('diagnosedDisease');
 			var data = store.getData();
 			var itemCount = data.getCount();
-			if(itemCount > 0) {
-				displayText += "Diagnoses: \n";
-			}
+			// if(itemCount > 0) {
+				// displayText += "Diagnoses: \n";
+			// }
 			console.log(DiagnosisPrinted);
 			for(var i = DiagnosisPrinted; i < itemCount; i++) {
 				var itemData = data.getAt(i).getData();
-				displayText += ('* ' + itemData.complain + '\n');
+				displayText += (itemData.complain + '\n');
 				DiagnosisPrinted++;
 				// return itemData.drugname || "";
 			}
@@ -266,6 +328,7 @@ var k2s = Ext.create('KineticToSencha', {
 		}
 	}
 });
+
 
 ///////////////////////////////////////////////////////////
 // Kinetic JS, drawing Canvas
@@ -289,7 +352,7 @@ var CONTROL_BASE_Y = 2;
 var CONTROL_ITEM_SPACING = 3;
 var CONTROL_ITEM_DIM = 50;
 var TOOLBAR_ITEM_DIM = 40;
-var TOOLBAR_ITEM_BASE_X = 4;
+var TOOLBAR_ITEM_BASE_X = 6;
 var TOOLBAR_ITEM_BASE_Y = 6;
 var HIGH_Y_OFFSET = 5; // a little extra space
 
@@ -313,7 +376,7 @@ var stage = new Object;
 var setupCanvas = function() {
 
 	var lowY = DRAWABLE_Y_MIN;
-	var highY = DRAWABLE_Y_MIN;
+	var highY = DRAWABLE_Y_MIN + 10;
 
 	var newLine;
 	var newLinePoints = [];
@@ -322,11 +385,11 @@ var setupCanvas = function() {
 
 	var historyYOffset = HISTORY_BASE_Y;
 
-	backgroundLayer = new Kinetic.Layer();
-	loadedImageLayer = new Kinetic.Layer(); // For re-loaded thumbs
-	linesLayer = new Kinetic.Layer();
-	textLayer = new Kinetic.Layer();
-	controlsLayer = new Kinetic.Layer();
+	var backgroundLayer = new Kinetic.Layer();
+	var loadedImageLayer = new Kinetic.Layer(); // For re-loaded thumbs
+	var linesLayer = new Kinetic.Layer();
+	var textLayer = new Kinetic.Layer();
+	var controlsLayer = new Kinetic.Layer();
 
 	// Recreates stage saved in JSON
 		//var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
@@ -365,7 +428,6 @@ var setupCanvas = function() {
 		dragComplete();
 	});
 	stage.on("paintDiagnosis", function() {
-		
 		console.log('printing Diagnosis');
 		console.log(g_diagnosis_list);
 		k2s.fireEvent('clickOnDiagnosis');
@@ -379,7 +441,6 @@ var setupCanvas = function() {
 	
 	// First touch or click starts a drag event
 	function dragStart() {
-		// console.log('dragStart');
 		var up = stage.getUserPosition();
 		if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 			return;
@@ -405,13 +466,7 @@ var setupCanvas = function() {
 	// While user holding down the mouse clicker or touch, continue dragging
 	function dragMove() {
 		var up = stage.getUserPosition();
-		// console.log(up.x, up.y);
-		if(!up || !isInDrawableArea(up.x, up.y)) {
-			return;
-		}
-
-		// console.log('dragMove');
-		if(mode !== 'draw') {
+		if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 			return;
 		}
 
@@ -430,14 +485,8 @@ var setupCanvas = function() {
 
 	// On release of mouse or touch, done dragging
 	function dragComplete() {
-		console.log('drag complete');
-
 		var up = stage.getUserPosition();
-		if(!up || !isInDrawableArea(up.x, up.y)) {
-			return;
-		}
-
-		if(mode !== 'draw') {
+		if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 			return;
 		}
 
@@ -463,76 +512,7 @@ var setupCanvas = function() {
 	function onSaveCanvas() {
 		// Callback, since the stage toDataURL() method is asynchronous, 
 		k2s.saveLoadMask();
-		saveDrawableCanvas();
-	}
-
-	// Save - saves just "drawable" portion of canvas
-	function saveDrawableCanvas() {
-		// TODO: Hide/show paper layer when creating dataURL "screenshot"?
-		// backgroundLayer.hide();
-		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
-		stage.toImage({
-			callback: function(i) {
-				i.id = "PatientRecord";
-				console.log(i);
-				kineticImage = new Kinetic.Image({
-					image: i,
-					x: 0,
-					y: 0,
-					id: 'PatientRecord',
-					crop: {
-						x: DRAWABLE_X_MIN,
-						y: DRAWABLE_Y_MIN,
-						width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
-						height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
-					}
-				});
-
-				// Create a temp layer and add the "screenshot" image. If it's not added to a layer,
-				// or added to the stage, then Kinetic won't allow you to call toDataUrl() on it.
-				var temp_layer = new Kinetic.Layer();
-				temp_layer.add(kineticImage);
-				stage.add(temp_layer);
-				var dataUrl = kineticImage.toDataURL({
-					callback: function(dataUrl) {
-						console.log('callback for dataUrl');
-					},
-					mimeType: 'image/jpeg',
-					quality: .3
-				});
-
-				// Delete temp layer
-				temp_layer.remove();
-				addHistoryItem('', 'yellow', dataUrl);
-				// TODO: delete kineticImage?
-				// backgroundLayer.show();
-			}
-		});
-
-	}
-
-	// Save - helper, adds items to history store (list is visible in history view)
-	function addHistoryItem(name, color, dataUrl) {
-		// if No data URL, then it's the "special" case for "new"
-		if(!dataUrl) {
-			return;
-		} else {
-
-			// If there is a dataUrl, then use that image to create thumb, linking to previous visit
-			// Keep track of all history Images; allows user to load history via Sencha UI
-			var visitHistoryStore = Ext.getStore('visitHistoryStore');
-			visitHistoryStore.add({
-				title: 'Visit <x>',
-				// date: today
-				uuid: 'FAKE-UUID-PUSHED',
-				// TODO: need to save/retrieve from OpenMRS
-				diagnosisCount: 0,
-				treatmentCount: 0,
-				imgSrc: dataUrl,
-				id: 'PatientRecord'
-			});
-			console.log(visitHistoryStore);
-		}
+		k2s.saveDrawableCanvas();
 	}
 
 	////////////////////////////////////////////////
@@ -540,6 +520,7 @@ var setupCanvas = function() {
 	//  - Draw background
 	//  - Add Controls... Pencil, eraser, save
 	////////////////////////////////////////////////
+	
 	// Background - blank white canvas
 	background = new Kinetic.Rect({
 		x: 0,
@@ -550,57 +531,29 @@ var setupCanvas = function() {
 	});
 	backgroundLayer.add(background);
 
+	// Background - toolbar background
 	toolbarBackground = new Kinetic.Rect({
-		// x: 2,
-		// y: 2,
-		// width: stage.getWidth(),
-		// width: 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) + 2,
-		// height: DRAWABLE_Y_MIN - 4,
-		
 		x: 0,
 		y: 0,
 		width: stage.getWidth(),
-		// width: 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) + 2,
 		height: DRAWABLE_Y_MIN - 4,
-		// fill: "#2c7cb9" // Dark Blue
-		fill: "#82b0e1"	// <- Light Blue. "#2c7cb9" <- Dark Blue		
+		fill: "#82b0e1"	// Light Blue.
 	});
 	backgroundLayer.add(toolbarBackground);
 
-	var imageObj2 = new Image();
-	imageObj2.onload = function() {
-		console.log("image loaded");
-		console.log(stage.getWidth(), stage.getHeight());
-		var backgroundImage = new Kinetic.Image({
-			x: 0,
-			y: DRAWABLE_Y_MIN,
-			image: imageObj2,
-			width: 709,
-			height: 835
-		});
-		backgroundLayer.add(backgroundImage);
-		backgroundLayer.draw();
-	}
-	var file = "resources/images/paper_left.jpg";
-	imageObj2.src = file;
-
-	// Background - image of OPD-lite: paper, inactive (currently) buttons, etc
-	var imageObj3 = new Image();
-	imageObj3.onload = function() {
-		console.log("image loaded");
-		console.log(stage.getWidth(), stage.getHeight());
-		var backgroundImage = new Kinetic.Image({
-			x: stage.getWidth() - 36,
-			y: DRAWABLE_Y_MIN,
-			image: imageObj3,
-			width: 36,
-			height: 835
-		});
-		backgroundLayer.add(backgroundImage);
-		backgroundLayer.draw();
-	}
-	var file = "resources/images/history_right.jpg";
-	imageObj3.src = file;
+	addImageToLayer("resources/images/paper_left.jpg", backgroundLayer, {
+		x: 0,
+		y: DRAWABLE_Y_MIN,
+		width: 709,
+		height: 835
+	});
+	
+	addImageToLayer("resources/images/history_right.jpg", backgroundLayer, {
+		x: stage.getWidth() - 36,
+		y: DRAWABLE_Y_MIN,
+		width: 36,
+		height: 835
+	});
 
 	var controlItems = [{
 		// Pencil (Draw mode)
@@ -763,6 +716,9 @@ var setupCanvas = function() {
 	}
 
 	function drawTextAtLowPoint(text) {
+		// text = "Rheumatic Fever";
+		// Image on each line.
+		// TODO: Needs pointer to the related in the store, so "X" can call delete
 		console.log("drawTextAtLowPoint");
 
 		// Set background color of text box according to type of text
@@ -771,38 +727,68 @@ var setupCanvas = function() {
 		} else if(text.indexOf('Diagnoses') >= 0) {
 			bgFill = '#f44';
 		} else {
-			bgFill = '#eee';
+			// bgFill = '#eee';
+			bgFill = '#fff';
 		}
 
-		var complexText = new Kinetic.Text({
+		var imageObj2 = new Image();
+		var myHighY = highY;
+		addImageToLayer("resources/images/icons/bullet_diagnosis.png", textLayer, {
 			x: DRAWABLE_X_MIN + 20,
-			stroke: '#555',
-			strokeWidth: 3,
-			fill: bgFill,
-			text: '',
-			fontSize: 14,
-			fontFamily: 'Calibri',
-			textFill: '#000',
-			padding: 10,
-			align: 'left',
-			fontStyle: 'italic',
-			shadow: {
-				color: 'black',
-				blur: 1,
-				offset: [10, 10],
-				opacity: 0.2
-			},
-			cornerRadius: 10
+			y: myHighY,
+			width: 14,
+			height: 14			
 		});
-
-		complexText.setAttrs({
+		
+		var complexText = new Kinetic.Text({
+			x: DRAWABLE_X_MIN + 20 + 20,
 			y: highY,
 			text: text,
-			fill: bgFill
+			fontSize: 14,
+			fontFamily: 'Helvetica',
+			textFill: '#000',
+			align: 'left',
 		});
 		textLayer.add(complexText);
-		stage.draw();
-		highY += (complexText.textHeight * complexText.textArr.length + 1) + 30;
 
+		// Add "delete" button
+		// Note, this creates item on control Layer, not text layer
+		createControlItem({
+			image: "resources/images/icons/delete.png",
+			x: DRAWABLE_X_MAX - 140,
+			y: myHighY,
+			width: 16,
+			height: 16,
+			handler: function() {
+				console.log('TODO: handle click delete button');
+			}
+		});
+
+		highY += ((complexText.textHeight * (complexText.textArr.length + 1)));	// length + title + space
+
+		var handDrawnLineY = highY;
+		addImageToLayer("resources/images/icons/horizontal_crazy_line.png", textLayer, {
+				x: DRAWABLE_X_MIN + 20,
+				y: handDrawnLineY,
+				width: 529,
+				height: 9
+		});
+
+		// += the height of the "hand drawn line" + "additional spacing"
+		highY += (10 + 5);
+		
+		stage.draw();
+	}
+
+	// Cleanup calls to add images, a little
+	function addImageToLayer(file, layer, config) {
+		var imgObj = new Image();
+		imgObj.onload = function() {
+			config.image = imgObj;
+			var kineticImage = new Kinetic.Image(config);
+			layer.add(kineticImage);
+			layer.draw();
+		}
+		imgObj.src = file;		
 	}
 };

@@ -1,6 +1,7 @@
 // TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
-var TEMP_TEST_THINGY = true;
+var TEMP_TEST_THINGY = false;
 
+// TODO: This code is to help fetch history items. once we have history views can implement better.
 function g_fetchObs(uuid, resource, obsStore) {
     var myUrl;
     if (resource == 'obs') {
