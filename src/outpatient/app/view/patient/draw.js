@@ -277,7 +277,7 @@ var k2s = Ext.create('KineticToSencha', {
       for(var i = DiagnosisPrinted; i < itemCount; i++) {
         var itemData = data.getAt(i).getData();
         displayText += ('* ' + itemData.complain + '\n');
-	DiagnosisPrinted++;
+      	DiagnosisPrinted++;
 
         // return itemData.drugname || "";
       }
@@ -301,10 +301,10 @@ var k2s = Ext.create('KineticToSencha', {
 ///////////////////////////////////////////////////////////
 imageCount = 0;
 
-var DRAWABLE_X_MIN = 0;
+var DRAWABLE_X_MIN = 60;
 var DRAWABLE_X_MAX = 700; // 708 - strict border
 var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
-var DRAWABLE_Y_MIN = 240 - DIFF; // 230 - strict border 
+var DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
 var DRAWABLE_Y_MAX = 1024;
 var DEFAULT_MODE = "draw"; // undefined
 var STAGE_X = 768; //768
@@ -313,10 +313,10 @@ var HISTORY_BASE_X = DRAWABLE_X_MAX;
 var HISTORY_BASE_Y = DRAWABLE_Y_MIN + 196;
 var HISTORY_ITEM_DIM = 64;
 
-var CONTROL_BASE_X = DRAWABLE_X_MAX + 8;
-var CONTROL_BASE_Y = DRAWABLE_Y_MIN - 6;
+var CONTROL_BASE_X = 2;
+var CONTROL_BASE_Y = 2;
 var CONTROL_ITEM_SPACING = 3;
-var CONTROL_ITEM_DIM = 52;
+var CONTROL_ITEM_DIM = 50;
 var HIGH_Y_OFFSET = 5; // a little extra space
 
 function isInDrawableArea(myX, myY) {
@@ -356,7 +356,7 @@ var setupCanvas = function() {
     
  
   /* Recreates stage saved in JSON
-	var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
+  var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
         // create node using json string
         var stage = Kinetic.Node.create(json, 'container');
 */
@@ -397,8 +397,6 @@ var setupCanvas = function() {
       k2s.fireEvent('clickOnDiagnosis');
       Ext.getCmp('diagnosis-panel').setHidden(true);
       drawDiagnosis(g_diagnosis_list);
-      
-      
     });
 
     ////////////////////////
@@ -507,7 +505,7 @@ var setupCanvas = function() {
             image: i,
             x: 0,
             y: 0,
-	    id : 'PatientRecord',
+      id : 'PatientRecord',
             crop: {
               x: DRAWABLE_X_MIN,
               y: DRAWABLE_Y_MIN,
@@ -525,8 +523,8 @@ var setupCanvas = function() {
             callback: function(dataUrl) {
               console.log('callback for dataUrl');
             },
-	    mimeType : 'image/jpeg',
-	    quality  : .3  
+      mimeType : 'image/jpeg',
+      quality  : .3  
           });
           
           // Delete temp layer
@@ -558,7 +556,7 @@ var setupCanvas = function() {
           diagnosisCount: 0,
           treatmentCount: 0,
           imgSrc: dataUrl,
-	  id: 'PatientRecord'
+    id: 'PatientRecord'
         }); console.log(visitHistoryStore);
       }
     }
@@ -578,29 +576,75 @@ var setupCanvas = function() {
     });
     backgroundLayer.add(background);
 
+    toolbarBackground = new Kinetic.Rect({
+      x: 2,
+      y: 2,
+      // width: stage.getWidth(),
+      width: 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING) + 2,
+      height: DRAWABLE_Y_MIN - 4,
+      fill: "#2c7cb9"
+    });
+    backgroundLayer.add(toolbarBackground);
+
     // Background - image of OPD-lite: paper, inactive (currently) buttons, etc
-    var imageObj = new Image();
-    imageObj.onload = function() {
+    // var imageObj = new Image();
+    // imageObj.onload = function() {
+    //   console.log("image loaded");
+    //   console.log(stage.getWidth(), stage.getHeight());
+    //   var backgroundImage = new Kinetic.Image({
+    //     x: 0,
+    //     y: 0,
+    //     image: imageObj,
+    //     width: stage.getWidth(),
+    //     height: 880
+    //   });
+    //   // backgroundLayer.add(backgroundImage);
+    //   backgroundLayer.draw();
+    // }
+    // var file = "resources/images/background-768x880.png";
+    // imageObj.src = file;
+
+    // Background - image of OPD-lite: paper, inactive (currently) buttons, etc
+    var imageObj2 = new Image();
+    imageObj2.onload = function() {
       console.log("image loaded");
       console.log(stage.getWidth(), stage.getHeight());
       var backgroundImage = new Kinetic.Image({
         x: 0,
-        y: 0,
-        image: imageObj,
-        width: stage.getWidth(),
-        height: 880
+        y: DRAWABLE_Y_MIN,
+        image: imageObj2,
+        width: 709,
+        height: 835
       });
       backgroundLayer.add(backgroundImage);
       backgroundLayer.draw();
     }
-    var file = "resources/images/background-768x880.png";
-    imageObj.src = file;
-/*
+    var file = "resources/images/paper_left.jpg";
+    imageObj2.src = file;
+
+    // Background - image of OPD-lite: paper, inactive (currently) buttons, etc
+    var imageObj3 = new Image();
+    imageObj3.onload = function() {
+      console.log("image loaded");
+      console.log(stage.getWidth(), stage.getHeight());
+      var backgroundImage = new Kinetic.Image({
+        x: stage.getWidth() - 36,
+        y: DRAWABLE_Y_MIN,
+        image: imageObj3,
+        width: 36,
+        height: 835
+      });
+      backgroundLayer.add(backgroundImage);
+      backgroundLayer.draw();
+    }
+    var file = "resources/images/history_right.jpg";
+    imageObj3.src = file;
+
     var controlItems = [{
       // Pencil (Draw mode)
-      image: 'resources/images/pencil.png',
+      image: 'resources/images/icons/pen_on.png',
       x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 0 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      y: CONTROL_BASE_Y,
       width: CONTROL_ITEM_DIM,
       height: CONTROL_ITEM_DIM,
       handler: function() {
@@ -609,122 +653,31 @@ var setupCanvas = function() {
       }
     }, {
       // Eraser (Erase mode)
-      image: 'resources/images/eraser.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 1 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      image: 'resources/images/icons/eraser_off.png',
+      x: CONTROL_BASE_X + 1 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      y: CONTROL_BASE_Y,
       width: CONTROL_ITEM_DIM,
       height: CONTROL_ITEM_DIM,
       handler: function() {
-        console.log('disabled, for now, since eraser isnt working');
+        console.log('ERASER: TODO');
         // mode = "erase";
       }
     }, {
-
-      //   handler: function() { console.log('keyboard not implemented');},
-      //   image: 'resources/images /keyboard.png'
-      // }, {
+      // Keyboard (typed text input)
+      image: 'resources/images/icons/text_off.png',
+      x: CONTROL_BASE_X + 2 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      y: CONTROL_BASE_Y,
+      width: CONTROL_ITEM_DIM,
+      height: CONTROL_ITEM_DIM,
+      handler: function() {
+        console.log('KEYBOARD: TODO');
+        // mode = "keyboard";
+      }
+  }, {
       // Save
       image: 'resources/images/save.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 2 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-      width: CONTROL_ITEM_DIM,
-      height: CONTROL_ITEM_DIM,
-      handler: function() {
-        console.log('tapped save button');
-        onSaveCanvas();
-      },
-      image: 'resources/images/save.png'
-    },{
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-      width: CONTROL_ITEM_DIM,
-      height: CONTROL_ITEM_DIM,
-      handler: function() {
-	console.log('End OPD VISIT');
-        k2s.config.sendDoctorOrderEncounter();
-      },
-      image: 'resources/images/EndOfOPD.png'
-    }, {
-      // Add diagnosis
-      image: 'resources/images/plus_diagnosis.png',
-      x: 200,
-      y: DRAWABLE_Y_MIN - 40,
-      width: 128,
-      height: 30,
-      handler: function() {
-        console.log("Bringing diagnoses modal window.")
-        onClickDiagnosis();
-      }
-    }, {
-      // Add medication
-      image: 'resources/images/plus_medication.png',
-      x: 350,
-      y: DRAWABLE_Y_MIN - 40,
-      width: 150,
-      height: 30,
-      handler: function() {
-        onClickMedication();
-      }
-    }, {
-      // Add investigation
-      image: 'resources/images/plus_investigation.png',
-      x: 514,
-      y: DRAWABLE_Y_MIN - 40,
-      width: 182,
-      height: 30,
-      handler: function() {
-        console.log('INVESTIGATIONS: TODO');
-      }
-    }, {
-      // New
-      image: 'resources/images/new.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
-      width: CONTROL_ITEM_DIM,
-      height: CONTROL_ITEM_DIM,
-      handler: function() {
-          // Reset the drawable canvas to be blank
-          // Also reset highY, so that text will appear in correct place relative to doctor handwriting
-          // loadedImageLayer.hide();
-          linesLayer.removeChildren();
-          textLayer.removeChildren();
-          highY = DRAWABLE_Y_MIN;
-          stage.draw();
-      }
-    }];
- */   
-
-        var controlItems = [{
-      // Pencil (Draw mode)
-      image: 'resources/images/pencil.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 0 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-      width: CONTROL_ITEM_DIM,
-      height: CONTROL_ITEM_DIM,
-      handler: function() {
-        console.log('mode = draw');
-        mode = "draw";
-      }
-    }, {
-      // Eraser (Erase mode)
-      image: 'resources/images/eraser.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 1 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-      width: CONTROL_ITEM_DIM,
-      height: CONTROL_ITEM_DIM,
-      handler: function() {
-        console.log('disabled, for now, since eraser isnt working');
-        // mode = "erase";
-      }
-    }, {
-
-      //   handler: function() { console.log('keyboard not implemented');},
-      //   image: 'resources/images /keyboard.png'
-      // }, {
-      // Save
-      image: 'resources/images/save.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 2 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      x: stage.getWidth() - 3 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
+      y: CONTROL_BASE_Y,
       width: CONTROL_ITEM_DIM,
       height: CONTROL_ITEM_DIM,
       handler: function() {
@@ -734,62 +687,64 @@ var setupCanvas = function() {
     } , {
       //Temp: Sending OPD Encounter
       image: 'resources/images/EndOfOPD.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + 4 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      x: stage.getWidth() - 2 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
+      y: CONTROL_BASE_Y,
       width: CONTROL_ITEM_DIM,
       height: CONTROL_ITEM_DIM,
       handler: function() {
         console.log('sending Doctor Encounter');
         k2s.config.sendDoctorOrderEncounter();
-	//TODO Move to patientlist and clear canvas
+        //TODO Move to patientlist and clear canvas
       },
     }, {
       // Add diagnosis
-      image: 'resources/images/plus_diagnosis.png',
-      x: 200,
-      y: DRAWABLE_Y_MIN - 40,
-      width: 128,
-      height: 30,
+      image: 'resources/images/icons/add_D_off.png',
+      x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+      y: CONTROL_BASE_Y + 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: 50,
+      height: 49,
       handler: function() {
         console.log("Bringing diagnoses modal window.")
         onClickDiagnosis();
       }
     }, {
       // Add medication
-      image: 'resources/images/plus_medication.png',
-      x: 350,
-      y: DRAWABLE_Y_MIN - 40,
-      width: 150,
-      height: 30,
+      image: 'resources/images/icons/add_drug_off.png',
+      x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+      y: CONTROL_BASE_Y + 4 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: 50,
+      height: 49,
       handler: function() {
         onClickMedication();
       }
     }, {
       // Add investigation
-      image: 'resources/images/plus_investigation.png',
-      x: 514,
-      y: DRAWABLE_Y_MIN - 40,
-      width: 182,
-      height: 30,
+      image: 'resources/images/icons/add_investigation_off.png',
+      x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+      y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+      width: 50,
+      height: 49,
       handler: function() {
         console.log('INVESTIGATIONS: TODO');
       }
-    }, {
-      // New
-      image: 'resources/images/new.png',
-      x: CONTROL_BASE_X,
-      y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
-      width: CONTROL_ITEM_DIM,
-      height: CONTROL_ITEM_DIM,
-      handler: function() {
-          // Reset the drawable canvas to be blank
-          // Also reset highY, so that text will appear in correct place relative to doctor handwriting
-          // loadedImageLayer.hide();
-          linesLayer.removeChildren();
-          textLayer.removeChildren();
-          highY = DRAWABLE_Y_MIN;
-          stage.draw();
-      }
+    // }, {
+    //   // New
+    //   // TODO: There should be some option to delete the entire interaction
+    //   //  the whole thing is wrong. wrong patient or something??
+    //   image: 'resources/images/new.png',
+    //   x: CONTROL_BASE_X,
+    //   y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
+    //   width: CONTROL_ITEM_DIM,
+    //   height: CONTROL_ITEM_DIM,
+    //   handler: function() {
+    //       // Reset the drawable canvas to be blank
+    //       // Also reset highY, so that text will appear in correct place relative to doctor handwriting
+    //       // loadedImageLayer.hide();
+    //       linesLayer.removeChildren();
+    //       textLayer.removeChildren();
+    //       highY = DRAWABLE_Y_MIN;
+    //       stage.draw();
+    //   }
     }];
 
     // Creates a 'clickable' item with a touch handler.
@@ -813,81 +768,11 @@ var setupCanvas = function() {
       }
       pencilImageObj.src = item.image;
     }
-    
-        for(var i = 0; i < controlItems.length; i++) {
-      createControlItem(controlItems[i]); console.log(i);
-    
-/*<<<<<<< HEAD
- 
-    createControlItem(controlItems[0], 0);
-    createControlItem(controlItems[1], 1);
-    createControlItem(controlItems[2], 2);
-    createControlItem(controlItems[3], 3);
-*/
-// // Overlaps with "new" history item. just to help make it easier to understand
-	// var newImgObj = new Image();
-    // newImgObj.onload = function() {
-    //   var box = new Kinetic.Image({
-    //     x: CONTROL_BASE_X,
-    //     y: CONTROL_BASE_Y + CONTROL_ITEM_DIM*3 + CONTROL_ITEM_SPACING*3,
-    //     width: CONTROL_ITEM_DIM,
-    //     height: CONTROL_ITEM_DIM,
-    //     stroke: "black",
-    //     strokeWidth: 1,
-    //     image: newImgObj
-    //   });
-    //   box.on('click touchstart', function() {
-    //     onSaveCanvas();
-    //   });
-    //   controlsLayer.add(box);
-    //   controlsLayer.draw();
-    // }
-    // newImgObj.src = 'resources/images/new.png';
-    var plusDiagnosisImgObj = new Image();
-    plusDiagnosisImgObj.onload = function() {
-      var box = new Kinetic.Image({
-        x: 200,
-        y: DRAWABLE_Y_MIN - 40,
-        width: 128,
-        height: 30,
-        stroke: "black",
-        strokeWidth: 1,
-        image: plusDiagnosisImgObj
-      });
-      box.on('click touchstart', function() {
-        console.log("Bringing diagnoses modal window.")
-        // TODO: Rewrire to pull up diagnosis window.
-        //  NOTE... there's some naming confusion because i originally wired up the diagnosis
-        //  button to open the medications/prescriptions window
-         onClickDiagnosis();
-      });
-      controlsLayer.add(box);
-      controlsLayer.draw();
-    }
-    plusDiagnosisImgObj.src = 'resources/images/plus_diagnosis.png';
 
-    var plusMedicationImgObj = new Image();
-    plusMedicationImgObj.onload = function() {
-      var box = new Kinetic.Image({
-        x: 350,
-        y: DRAWABLE_Y_MIN - 40,
-        width: 150,
-        height: 30,
-        stroke: "black",
-        strokeWidth: 1,
-        image: plusMedicationImgObj
-      });
-      box.on('click touchstart', function() {
-        onAddDiagnosis();
-      });
-      controlsLayer.add(box);
-      controlsLayer.draw();
-/*=======
-*/
+    for(var i = 0; i < controlItems.length; i++) {
+      createControlItem(controlItems[i]);
+    }
 
-//>>>>>>> 107bd663c7b8fde13e0675aa823a35e49c78ce9b
-    }
-    }
     //
     // Handlers
     //
@@ -929,7 +814,7 @@ var setupCanvas = function() {
       }
 
       var complexText = new Kinetic.Text({
-        x: 20,
+        x: DRAWABLE_X_MIN + 20,
         stroke: '#555',
         strokeWidth: 3,
         fill: bgFill,
@@ -961,14 +846,14 @@ var setupCanvas = function() {
     }
   };
 
-///////////////////////////////////////////////////////////
-// Sencha code
-//  - well, it's a glorified canvas, wrapped in Sencha
-///////////////////////////////////////////////////////////
+// A glorified Canvas, in Sencha
+// - The magic is created using KineticJS framework.
+// - Drawing and handling of canvas is managed in 'outpatient/app/drawLogic.js'
 Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
   extend: 'Ext.Container',
   xtype: 'draw-panel',
   id: 'drawPanel',
+  isCanvasSetup: false,
   config: {
     layout: 'hbox',
     items: [{
@@ -983,12 +868,15 @@ Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
       }],
       listeners: {
         painted: function() {
-          console.log("painted");
-          setupCanvas();
-          k2s.config.initStore();
+          if (!this.isCanvasSetup) {
+            console.log("Setting up canvas")
+            // TODO: Load canvas according to which patient is selected
+            setupCanvas();
+            k2s.config.initStore();
+            this.isCanvasSetup = true;
+          }
         }
       },
-
     }]
   },
 });
