@@ -92,13 +92,14 @@ Ext.define('KineticToSencha', {
 });
 
 // TODO: take these out of global scope
-var g_diagnosis_text = "";
-var g_diagnosis_list = "";
+var g_medication_list = [];
+var g_diagnosis_list = [];
 var order;
 var obs;
 var DoctorOrderStore;
 var DoctorOrderModel;
 var DiagnosisPrinted = 0;
+var MedicationPrinted= 0;
 var k2s = Ext.create('KineticToSencha', {
 
 	// TODO: Move all of these functions to the define() statement for k2s, and you can call via
@@ -251,15 +252,12 @@ var k2s = Ext.create('KineticToSencha', {
 		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
 			// By default, "this" will be the object that fired the event.
 			console.log("k2s: clickAddMedication");
-			var displayText = "";
+			var displayText = [];
 			var store = Ext.getStore('drugpanel');
 			var data = store.getData();
 			var itemCount = data.getCount();
-			if(itemCount > 0) {
-				displayText += "Medications: \n";
-			}
 
-			for(var i = 0; i < itemCount; i++) {
+			for(var i = MedicationPrinted,index=0; i < itemCount; i++,index++) {
 				var itemData = data.getAt(i).getData();
 
 				// TODO: Consolidate following code into loop
@@ -267,42 +265,36 @@ var k2s = Ext.create('KineticToSencha', {
 					// If no drug name, skip to next loop iteration
 					continue;
 				} else {
-					displayText += ('* ' + itemData.drugname);
-				}
-
-				var duration = itemData.duration;
-				if(duration) {
-					displayText += (' - ' + duration);
+					displayText[index] = (itemData.drugname);
 				}
 
 				var strength = itemData.strength;
 				if(strength) {
-					displayText += (' - ' + strength);
-				}
-
-				var quantity = itemData.duration;
-				if(quantity) {
-					displayText += (' - ' + quantity);
+					displayText[index] += (' ' +strength + 'mg ');
 				}
 
 				var frequency = itemData.frequency;
 				if(frequency) {
-					displayText += (' - ' + frequency);
+					displayText[index] += (' ' + frequency);
 				}
 
 				var instruction = itemData.instruction;
 				if(instruction) {
-					displayText += (' - ' + instruction);
+					displayText[index] += (' ' + instruction);
 				}
 
-				displayText += '\n';
-
+				var quantity = itemData.duration;
+				if(quantity) {
+					displayText[index] += (' ' + quantity + ' days');
+				}
+				console.log(displayText)
 				// return itemData.drugname || "";
+				MedicationPrinted++;
 			}
 			console.log('display...', displayText);
 
 			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
-			g_diagnosis_text = displayText;
+			g_medication_list = displayText;
 
 			//TODO UI Designers want prev Diagnosis to be showed (with different color    
 			// store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
@@ -314,14 +306,17 @@ var k2s = Ext.create('KineticToSencha', {
 		clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
 			console.log("k2s: clickOnDiagnosis");
 			// Print store. I'll have to pull info from this to print in Canvas
-			var displayText = "";
+			var displayText = [];
 			var store = Ext.getStore('diagnosedDisease');
 			var data = store.getData();
 			var itemCount = data.getCount();
-		
-			for(var i = DiagnosisPrinted; i < itemCount; i++) {
-				var itemData = data.getAt(i).getData();
-				displayText += (itemData.complain + '\n');
+			console.log('itemcount= '+itemCount); console.log('Diagnosis Printed='+DiagnosisPrinted);
+			
+
+			for(var i = DiagnosisPrinted, index=0; i < itemCount; i++, index++) {
+				var itemData = data.getAt(i).getData(); console.log(itemData);
+				console.log('index='+index+ ' i= '+i);
+				displayText[index] = (itemData.complain);
 				DiagnosisPrinted++;
 			}
 			console.log('display...', displayText);
@@ -390,11 +385,11 @@ var setupCanvas = function() {
 
 	var historyYOffset = HISTORY_BASE_Y;
 
-	var backgroundLayer = new Kinetic.Layer();
-	var loadedImageLayer = new Kinetic.Layer(); // For re-loaded thumbs
-	var linesLayer = new Kinetic.Layer();
-	var textLayer = new Kinetic.Layer();
-	var controlsLayer = new Kinetic.Layer();
+	var backgroundLayer = new Kinetic.Layer({id:'backgroundLayer'});
+	var loadedImageLayer = new Kinetic.Layer({id:'loadedImageLayer'}); // For re-loaded thumbs
+	var linesLayer = new Kinetic.Layer({id:'linesLayer'});
+	var textLayer = new Kinetic.Layer({id:'textLayer'});
+	var controlsLayer = new Kinetic.Layer({id:'controlsLayer'});
 
 	// Recreates stage saved in JSON : if there is '/n' in the code, we need to handle the case  
 		//var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
@@ -440,6 +435,14 @@ var setupCanvas = function() {
 		k2s.fireEvent('clickOnDiagnosis');
 		Ext.getCmp('diagnosis-panel').setHidden(true);
 		drawDiagnosis(g_diagnosis_list);
+	});
+	stage.on("paintMedication", function() {
+		//To be refactored
+		console.log('printing Drug Order');
+		console.log(g_medication_list);
+		k2s.fireEvent('clickAddMedication');
+		Ext.getCmp('drugForm').setHidden(true);
+		drawDiagnosis(g_medication_list);
 	});
 
 	////////////////////////
@@ -713,7 +716,7 @@ var setupCanvas = function() {
 
 		// inserts a dianosis wherever there's untouched space on canvas
 		// drawTextAtLowPoint(input);
-		drawDiagnosis(g_diagnosis_text);
+		//drawDiagnosis(g_medication_list);
 	}
 
 	function drawDiagnosis(text) {
@@ -748,18 +751,22 @@ var setupCanvas = function() {
 			width: 14,
 			height: 14			
 		});
-		
-		var complexText = new Kinetic.Text({
+		console.log(text);
+		for(var i=0 ; i < text.length;i++)
+		{
+			var complexText = new Kinetic.Text({
 			x: DRAWABLE_X_MIN + 20 + 20,
 			y: highY,
-			text: text,
+			text: text[i],
 			fontSize: 14,
 			fontFamily: 'Helvetica',
 			textFill: '#000',
 			align: 'left',
-		});
-		textLayer.add(complexText);
+			});
+			textLayer.add(complexText);
+			highY += ((complexText.textHeight * (complexText.textArr.length + 1)));	// length + title + space
 
+		}
 		// Add "delete" button
 		// Note, this creates item on control Layer, not text layer
 		createControlItem({
@@ -770,12 +777,13 @@ var setupCanvas = function() {
 			height: 16,
 			handler: function() {
 				console.log('TODO: handle click delete button');
+				console.log(this);
+				console.log(arguments);
 			}
 		});
 
-		highY += ((complexText.textHeight * (complexText.textArr.length + 1)));	// length + title + space
 
-		var handDrawnLineY = highY;
+		var handDrawnLineY = highY ;// + 20*(text.length-1);
 		addImageToLayer("resources/images/icons/horizontal_crazy_line.png", textLayer, {
 				x: DRAWABLE_X_MIN + 20,
 				y: handDrawnLineY,
