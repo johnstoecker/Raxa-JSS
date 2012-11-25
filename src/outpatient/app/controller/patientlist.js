@@ -721,7 +721,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     // to filter the search in the signlist
     signFilter: function () {
         var value = Ext.getCmp('signFilter').getValue();
-        var store = Ext.getCmp('signList').getStore();
+        var store = Ext.getCmp('diagnosislist').getStore();
 
         if (value) {
             var searches = value.split(' ');

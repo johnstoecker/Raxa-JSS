@@ -94,6 +94,38 @@ Ext.define('KineticToSencha', {
 // TODO: take these out of global scope
 var g_medication_list = [];
 var g_diagnosis_list = [];
+
+function PrintClass()
+{
+    //This function is same as a constructor
+    //alert("Print Class");
+}
+
+PrintClass.prototype =
+{
+    PrintText: function()
+    	{
+    		//create function to Print Text
+    	},
+    TextGroupProperty: new Object() ,
+    TextArray : new Array(new TextProperty()),
+}
+
+PrintClass.prototype.TextGroupProperty =
+{
+	type : null,
+	storeId: null,
+	gid :  null
+}
+
+function TextProperty(text, uuid)
+{
+    	this.text = text,
+    	this.uuid = uuid
+}
+
+var PrintObject = new PrintClass();
+
 var order;
 var obs;
 var DoctorOrderStore;
@@ -252,52 +284,54 @@ var k2s = Ext.create('KineticToSencha', {
 		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
 			// By default, "this" will be the object that fired the event.
 			console.log("k2s: clickAddMedication");
-			var displayText = [];
+			var displayText = new String();
 			var store = Ext.getStore('drugpanel');
 			var data = store.getData();
 			var itemCount = data.getCount();
 
+			PrintObject.TextGroupProperty.type = 'DrugOrder';
+			PrintObject.TextGroupProperty.storeId = 'drugpanel';
+			PrintObject.TextGroupProperty.gid = Math.floor((Math.random()*5000)+1);
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
+
 			for(var i = MedicationPrinted,index=0; i < itemCount; i++,index++) {
 				var itemData = data.getAt(i).getData();
-
+				displayText= '';
 				// TODO: Consolidate following code into loop
 				if(!itemData.drugname) {
 					// If no drug name, skip to next loop iteration
 					continue;
 				} else {
-					displayText[index] = (itemData.drugname);
+					displayText = (itemData.drugname);
 				}
 
 				var strength = itemData.strength;
 				if(strength) {
-					displayText[index] += (' ' +strength + 'mg ');
+					displayText += (' ' +strength + 'mg ');
 				}
 
 				var frequency = itemData.frequency;
 				if(frequency) {
-					displayText[index] += (' ' + frequency);
+					displayText += (' ' + frequency);
 				}
 
 				var instruction = itemData.instruction;
 				if(instruction) {
-					displayText[index] += (' ' + instruction);
+					displayText += (' ' + instruction);
 				}
 
 				var quantity = itemData.duration;
 				if(quantity) {
-					displayText[index] += (' ' + quantity + ' days');
+					displayText += (' ' + quantity + ' days');
 				}
 				console.log(displayText)
 				// return itemData.drugname || "";
 				MedicationPrinted++;
+				var textForPrintObject = new TextProperty(displayText,itemData.uuid);
+				PrintObject.TextArray.push(textForPrintObject);
 			}
-			console.log('display...', displayText);
+				console.log(PrintObject);
 
-			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
-			g_medication_list = displayText;
-
-			//TODO UI Designers want prev Diagnosis to be showed (with different color    
-			// store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
 			Ext.getCmp('drugForm').setHidden(false);
 			Ext.getCmp('drugaddform').reset();
 			// Ext.getCmp('treatment-panel').setActiveItem(0);
@@ -311,20 +345,22 @@ var k2s = Ext.create('KineticToSencha', {
 			var data = store.getData();
 			var itemCount = data.getCount();
 			console.log('itemcount= '+itemCount); console.log('Diagnosis Printed='+DiagnosisPrinted);
-			
+			PrintObject.TextGroupProperty.type = 'Diagnosis';
+			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
+			PrintObject.TextGroupProperty.gid = Math.floor((Math.random()*5000)+1);
+
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
 			for(var i = DiagnosisPrinted, index=0; i < itemCount; i++, index++) {
 				var itemData = data.getAt(i).getData(); console.log(itemData);
-				console.log('index='+index+ ' i= '+i);
-				displayText[index] = (itemData.complain);
 				DiagnosisPrinted++;
+				var textForPrintObject = new TextProperty(itemData.complain,itemData.id);
+				PrintObject.TextArray.push(textForPrintObject);
 			}
-			console.log('display...', displayText);
-			g_diagnosis_list = displayText;
+				console.log(PrintObject);
+
 			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
 			Ext.getCmp('diagnosis-panel').setHidden(false);
-			//      Ext.getCmp('drugaddform').reset();
-			//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
 		}
 	}
 });
@@ -434,7 +470,7 @@ var setupCanvas = function() {
 		console.log(g_diagnosis_list);
 		k2s.fireEvent('clickOnDiagnosis');
 		Ext.getCmp('diagnosis-panel').setHidden(true);
-		drawDiagnosis(g_diagnosis_list);
+		drawDiagnosis(PrintObject);
 	});
 	stage.on("paintMedication", function() {
 		//To be refactored
@@ -442,7 +478,7 @@ var setupCanvas = function() {
 		console.log(g_medication_list);
 		k2s.fireEvent('clickAddMedication');
 		Ext.getCmp('drugForm').setHidden(true);
-		drawDiagnosis(g_medication_list);
+		drawDiagnosis(PrintObject);
 	});
 
 	////////////////////////
@@ -678,6 +714,8 @@ var setupCanvas = function() {
 		var imageObj = new Image();
 		imageObj.onload = function() {
 			var box = new Kinetic.Image({
+				gid: item.gid,
+				storeId : item.storeId,
 				x: item.x,
 				y: item.y,
 				width: item.width,
@@ -721,43 +759,60 @@ var setupCanvas = function() {
 
 	function drawDiagnosis(text) {
 		console.log('drawDiagnosis');
-		console.log(text);
-		if(text) {
+		if(text.TextArray.length) {
 			drawTextAtLowPoint(text);
 		}
+
 	}
 
-	function drawTextAtLowPoint(text) {
+	function drawTextAtLowPoint(PrintObject) {
+		console.log(PrintObject);
 		// text = "Rheumatic Fever";
 		// Image on each line.
 		// TODO: Needs pointer to the related in the store, so "X" can call delete
 		console.log("drawTextAtLowPoint");
 
-		// Set background color of text box according to type of text
-		if(text.indexOf('Medications') >= 0) {
-			bgFill = '#44f';
-		} else if(text.indexOf('Diagnoses') >= 0) {
-			bgFill = '#f44';
-		} else {
-			// bgFill = '#eee';
-			bgFill = '#fff';
+//PrintObject.TextGroupProperty['gid']
+	
+	var type = PrintObject.TextGroupProperty.type;
+	var storeId = PrintObject.TextGroupProperty.storeId;
+	var gid = PrintObject.TextGroupProperty.gid;
+	var TextArray = PrintObject.TextArray;
+
+//		Bullet icon is based on type of text to be printed	
+		var bullet_icon_link = '';
+		switch(type)
+		{
+		case 'Diagnosis':
+		  bullet_icon_link = 'resources/images/icons/bullet_diagnosis.png';
+		  break;
+		case 'DrugOrder':
+		  bullet_icon_link = 'resources/images/icons/bullet_drug.png';
+		  break;
+		case 'LabOrder':
+		  bullet_icon_link = 'resources/images/icons/bullet_investigation.png';
+		  break;
 		}
 
 		var imageObj2 = new Image();
 		var myHighY = highY;
-		addImageToLayer("resources/images/icons/bullet_diagnosis.png", textLayer, {
+		addImageToLayer(bullet_icon_link, textLayer, {
+			gid: gid,
 			x: DRAWABLE_X_MIN + 20,
 			y: myHighY,
 			width: 14,
 			height: 14			
 		});
-		console.log(text);
-		for(var i=0 ; i < text.length;i++)
+		console.log(TextArray);
+		for(var i=0 ; i < TextArray.length;i++)
 		{
 			var complexText = new Kinetic.Text({
+			gid: gid,
+			storeId : storeId,
+			storeUuid: TextArray[i].uuid,
 			x: DRAWABLE_X_MIN + 20 + 20,
 			y: highY,
-			text: text[i],
+			text: TextArray[i].text,
 			fontSize: 14,
 			fontFamily: 'Helvetica',
 			textFill: '#000',
@@ -770,21 +825,94 @@ var setupCanvas = function() {
 		// Add "delete" button
 		// Note, this creates item on control Layer, not text layer
 		createControlItem({
+			gid: gid,
 			image: "resources/images/icons/delete.png",
 			x: DRAWABLE_X_MAX - 140,
 			y: myHighY,
 			width: 16,
 			height: 16,
 			handler: function() {
-				console.log('TODO: handle click delete button');
-				console.log(this);
-				console.log(arguments);
+				gidToBeDeleted = this.attrs.gid; 
+				console.log('Deleting objects with gid= '+gidToBeDeleted);
+				
+				// Step 1 : Get Layers
+				for (var i= 0; i< stage.getChildren().length ; i++) 
+				{
+					//Children in only textLayer and controlsLayer to be removed
+					if (stage.getChildren()[i].getId() === "textLayer" || stage.getChildren()[i].getId() === "controlsLayer" ) 
+					{
+						//To check on infinite loop , TODO: Remove after testing
+						var count =0;
+						for(var j= 0 ; j< stage.getChildren()[i].getChildren().length; j++)
+						{
+							count++;
+							if(count == 100)
+							{
+								console.log('bad code.... infinite loop on');
+								break;
+							}
+				
+							//Step 2 : Select Children with help of group id and delete those chidren
+							if( stage.getChildren()[i].getChildren()[j].attrs.gid === gidToBeDeleted)
+							{
+								//Step 3 : Search & Delete related item from store from Store
+								//Checks if this item has any storeId & storeUuid linked
+								if(stage.getChildren()[i].getChildren()[j].attrs.storeId && stage.getChildren()[i].getChildren()[j].attrs.storeUuid)
+								{
+									storeToBeDeleted = Ext.getStore(stage.getChildren()[i].getChildren()[j].attrs.storeId);
+									var SearchKey = stage.getChildren()[i].getChildren()[j].attrs.storeUuid;
+									var SearchOnId = '';
+									switch(stage.getChildren()[i].getChildren()[j].attrs.storeId)
+										{
+										case 'diagnosedDisease':
+										  SearchOnId = 'id';        //Can change mapping of all stores to remove this switch case
+										  break;
+										case 'drugpanel':
+										  SearchOnId = 'uuid';
+										  break;
+										case 'LabOrder':
+										  SearchOnId = 'uuid';
+										  break;
+										}
+									//Remove item from relevant store
+									storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId,SearchKey));
+										
+									//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
+									//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
+									//Doctor can re search already diagnosed disease and select, though that will not effect anything
+										if(stage.getChildren()[i].getChildren()[j].attrs.storeId==='diagnosedDisease')											
+									    {
+									        diagnosedList = Ext.getCmp('diagnosisList');
+									        diagnosedList.getStore().add({
+									            complain: stage.getChildren()[i].getChildren()[j].attrs.text,
+									            id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
+									        });
+											--DiagnosisPrinted;
+									    }
+
+									   	if(stage.getChildren()[i].getChildren()[j].attrs.storeId==='drugpanel')										
+									    {
+											--MedicationPrinted;
+									    }
+								}
+
+								//Removing child layer from stage
+								console.log('Deleted Child: ');
+								console.log(stage.getChildren()[i].getChildren().splice(j,1));
+								--j;
+							}
+
+						//Refreshes stage to show changes made above
+						stage.getChildren()[i].draw();
+					}
+				}
+				}
 			}
 		});
 
-
 		var handDrawnLineY = highY ;// + 20*(text.length-1);
 		addImageToLayer("resources/images/icons/horizontal_crazy_line.png", textLayer, {
+				gid: gid,
 				x: DRAWABLE_X_MIN + 20,
 				y: handDrawnLineY,
 				width: 529,
