@@ -441,7 +441,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 if(success){
                         // wait for store to load
                         console.log(obsStore); 
-                        var obsTypes = ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE'];
+                        var obsTypes = ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE','PATIENT IMAGE'];
                         item = {};
                         item.pulse = '-';
                         item.temp = '-';
@@ -451,7 +451,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                         item.resrate = '-';
                         for (var i=0; i < obsTypes.length; i++) {
                             var val = getMostRecentObsValue(obsTypes[i], obsStore)
-                            console.log(obsTypes[i] + " is " + val);
                             // TODO: Will show undefined if no value is found
                             switch (obsTypes[i]){
                                 case 'PULSE':
@@ -472,7 +471,13 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                                 case 'RESPIRATORY RATE':
                                     item.resrate = val;
                                     break;
-                                default:
+                                case 'PATIENT IMAGE' :
+                                    if (val!=='-')
+                                        {
+                                            document.getElementById('patientProfile').style['background-image'] = "url("+val+")";
+                                        }
+                                    break;
+                                 default:
                                     break;
                             }
                         }
