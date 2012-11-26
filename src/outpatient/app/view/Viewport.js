@@ -15,10 +15,11 @@
  */
 
 Ext.define('RaxaEmr.Outpatient.view.Viewport', {
-    extend: 'Ext.navigation.View',  // TODO: this shouldnt be a navigation view. not using "push" anymore
+    // TODO: this shouldnt be a navigation view. not using "push" anymore. However,
+    //  changing to a Ext.panel/container causes patient list to fail to load. Why?
+    extend: 'Ext.navigation.View',
     xtype: 'mainview',
     id: 'mainview',
-    //other view used in this view are included
     requires: ['RaxaEmr.Outpatient.view.patientlist', 'RaxaEmr.Outpatient.view.patient.more', 'RaxaEmr.Outpatient.view.patient.labresulthistorypanel', 'RaxaEmr.Outpatient.view.patient.refertodocpanel', 'RaxaEmr.Outpatient.view.patient.medicationhistorypanel', 'RaxaEmr.Outpatient.view.patient.diagnosis'],
 
     initialize: function() {
@@ -35,7 +36,6 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
             modal: true,
             hideOnMaskTap: true,
 
-            // fullscreen: true,
             // Make it hidden by default
             hidden: true,
 
@@ -43,11 +43,6 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
             width: 768,
             height: 200,
 
-            // Here we specify the #id of the element we created in `index.html`
-            // contentEl: 'content',
-            // Style the content and make it scrollable
-            // styleHtmlContent: true,
-            // scrollable: true,
             layout: 'hbox',
             showAnimation: {
                 type: 'slide',
@@ -57,7 +52,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 type: 'slideOut',
                 direction: 'up'
             },
-            // Insert a title docked at the top with a title
+
             items: [{
                 xtype: 'button',
                 text: 'PatientList',
@@ -95,7 +90,6 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
 
         var patientList = this.add({
             xtype: 'patientlist',
-            // id: 'patientManagementDashboard',
 
             // We give it a left and top property to make it floating by default
             left: 0,
@@ -105,7 +99,6 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
             modal: true,
             hideOnMaskTap: true,
 
-            // fullscreen: true,
             // Make it hidden by default
             hidden: true,
 
@@ -113,11 +106,6 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
             width: 768,
             height: 600,
 
-            // Here we specify the #id of the element we created in `index.html`
-            // contentEl: 'content',
-            // Style the content and make it scrollable
-            // styleHtmlContent: true,
-            // scrollable: true,
             layout: 'hbox',
             showAnimation: {
                 type: 'slide',
@@ -127,39 +115,11 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 type: 'slideOut',
                 direction: 'down'
             },
-            // Insert a title docked at the top with a title
         });
     },
 
     config: {
         navigationBar: false,
-        // autoDestroy: false,
-        // fullscreen: true,
-        // confirmation buttons in the toolbar in the different view like medication history, refer to doc panel etc.
-        // navigationBar: {
-        //     items: [{
-        //         xtype: 'button',
-        //         id: 'confirmmedicationhistory',
-        //         text: 'Done',
-        //         ui: 'confirm',
-        //         align: 'right',
-        //         hidden: true
-        //     }, {
-        //         xtype: 'button',
-        //         id: 'confirmlabresulthistory',
-        //         text: 'Done',
-        //         ui: 'confirm',
-        //         align: 'right',
-        //         hidden: true
-        //     }, {
-        //         xtype: 'button',
-        //         id: 'confirmrefertodoc',
-        //         text: 'Done',
-        //         ui: 'confirm',
-        //         align: 'right',
-        //         hidden: true
-        //     }, ]
-        // },
         //the basic view of the main page is loaded
         items: [{
             xtype: 'toolbar',
@@ -170,34 +130,20 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 xtype: 'button',
                 iconCls: 'team',
                 iconMask: true,
+                // TODO: update with # of patients in waiting
                 badgeText: 2,
-                // TODO: update with # of patients in waiti
-                // ui: 'plain',
-                handler: function() { 
+                handler: function() {
                     var dash = Ext.getCmp('patientManagementDashboard');
                     var hidden = dash.getHidden();
                     if(hidden) {
-                        // dash.show({type: 'slide', direction: 'down'});
                         dash.show();
-                        // http://senchaexamples.com/2012/03/01/specifying-
-                        // hideAnimation: 'slideOut'
                     } else {
-                        // dash.hide({type: 'fade'});
                         dash.hide();
                     }
                 }
             }]
-
         }, {
-        // xtype: 'patientlist',
-        //     flex: 1,
-        //     }, {    
-        //     xtype: 'button',
-        //     flex: 1,
-        //     text: 'hello'
-                xtype: 'patientlist-show'
-            // }, {
-                // xtype: 'treatment-panel'
+            xtype: 'patientlist-show'
         }]
     }
 });

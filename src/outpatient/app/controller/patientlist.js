@@ -198,7 +198,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     // Opens dashboard immediately on Start.
     // TODO: Must enforce that you cannot draw on canvas or press any buttons until
-    //  an actual patient record is loaded, as this will throw errors
+    //  an actual patient record is loaded, as this will throw errors.
     launch: function () {
         Ext.getCmp('patientManagementDashboard').show();
     },

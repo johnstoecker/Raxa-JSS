@@ -43,7 +43,6 @@ Ext.define('Ext.LockableCarousel', {
  */
 
 Ext.define('RaxaEmr.Outpatient.view.patient.treatment', {
-    // extend: 'Ext.Container',
     extend: 'Ext.LockableCarousel',
 
     xtype: 'treatment-panel',
