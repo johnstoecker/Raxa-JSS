@@ -1,5 +1,5 @@
 // TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
-var TEST_HOOK = true;
+var TEST_HOOK = false;
 
 /**
  * Copyright 2012, Raxa
@@ -22,7 +22,8 @@ var opd_observations = new Array(); //contains the observations of different tab
 Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     extend: 'Ext.app.Controller',
     config: {
-        refs: { // all the fields are accessed in the controller through the id of the components 
+        // All the fields are accessed in the controller through the id of the components
+        refs: { 
             main: '#mainview',
             contacts: 'patientlist',
             contact: '#contact',
@@ -67,11 +68,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             vitalsGrid : '#vitalsGrid',
         },
 
-        control: { //to perform action on specific component accessed through it's id above 
-            main: {
-                push: 'onMainPush',
-                pop: 'onMainPop'
-            },
+        // To perform action on specific component accessed through it's id above 
+        control: { 
             contacts: {
                 itemtap: 'onContactSelect'
             },
@@ -195,20 +193,14 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     //this function starts on the load of the module
     init: function () {
-
-        // TODO: Temp
-        if (! TEST_HOOK)
-        {
-           this.getpatientlist();
-        }
+        this.getpatientlist();
     }, 
 
-    // TODO: Temp
+    // Opens dashboard immediately on Start.
+    // TODO: Must enforce that you cannot draw on canvas or press any buttons until
+    //  an actual patient record is loaded, as this will throw errors
     launch: function () {
-        if (TEST_HOOK)
-        {
-            this.onContactSelect();
-        }
+        Ext.getCmp('patientManagementDashboard').show();
     },
 
     //fetches patient list who are screened but not not have an OPD encounter
@@ -263,6 +255,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             scope: this,
             callback: function(records, operation, success){
                 if(success){
+                    console.log('updating store');
                     Ext.getCmp('contact').setStore(store_patientList);//setting store for the patient list
                 }
                 else{
@@ -276,33 +269,27 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     getPatientListUrl: function (scr_UUID, out_UUID, encountertype) {
         return (HOST + '/ws/rest/v1/raxacore/patientlist' + '?inList=' + scr_UUID + '&notInList=' + out_UUID + '&encounterType=' + encountertype);
     },
-    //what happens when we push something in the main view i.e. acually viewport of the module
-    onMainPush: function (view, item) {
 
-        if (item.xtype == "contact-show") {
-            this.getContacts().deselectAll();
-        }
-
-    },
-    //function is called when we popped from main view
-    onMainPop: function (view, item) {
-        this.buttonHide('confirmlabresulthistory');
-        this.buttonHide('confirmmedicationhistory');
-        this.buttonHide('confirmrefertodoc');
-    },
     //called after clicking on a patient in the patient list
     onContactSelect: function (list, index, node, record) {
 
         if (!this.showContact) {
-            this.showContact = Ext.create('RaxaEmr.Outpatient.view.patient.more');
+            console.log('creating show Contact screen')
+
+            // this.showContact = Ext.create('RaxaEmr.Outpatient.view.patient.more');
+            this.showContact = Ext.getCmp('more');
         }
 
         // TODO: Temp
         if (! TEST_HOOK) {
             this.showContact.setRecord(record);
         }
-        this.getMain().push(this.showContact);
         
+        // Hide patients list
+        Ext.getCmp('contact').hide();
+
+        // Show contact
+        this.getMain().setActiveItem(this.showContact);
 
         if (TEST_HOOK) {
             return;
@@ -333,9 +320,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         };
         
         // Load observations for current patient
-        console.log("load obsStore");
         var obsStore = Ext.create('RaxaEmr.Outpatient.store.obs');
-        console.log(obsStore); 
             
         obsStore.getProxy().setUrl(HOST + '/ws/rest/v1/obs?patient=' + myRecord.data.uuid);
         var that = this;
