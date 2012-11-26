@@ -826,11 +826,11 @@ var setupCanvas = function() {
 		// Note, this creates item on control Layer, not text layer
 		createControlItem({
 			gid: gid,
-			image: "resources/images/icons/delete.png",
+			image: "resources/images/icons/delete_bigger.png",
 			x: DRAWABLE_X_MAX - 140,
 			y: myHighY,
-			width: 16,
-			height: 16,
+			width: 32,
+			height: 32,
 			handler: function() {
 				gidToBeDeleted = this.attrs.gid; 
 				console.log('Deleting objects with gid= '+gidToBeDeleted);
@@ -911,7 +911,7 @@ var setupCanvas = function() {
 		});
 
 		var handDrawnLineY = highY ;// + 20*(text.length-1);
-		addImageToLayer("resources/images/icons/horizontal_crazy_line.png", textLayer, {
+		addImageToLayer("resources/images/icons/line.png", textLayer, {
 				gid: gid,
 				x: DRAWABLE_X_MIN + 20,
 				y: handDrawnLineY,
