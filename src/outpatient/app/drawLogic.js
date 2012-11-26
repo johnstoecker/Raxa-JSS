@@ -501,7 +501,7 @@ var setupCanvas = function() {
 			newLinePoints.push(prevPos);
 			newLine = new Kinetic.Line({
 				points: newLinePoints,
-				stroke: "red",
+				stroke: "black",
 			});
 			linesLayer.add(newLine);
 
@@ -821,6 +821,12 @@ var setupCanvas = function() {
 			textLayer.add(complexText);
 			highY += ((complexText.textHeight * (complexText.textArr.length + 1)));	// length + title + space
 
+			//Drug order suggestion demo interface
+			if(TextArray[i].text==="SINUSITIS")
+			{
+				console.log('SINUSITIS Detected');
+				var SuggestDrugOrder = true;
+			}
 		}
 		// Add "delete" button
 		// Note, this creates item on control Layer, not text layer
@@ -882,11 +888,11 @@ var setupCanvas = function() {
 									//Doctor can re search already diagnosed disease and select, though that will not effect anything
 										if(stage.getChildren()[i].getChildren()[j].attrs.storeId==='diagnosedDisease')											
 									    {
-									        diagnosedList = Ext.getCmp('diagnosisList');
-									        diagnosedList.getStore().add({
-									            complain: stage.getChildren()[i].getChildren()[j].attrs.text,
-									            id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
-									        });
+									        // var diagnosedList = Ext.getCmp('diagnosisList');
+									        // diagnosedList.getStore().add({
+									        //     complain: stage.getChildren()[i].getChildren()[j].attrs.text,
+									        //     id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
+									        // });
 											--DiagnosisPrinted;
 									    }
 
@@ -923,6 +929,33 @@ var setupCanvas = function() {
 		highY += (10 + 5);
 		
 		stage.draw();
+
+		//FOR DEMO UI OF DECISION SUPPORT
+		if(SuggestDrugOrder)
+		{
+			Ext.Msg.defaultAllowedConfig.maxHeight = 300;
+			Ext.Msg.defaultAllowedConfig.maxWidth = 600;
+
+			Ext.Msg.confirm('Confirmation for Raxa Decision Support Suggestion',
+				'Raxa Decision Support has suggested following Prescription \n' + '<font size="3" color="red"><br><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> for <b>SINUSITIS</b> </br>  \n Do you wish to accept this suggestion?' ,
+                function(btn){
+                    if (btn == 'yes'){
+                       Ext.getStore('drugpanel').add({
+							concept: "1ca5a9da-f770-11e1-a276-f23c91ae55df",
+							drugname: "Mometasone",
+							duration: "15",
+							frequency: "Twice Daily",
+							id: "ext-record-1733",
+							instruction: "With Meals",
+							routeofadministration: "TABLET",
+							strength: "200",
+							uuid: "99a67cfa-810e-4563-8a2b-37e72bb064eb"
+						});
+					stage.fire('paintMedication');
+                    }
+                }
+            ).setSize(600,300);
+		}
 	}
 
 	// Cleanup calls to add images, a little
