@@ -99,6 +99,7 @@ var obs;
 var DoctorOrderStore;
 var DoctorOrderModel;
 var DiagnosisPrinted = 0;
+
 var k2s = Ext.create('KineticToSencha', {
 
 	// TODO: Move all of these functions to the define() statement for k2s, and you can call via
@@ -309,6 +310,7 @@ var k2s = Ext.create('KineticToSencha', {
 				var itemData = data.getAt(i).getData();
 				displayText += (itemData.complain + '\n');
 				DiagnosisPrinted++;
+		
 			}
 			console.log('display...', displayText);
 			g_diagnosis_list = displayText;
