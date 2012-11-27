@@ -120,7 +120,6 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
 
     config: {
         navigationBar: false,
-        //the basic view of the main page is loaded
         items: [{
             xtype: 'toolbar',
             docked: 'top',

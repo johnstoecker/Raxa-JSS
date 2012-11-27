@@ -19,70 +19,12 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
     id: 'contact',
 
     config: {
-        // fullscreen: true,
-        // title: 'Outpatient Department',
         cls: 'x-contacts',
         ui: 'round',
-		// patient list toolbars
-        // items: [{
+		// items: [{
         //     xtype: 'toolbar',
         //     docked: 'top',
-        //     items: [{
-        //         xtype: 'segmentedbutton',
-        //         allowDepress: false,
-        //         items: [{
-        //             xtype: 'button',
-        //             ui: 'normal',
-        //             text: 'Today\'s List',
-        //             pressed: true,
-        //             width: 150,
-        //         }, {
-        //             xtype: 'button',
-        //             text: 'All Patients',
-        //             width: 150,
-        //         }, {
-        //             xtype: 'button',
-        //             text: 'Pending',
-        //             width: 150,
-        //         }]
-        //     }, {
-        //         xtype: 'spacer'
-        //     }, {
-        //         xtype: 'searchfield',
-        //         id: 'searchfield',
-        //         placeHolder: 'Search...'
-        //     }]
-        // }, {
-        //     xtype: 'toolbar',
-        //     docked: 'top',
-
         //     items: [ {
-        //         xtype: 'segmentedbutton',
-        //         allowDepress: false,
-        //         items: [{
-        //             xtype: 'button',
-        //             width: 130,
-        //             text: 'Name',
-        //             id: 'name'
-        //         }, {
-        //             xtype: 'button',
-        //             width: 130,
-        //             text: 'Doctor',
-        //             id: 'docname'
-        //         }, {
-        //             xtype: 'button',
-        //             width: 130,
-        //             text: 'Urgency',
-        //             id: 'urgency'
-        //         }, {
-        //             xtype: 'button',
-        //             width: 130,
-        //             text: 'Last Visit',
-        //             id: 'lastvisit'
-        //         }]
-        //     },{
-        //         xtype: 'spacer'
-        //     },{
         //             xtype: 'button',
         //             width: 130,
         //             text: 'Refresh',
