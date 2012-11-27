@@ -254,6 +254,11 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 if(success){
                     console.log('updating store');
                     Ext.getCmp('contact').setStore(store_patientList);//setting store for the patient list
+
+                    // Update badge text
+                    // Possible instead to do this via a "datachanged" listener on the store?
+                    Ext.getCmp('dashboardToggleButton').setBadgeText(store_patientList.getCount());
+                    Ext.getCmp('dashboardPatientListButton').setBadgeText(store_patientList.getCount());
                 }
                 else{
                     Ext.Msg.alert("Error", Util.getMessageLoadError());

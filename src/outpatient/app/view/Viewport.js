@@ -56,6 +56,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
             items: [{
                 xtype: 'button',
                 text: 'PatientList',
+                id: 'dashboardPatientListButton',
                 iconCls: 'team',
                 iconMask: true,
                 handler: function() {
@@ -130,10 +131,9 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
 
             items: [{
                 xtype: 'button',
+                id: 'dashboardToggleButton',
                 iconCls: 'team',
                 iconMask: true,
-                // TODO: update with # of patients in waiting
-                badgeText: 2,
                 handler: function() {
                     var dash = Ext.getCmp('patientManagementDashboard');
                     var hidden = dash.getHidden();
@@ -145,7 +145,12 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
 
                     // Hide any other modals, like "patient list", "add new", "search"
                     Ext.getCmp('contact').hide();   // patient list
-                    Ext.getCmp('newPatient').hide();    // add 
+                    
+                    var newPatientModal = Ext.getCmp('newPatient');
+                    if (newPatientModal) {
+                        newPatientModal.hide();    
+                    }
+                    
                     // search
                 }
             }]
