@@ -67,11 +67,13 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 flex: 1,
             }, {
                 xtype: 'button',
+                id: 'addPatientButton',
                 text: 'Add',
                 iconCls: 'add',
                 iconMask: true,
                 handler: function() {
                     console.log('add patient patientManagementDashboard button');
+                    Ext.getCmp('patientManagementDashboard').hide();
                 },
                 margin: 30,
                 flex: 1,
@@ -82,6 +84,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 iconMask: true,
                 handler: function() {
                     console.log('search patient patientManagementDashboard button');
+                    Ext.getCmp('patientManagementDashboard').hide();
                 },
                 margin: 30,
                 flex: 1,
@@ -142,7 +145,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
 
                     // Hide any other modals, like "patient list", "add new", "search"
                     Ext.getCmp('contact').hide();   // patient list
-                    // add
+                    Ext.getCmp('newPatient').hide();    // add 
                     // search
                 }
             }]

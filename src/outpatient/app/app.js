@@ -31,7 +31,7 @@ Ext.application({
     models: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign','diagnosis','diagnosedDisease','druglist','Observation','DoctorOrder','DoctorOrderObservation'],
     stores: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign','diagnosis','diagnosedDisease','druglist','DoctorOrder'],
     views: ['Viewport'], 
-    controllers: ['patientlist','DoctorOrder'],
+    controllers: ['patientlist','DoctorOrder','AddPatient'],
     // to launch the module view
     launch: function () {
         if(Util.checkModulePrivilege('outpatient')&& Util.uuidLoadedSuccessfully()){

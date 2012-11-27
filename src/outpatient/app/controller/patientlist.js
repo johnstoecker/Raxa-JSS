@@ -1,6 +1,3 @@
-// TODO: Remove this test hook. just causes you to autonavigate to screen 2, to save some clicking effort.
-var TEST_HOOK = false;
-
 /**
  * Copyright 2012, Raxa
  *
@@ -280,21 +277,13 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             this.showContact = Ext.getCmp('more');
         }
 
-        // TODO: Temp
-        if (! TEST_HOOK) {
-            this.showContact.setRecord(record);
-        }
+        this.showContact.setRecord(record);
         
         // Hide patients list
         Ext.getCmp('contact').hide();
 
         // Show contact
         this.getMain().setActiveItem(this.showContact);
-
-        if (TEST_HOOK) {
-            return;
-        }
-
 
         // Persist current patient's details
         myRecord = record;
@@ -965,5 +954,5 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         store.on('write', function () {
             Ext.Msg.alert('successful');
         }, this);
-    }
+    },
 });
