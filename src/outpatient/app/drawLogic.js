@@ -332,6 +332,11 @@ var k2s = Ext.create('KineticToSencha', {
 			}
 				console.log(PrintObject);
 
+			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
+			g_medication_list = displayText;
+
+			//TODO UI Designers want prev Diagnosis to be showed (with different color    
+			// store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
 			Ext.getCmp('drugForm').setHidden(false);
 			Ext.getCmp('drugaddform').reset();
 			// Ext.getCmp('treatment-panel').setActiveItem(0);
@@ -353,6 +358,8 @@ var k2s = Ext.create('KineticToSencha', {
 
 			for(var i = DiagnosisPrinted, index=0; i < itemCount; i++, index++) {
 				var itemData = data.getAt(i).getData(); console.log(itemData);
+				console.log('index='+index+ ' i= '+i);
+				displayText[index] = (itemData.complain);
 				DiagnosisPrinted++;
 				var textForPrintObject = new TextProperty(itemData.complain,itemData.id);
 				PrintObject.TextArray.push(textForPrintObject);
@@ -361,6 +368,8 @@ var k2s = Ext.create('KineticToSencha', {
 
 			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
 			Ext.getCmp('diagnosis-panel').setHidden(false);
+			//      Ext.getCmp('drugaddform').reset();
+			//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
 		}
 	}
 });
@@ -634,24 +643,24 @@ var setupCanvas = function() {
 			console.log('KEYBOARD: TODO');
 			// mode = "keyboard";
 		}
-	}, {
-		// Save
-		image: 'resources/images/save.png',
-		x: stage.getWidth() - 3 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
-		handler: function() {
-			console.log('tapped save button');
-			onSaveCanvas();
-		},
+	// }, {
+	// 	// Save
+	// 	image: 'resources/images/save.png',
+	// 	x: stage.getWidth() - 3 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
+	// 	y: CONTROL_BASE_Y,
+	// 	width: CONTROL_ITEM_DIM,
+	// 	height: CONTROL_ITEM_DIM,
+	// 	handler: function() {
+	// 		console.log('tapped save button');
+	// 		onSaveCanvas();
+	// 	},
 	}, {
 		//Temp: Sending OPD Encounter
-		image: 'resources/images/EndOfOPD.png',
-		x: stage.getWidth() - 2 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
+		image: 'resources/images/icons/button_finalize.png',
+		x: stage.getWidth() - 110 - 58,
+		y: TOOLBAR_ITEM_BASE_Y + 3,
+		width: 110,
+		height: 35,
 		handler: function() {
 			console.log('sending Doctor Encounter');
 			k2s.config.sendDoctorOrderEncounter();
@@ -762,7 +771,6 @@ var setupCanvas = function() {
 		if(text.TextArray.length) {
 			drawTextAtLowPoint(text);
 		}
-
 	}
 
 	function drawTextAtLowPoint(PrintObject) {
@@ -915,6 +923,7 @@ var setupCanvas = function() {
 				}
 			}
 		});
+
 
 		var handDrawnLineY = highY ;// + 20*(text.length-1);
 		addImageToLayer("resources/images/icons/line.png", textLayer, {

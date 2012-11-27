@@ -1,7 +1,7 @@
 Ext.define('RaxaEmr.Outpatient.view.patient.history', {
     extend: 'Ext.Container',
     xtype: 'history-panel',
-    requires: ['RaxaEmr.Outpatient.view.patient.history.Unstructured'],
+    requires: ['RaxaEmr.Outpatient.view.patient.history.Unstructured', 'RaxaEmr.Outpatient.view.patient.history.Diagnosis'],
     id: 'history-panel',
     title: 'History',
     initialize: function() {
@@ -62,7 +62,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history', {
             }, {
                 html: 'Investigations'
             }, {
-                html: 'Diagnoses'
+                // html: 'Diagnoses'
+                xtype: 'history-diagnosis'
             }, {
                 html: 'Medicine'
             }]

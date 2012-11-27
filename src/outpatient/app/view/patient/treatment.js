@@ -10,7 +10,9 @@ Ext.define('Ext.LockableCarousel', {
             // console.log(e);
             // TODO: Fiddle with this. idea is that you cannot drag on the canvasas "drawable area"
             // TODO: Instead, catch event where (if mouse over floating "tab" (or "thin bar"), then you can drag it)
-            if (e.startX > 710) {
+            var RIGHT_SIDE_X = 710; // 58 pixels can be clicked, since full width is 768
+            var LEFT_SIDE_X = 58;  
+            if (e.startX > RIGHT_SIDE_X || e.startX < LEFT_SIDE_X) {
             // if(!this.locked) {
                 this.onDragOrig(e);
             }
@@ -43,12 +45,12 @@ Ext.define('Ext.LockableCarousel', {
  */
 
 Ext.define('RaxaEmr.Outpatient.view.patient.treatment', {
-    // extend: 'Ext.Container',
     extend: 'Ext.LockableCarousel',
 
     xtype: 'treatment-panel',
     requires: ['RaxaEmr.Outpatient.view.patient.drugpanel', 'RaxaEmr.Outpatient.view.patient.treatmentsummery', 'Screener.store.druglist', 'Screener.model.druglist', 'RaxaEmr.Outpatient.view.patient.druglist', 'RaxaEmr.Outpatient.view.patient.drugform', 'RaxaEmr.Outpatient.view.patient.DrugGrid'],
     id: 'treatment-panel',
+    
     config: {
         title: 'Treatment',
         indicator: false,
