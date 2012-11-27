@@ -643,24 +643,24 @@ var setupCanvas = function() {
 			console.log('KEYBOARD: TODO');
 			// mode = "keyboard";
 		}
-	}, {
-		// Save
-		image: 'resources/images/save.png',
-		x: stage.getWidth() - 3 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
-		handler: function() {
-			console.log('tapped save button');
-			onSaveCanvas();
-		},
+	// }, {
+	// 	// Save
+	// 	image: 'resources/images/save.png',
+	// 	x: stage.getWidth() - 3 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
+	// 	y: CONTROL_BASE_Y,
+	// 	width: CONTROL_ITEM_DIM,
+	// 	height: CONTROL_ITEM_DIM,
+	// 	handler: function() {
+	// 		console.log('tapped save button');
+	// 		onSaveCanvas();
+	// 	},
 	}, {
 		//Temp: Sending OPD Encounter
-		image: 'resources/images/EndOfOPD.png',
-		x: stage.getWidth() - 2 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
-		y: CONTROL_BASE_Y,
-		width: CONTROL_ITEM_DIM,
-		height: CONTROL_ITEM_DIM,
+		image: 'resources/images/icons/button_finalize.png',
+		x: stage.getWidth() - 110 - 58,
+		y: TOOLBAR_ITEM_BASE_Y + 3,
+		width: 110,
+		height: 35,
 		handler: function() {
 			console.log('sending Doctor Encounter');
 			k2s.config.sendDoctorOrderEncounter();

@@ -186,7 +186,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
     //////// ^^ COPIED DIRECTLY FROM SCREENER CONTROLLER "Application.js" ^^ ////////
 
-    // MINOR REFACTORING OF WHAT WAS IN "Application.js" //
+    // MINOR REFACTORING OF WHAT WAS IN SCREENER "Application.js" //
     // Removed everything which relates to updating the UI //
     // Note: "Screener Vitals" encounter should be separated from "Screener" encounter in sendEncounterData()
 
