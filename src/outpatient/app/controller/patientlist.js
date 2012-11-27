@@ -845,6 +845,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
             if (obj.id != 'addMoreDrug') {
                 Ext.getCmp('drugForm').setHidden(true);
+                        //Print prescription of drug order
+                        stage.fire('paintMedication');
             };   
         } 
         else {
