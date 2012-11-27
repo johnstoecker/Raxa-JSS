@@ -140,6 +140,11 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                     } else {
                         dash.hide();
                     }
+
+                    // Hide any other modals, like "patient list", "add new", "search"
+                    Ext.getCmp('contact').hide();   // patient list
+                    // add
+                    // search
                 }
             }]
         }, {
