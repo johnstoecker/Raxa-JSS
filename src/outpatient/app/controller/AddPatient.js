@@ -214,7 +214,12 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         }, this)
     },
 
+    // Assigns patient, pops-open the patient-list so you can select that patient
     assignPatient: function (patient, provider) {
         this.sendEncounterData(patient, localStorage.screenerUuidencountertype, localStorage.waitingUuidlocation, provider)
+        
+        // Show patient list, so user gets feedback that their patient was added successfully
+        // TODO: Move this logic into view modification.. shouldn't be involved in the controller
+        Ext.getCmp('contact').show();
     },    
 });
