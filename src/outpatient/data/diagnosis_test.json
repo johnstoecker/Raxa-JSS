@@ -1,6 +1,6 @@
 [
 	{
-		"sign": "Fever",
+		"sign": "FEVER",
 		"id": "1cad0676-f770-11e1-a276-f23c91ae55df",
 		"type": "all"
 	},
@@ -17,6 +17,11 @@
 	{
 		"sign": "HEADACHE",
 		"id": "1ca1b8ca-f770-11e1-a276-f23c91ae55df",
+		"type": "all"
+	},
+	{
+		"sign": "SINUSITIS",
+		"id": "1c9efbbc-f770-11e1-a276-f23c91ae55df",
 		"type": "all"
 	},
 ]
