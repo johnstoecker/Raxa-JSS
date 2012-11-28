@@ -70,16 +70,13 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 				disableSelection: true,
 				listeners: {
 					itemtap: function(view, index, target, record, e, eOpts) {
-						gloRecord = record;
-						console.log(record);
+						var svh = Ext.getCmp('singleVisitHistory'); 
+						var scroller = svh.getScrollable().getScroller();
+						var HEIGHT_OF_STAGE = 1024;
+						scroller.scrollTo(0, index*HEIGHT_OF_STAGE, true);
+
 						// Close this window
 						Ext.getCmp('visitHistory').hide();
-
-						var stageJSON = record.get('json');
-						var stage = Ext.getCmp('history-unstructured-panel').stage; 
-						// stage.clear();
-						stage = Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
-						stage.draw();
 
 						var button = Ext.getCmp('unstructuredHistoryChooseDateButton');
 						var visitDate = record.get('date');
@@ -130,7 +127,11 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 		}, {
 			xtype: 'container',
 			id: 'singleVisitHistory',
-			scrollable: true,
+			// scrollable: true,
+			scrollable: {
+                direction: 'vertical',
+                directionLock: true
+            },
 			layout: 'vbox',
 			flex: 1,
 
