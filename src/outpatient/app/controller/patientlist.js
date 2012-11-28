@@ -426,7 +426,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         // Get patient's visit history
         var patientEncounterStore = this.getPatientEncounters(myRecord.data.uuid);
         patientEncounterStore.on('load', function () {
-            this.getVisitHistory(patientEncounterStore);
+            // TODO: Sort by date, desc
+
+            // Add all visits to the view
+            var visitHistoryStore = this.getVisitHistory(patientEncounterStore);
+            for (var i =0; i < visitHistoryStore.getCount(); i++) {
+                var stageJSON = visitHistoryStore.getAt(i).getData().json;
+                
+                // Add to stage
+                Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
+            }
         }, this);
 
         // TODO: Get patient's diagnoses
@@ -1146,6 +1155,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 visitHistoryStore.add(visitHistoryItem);            
             }
         }
+
+        return visitHistoryStore;
     },
 
     getPatientEncounters: function(patientUuid) {
