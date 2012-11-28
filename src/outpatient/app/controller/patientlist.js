@@ -1106,23 +1106,29 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
         // Get each Outpatient encounter, put relevant items into visitHistoryStore
         for (var i=0; i < encounterStore.getCount(); i++) {
-
+            console.log(encounterData)
             var encounterData = encounterStore.getAt(i).getData();
             var display = encounterData.display;
             var obs = encounterData.obs;
             
             console.log('Encounter #', (i+1), display);        
             if(encounterData.encounterType.uuid == localStorage.outUuidencountertype) {
+                gloObs = obs;
                 // find vectorImage (json) and thumbnail Image (dataUrl)
                 // TODO: Handle multiple images or jsons per encounter.
                 var json = '';
                 var imgSrc = '';
                 for (var j = 0; j < obs.length; j++) {
-                    var conceptUuid = obs[j].concept.uuid;
+                    o = obs[j];
+                    var conceptUuid = o.concept.uuid;
+                    console.log('obs #', j, ' ... conceptUuid = ', conceptUuid);
                     if(conceptUuid == localStorage.patientRecordImageUuidconcept) {
-                        imgSrc = obs.value;
+                        console.log('found thumb image!');
+                        imgSrc = o.value;
                     } else if (conceptUuid == localStorage.patientRecordVectorImageUuidconcept) {
-                        json = obs.value;
+                        console.log('found vector image!');
+                        console.log(o);
+                        json = o.value;
                     }
                 }   
                 

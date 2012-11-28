@@ -27,7 +27,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.DiagnosisGrid', {
     flex: 1,
     config: {
         title: 'Grid',
-        // store: g_obsStore,
         scrollable: 'false',
         columns: [{
             header: 'Name',

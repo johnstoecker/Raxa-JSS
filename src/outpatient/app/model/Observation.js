@@ -3,7 +3,7 @@ Ext.define('RaxaEmr.Outpatient.model.Observation', {
 	config: {
 		fields: [{
 			name: 'concept',
-			type: 'string'
+			// type: 'string'
 		},
 		{
 			name: 'person',
