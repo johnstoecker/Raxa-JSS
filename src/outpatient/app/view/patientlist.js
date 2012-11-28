@@ -55,7 +55,7 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
 		// List item template
         // itemTpl: '{display}',
 		itemTpl: new Ext.XTemplate(
-            '<div class="headshot" style="background-image:url({image});"></div>', 
+            '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>', 
             '<div style="float:left;width:60%">', '{display}', '</div>', 
             '<div style="float:left;width:30%;font-size:18px">', 
                 '<span>Gender : {[this.gender(values.gender)]}</span>',
@@ -72,7 +72,7 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
                         return 'Female';
 					}
 				  }
-			}
+			} 
 		)
 	}
 });

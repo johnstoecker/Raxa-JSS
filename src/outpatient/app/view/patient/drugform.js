@@ -28,6 +28,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.drugform', {
         hideOnMaskTap: true,
         title: 'Treatment',
         items: [{
+            xtype: 'titlebar',
+            docked: 'top',
+            title: 'Drug Order'
+            },{
             xtype: 'container',
             width: 500,
             layout: {

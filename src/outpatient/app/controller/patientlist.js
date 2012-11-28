@@ -474,22 +474,28 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                             // TODO: Will show undefined if no value is found
                             switch (obsTypes[i]){
                                 case 'PULSE':
+                                    document.getElementById('PR').innerHTML =val;
                                     item.pulse = val;
                                     break;
                                 case 'TEMPERATURE (C)':
+                                    document.getElementById('Temp').innerHTML =val;;
                                     item.temp = val;
                                     break;
                                 case 'BLOOD OXYGEN SATURATION':
+                                    document.getElementById('O2Sat').innerHTML =val;
                                     item.oxysat = val;
                                     break;
                                 case 'DIASTOLIC BLOOD PRESSURE': 
+                                    document.getElementById('DBP').innerHTML = val;
                                     item.dbp = val;
                                     break;
                                 case 'SYSTOLIC BLOOD PRESSURE':
                                     item.sbp = val;
+                                    document.getElementById('SBP').innerHTML = val;
                                     break;
                                 case 'RESPIRATORY RATE':
                                     item.resrate = val;
+                                    document.getElementById('RR').innerHTML = val;
                                     break;
                                 case 'PATIENT IMAGE' :
                                     if (val!=='-')
