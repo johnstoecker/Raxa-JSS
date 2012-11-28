@@ -1,6 +1,15 @@
 /// <<< -- TODO: REMOVE THE BELOW
 
 // TODO: This code is to help fetch history items. once we have history views can implement better.
+
+// Usage: for now, after app starts, just run g_getAllDiagnoses()
+//  This will load up some items into the diagnosis history and unstructured history views from
+//  a patient on the test.raxa.org server
+
+// Can fetch obs by 
+// - encounter UUID (0 to n obs)
+// - patient UUID (0 to n obs)
+// - by obs UUID (0 to 1 obs)
 function g_fetchObs(uuid, resource, obsStore) {
     var myUrl;
     if (resource == 'obs') {
@@ -13,6 +22,8 @@ function g_fetchObs(uuid, resource, obsStore) {
         return;
     }
 
+    var visitHistoryStore = Ext.getStore('visitHistoryStore');
+
     Ext.Ajax.request({
         url: myUrl,
         success: function(response) {
@@ -21,6 +32,22 @@ function g_fetchObs(uuid, resource, obsStore) {
             for (var i = 0; i < r.length; i++) {
                 console.log(r[i]);
                 obsStore.add(r[i]);
+
+                // If it's an image, add it to the image store
+                if(r[i].concept.uuid == localStorage.patientRecordImageUuidconcept || 
+                    r[i].concept.uuid == "1006f63a-3d43-4cc1-b4af-fd2dd8be3109") {  // TEMP so it works on Raxa.io and test.raxa, with dif uuids
+                    console.log("Found an image");
+                    visitHistoryStore.add({
+                        'title': 'myTitle',
+                        'uuid' : r[i].uuid,
+                        'diagnosisCount': 'd#',
+                        'treatmentCount': 't#',
+                        'imgSrc' : r[i].value
+                    });
+
+                    // TODO: Add vector image, too
+                }
+
                 console.log(obsStore.getCount());
             }
         },
@@ -32,6 +59,7 @@ function g_fetchSomeEncounters() {
         var store = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
         // Insert proper patient's UUID
         myUrl = HOST + '/ws/rest/v1/encounter' + '?patient=5ff52670-2cb2-4874-9fb1-b4bbe10dadda&v=full';
+        myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/encounter' + '?patient=5ff52670-2cb2-4874-9fb1-b4bbe10dadda&v=full';
         // myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/encounter/05f95678-d4a9-4b43-b23e-e568245694e8?v=full';
         store.getProxy().setUrl(myUrl);
         // store.getProxy().setUrl(HOST + '/ws/rest/v1/encounter' + '?patient=75d93e0c-8596-4afb-88a9-dcf07a1b487f&v=full');
@@ -46,8 +74,12 @@ var g_encounterStore = g_fetchSomeEncounters();
 var g_obsStore = Ext.create('RaxaEmr.Outpatient.store.opdObs');
 
 //  1. All diagnoses
-function g_getAllDiagnoses() {
+function g_getAllDiagnoses() {\
     console.log('g_getAllDiagnoses');
+}
+
+function g_getAllObs() {
+    console.log('g_getAllObs');
     // TODO: Should I directly just fetch all observations? filter on diagnoses? too many?
 
     // Obs
@@ -99,6 +131,7 @@ function g_getAllMedications() {
 
 //  4. All investigations ordered (ideally, with results tagged on to them)
 function g_getAllInvestigations() {
+
 }
 
 /// <<< -- TODO: REMOVE THE ABOVE
