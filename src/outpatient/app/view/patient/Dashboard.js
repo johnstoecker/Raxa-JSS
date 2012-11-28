@@ -46,8 +46,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         type: 'slideOut',
         direction: 'up'
     },
-    MARGIN: 35,
-
+    
     items: [{
         xtype: 'button',
         text: 'Patient List',
