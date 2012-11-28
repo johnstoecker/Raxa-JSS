@@ -59,19 +59,19 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
             }, {
                 xtype: 'list',
                 id: 'visitHistoryList',
-                itemTpl: '<img src="{imgSrc}" height="32" width="32" /> {title} (Dx: {diagnosisCount}, Rx: {treatmentCount})',
+                itemTpl: '<img src="{imgSrc}" height="32" width="32" /> {date}',
                 store: new Ext.data.ArrayStore({
                     id: 'visitHistoryStore',
-                    fields: ['title', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc'],
+                    fields: ['title', 'date', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc', 'json'],
                     data: []
                 }),
 
                 flex: 1,
                 disableSelection: true,
-                preventSelectionOnDisclose: true,
-                onItemDisclosure: true,
                 listeners: {
-                    disclose: function(view, record, target, index, e, eOpts) {
+                	// TODO: Change to "tap" rather than disclose
+                	itemtap: function( view, index, target, record, e, eOpts ) {
+                    // tap: function(view, record, target, index, e, eOpts) {
                         console.log('Disclose!', 'You selected ' + record.get('uuid') + '... so let\'s open this history record');
                         // Close this window
                         Ext.getCmp('visitHistory').hide();
@@ -82,7 +82,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
                         img.setConfig({'height':800});
 
                         var button = Ext.getCmp('unstructuredHistoryChooseDateButton');
-                        button.setText('Date of visit');
+                        var visitDate = record.get('date');
+                        button.setText(visitDate);
 
                         Ext.getCmp('singleVisitHistory').show();
                     }

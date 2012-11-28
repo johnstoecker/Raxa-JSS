@@ -1,3 +1,199 @@
+/// <<< -- TODO: REMOVE THE BELOW
+
+// TODO: This code is to help fetch history items. once we have history views can implement better.
+
+// Usage: for now, after app starts, just run g_getAllDiagnoses()
+//  This will load up some items into the diagnosis history and unstructured history views from
+//  a patient on the test.raxa.org server
+
+// Can fetch obs by 
+// - encounter UUID (0 to n obs)
+// - patient UUID (0 to n obs)
+// - by obs UUID (0 to 1 obs)
+
+function g_getVisitHistory() {
+
+    var visitHistoryStore = Ext.getStore('visitHistoryStore');
+
+    // Get each Outpatient encounter, put relevant items into visitHistoryStore
+    for (var i=0; i < g_encounterStore.getCount(); i++) {
+
+        var encounterData = g_encounterStore.getAt(i).getData();
+        var display = encounterData.display;
+        var obs = encounterData.obs;
+        
+        gloEncounterData = encounterData;
+        console.log('Encounter #', (i+1), display);        
+        console.log(encounterData.encounterType.uuid);
+        if(encounterData.encounterType.uuid == localStorage.outUuidencountertype) {
+            console.log("is Outpatient Encounter");
+            
+            // find vectorImage (json) and thumbnail Image (dataUrl)
+            // TODO: Handle multiple images or jsons per encounter.
+            var json = '';
+            var imgSrc = '';
+            for (var j = 0; j < obs.length; j++) {
+                var conceptUuid = obs[j].concept.uuid;
+                if(conceptUuid == localStorage.patientRecordImageUuidconcept) {
+                    imgSrc = obs.value;
+                } else if (conceptUuid == localStorage.patientRecordVectorImageUuidconcept) {
+                    json = obs.value;
+                }
+            }   
+            
+            console.log('adding to visitHistoryStore');
+            visitHistoryStore.add({
+                'title': encounterData.display,
+                'date' : Ext.util.Format.date(encounterData.encounterDatetime),
+                'uuid' : encounterData.uuid,
+                'diagnosisCount': 'd#',
+                'treatmentCount': 't#',
+                'imgSrc' : imgSrc,
+                'json' : json
+            });            
+        }
+    }
+}
+
+function g_fetchObs(uuid, resource, obsStore) {
+    console.log('g_fetchObs: ', uuid, resource, obsStore);
+    var myUrl;
+    if (resource == 'obs') {
+        myUrl = HOST + '/ws/rest/v1/obs/' + uuid;
+    } else if (resource == 'patient') {
+        myUrl = HOST + '/ws/rest/v1/obs?patient=' + uuid;
+    } else if (resource == 'encounter') {
+        myUrl = HOST + '/ws/rest/v1/obs?encounter=' + uuid + '&v=full';
+    } else {
+        return;
+    }
+
+    console.log('g_fetchObs: ' + myUrl);
+    var visitHistoryStore = Ext.getStore('visitHistoryStore');
+
+    // TODO: No need for ajax request. Just dig through the encounter Store.
+    //  Make the history store more robust... needs  
+    //      - at a minimum: Date, thumbNail (image), json
+    //      - someday: # dx, # rx, # images, referral, lab .. (various stats to show in the preview)
+    Ext.Ajax.request({
+        url: myUrl,
+        success: function(response) {
+            var r = JSON.parse(response.responseText).results;
+            
+            for (var i = 0; i < r.length; i++) {
+                obsStore.add(r[i]);
+
+                // If it's an outpatient visit...
+                // Check for image. This will be thumbnail.
+                // TODO: Check for vector image, this is used to reload into the view
+                if(r[i].concept.uuid == localStorage.patientRecordImageUuidconcept || 
+                    
+                    r[i].concept.uuid == "1006f63a-3d43-4cc1-b4af-fd2dd8be3109") {  // TEMP so it works on Raxa.io and test.raxa, with dif uuids
+                    console.log("Found an image");
+                    visitHistoryStore.add({
+                        'title': 'myTitle',
+                        'uuid' : r[i].uuid,
+                        'diagnosisCount': 'd#',
+                        'treatmentCount': 't#',
+                        'imgSrc' : r[i].value
+                    });
+
+                    
+                }
+            }
+        },
+        headers: Util.getBasicAuthHeaders(),
+    });
+}
+
+function g_fetchSomeEncounters(patientUuid) {
+        var store = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
+        // Insert proper patient's UUID
+
+        var myUrl;
+        if (patientUuid) {
+            myUrl = HOST + '/ws/rest/v1/encounter' + '?patient=' + patientUuid + '&v=full';    
+        }
+        else {
+            myUrl = HOST + '/ws/rest/v1/encounter' + '?patient=5ff52670-2cb2-4874-9fb1-b4bbe10dadda&v=full';    
+        }
+
+        // myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/encounter' + '?patient=5ff52670-2cb2-4874-9fb1-b4bbe10dadda&v=full';
+        // myUrl = 'http://test.raxa.org:8080/openmrs/ws/rest/v1/encounter/05f95678-d4a9-4b43-b23e-e568245694e8?v=full';
+        store.getProxy().setUrl(myUrl);
+        // store.getProxy().setUrl(HOST + '/ws/rest/v1/encounter' + '?patient=75d93e0c-8596-4afb-88a9-dcf07a1b487f&v=full');
+        
+        //store.getProxy().getReader().setRootProperty('results');
+        store.load();
+        store.sync();
+        return store;
+}
+
+var g_obsStore = Ext.create('RaxaEmr.Outpatient.store.opdObs');
+
+//  1. All diagnoses
+function g_getAllDiagnoses() {
+    console.log('g_getAllDiagnoses');
+}
+
+function g_getAllObs() {
+    console.log('g_getAllObs');
+    // TODO: Should I directly just fetch all observations? filter on diagnoses? too many?
+
+    // Obs
+    // var obsStore = Ext.create('RaxaEmr.Outpatient.store.opdObs');
+    var obsStore = Ext.getStore('opdObservations');
+    console.log(obsStore.getCount());
+    var obsCount = 0;
+    // Get each Outpatient encounter
+    for (var i=0; i < g_encounterStore.getCount(); i++) {
+        
+        var encounterData = g_encounterStore.getAt(i).getData();
+        console.log(encounterData);
+        var display = encounterData.display;
+        var obs = encounterData.obs;
+        
+        console.log('Encounter #', (i+1), display);
+        g_fetchObs(encounterData.uuid,'encounter', obsStore);
+        // Get the obs from each encounter and add to store
+
+        // var handler = function () {
+        //     for (var j=0; j < obs.length; j++) {
+        //         console.log('\t', 'Obs #', (j+1), obs[j].display);
+
+        //         // TODO: Ensure we're copying all necessary fields
+        //         // obsStore.add(obs[j])
+        //     }
+        // }
+    }
+    console.log(obsStore.getCount());
+    // obsStore.sync();
+    
+    // TODO: Copy all obs into an obs store, just to try it.. good for grid and list displays
+    return obsStore;
+}
+
+//  2. All height / weights
+        // TODO: proof of concept for retrieving and visualizing info. 
+        // display a "growth chart" using height/weight vs datetime measures taken
+        // http://www.cdc.gov/growthcharts/ ... http://www.cdc.gov/growthcharts/who_charts.htm#The WHO Growth Charts
+
+function g_getGrowthChart() {
+
+}
+
+//  3. All medications ordered
+function g_getAllMedications() {
+    
+}
+
+//  4. All investigations ordered (ideally, with results tagged on to them)
+function g_getAllInvestigations() {
+
+}
+
+/// <<< -- TODO: REMOVE THE ABOVE
+
 /**
  * Copyright 2012, Raxa
  *
@@ -293,6 +489,17 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         // Persist current patient's details
         myRecord = record;
        
+        console.log('fetching patients encounters');
+        // Get patient's diagnoses
+        
+        // var patientEncounterStore = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
+        // patientEncounterStore = g_fetchSomeEncounters(myRecord.data.uuid);
+        g_encounterStore = g_fetchSomeEncounters(myRecord.data.uuid);
+        g_encounterStore.on('load', function () {
+            Ext.Msg.alert('Loaded', 'Encounter Store loaded... now getting visit history');
+            g_getVisitHistory();
+        }, this);
+
         // Helper Function for getting most recent value of an observation type
         //
         // Input: display name of Observation and store of Observations

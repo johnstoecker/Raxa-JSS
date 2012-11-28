@@ -10,7 +10,7 @@ Ext.define('RaxaEmr.Outpatient.model.opdEncounter', {
             type: 'string'
         }, {
             name: 'encounterType',
-            type: 'string'
+            // type: 'string'
         }, {
             name: 'encounterDatetime'
         }, {
