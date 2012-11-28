@@ -14,6 +14,7 @@
  * the License.
  */
 
+var DASHBOARD_BUTTON_MARGIN = 50;
 Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     extend: 'Ext.Panel',    // TODO: Container
     xtype: 'opdDashboard',
@@ -45,10 +46,11 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         type: 'slideOut',
         direction: 'up'
     },
+    MARGIN: 35,
 
     items: [{
         xtype: 'button',
-        text: 'PatientList',
+        text: 'Patient List',
         id: 'dashboardPatientListButton',
         iconCls: 'team',
         iconMask: true,
@@ -57,32 +59,34 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
             Ext.getCmp('patientManagementDashboard').hide();
             Ext.getCmp('contact').show();
         },
-        margin: 30,
+        margin: DASHBOARD_BUTTON_MARGIN,
         flex: 1,
     }, {
         xtype: 'button',
         id: 'addPatientButton',
         text: 'Add',
+        // html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="64" height="64"/></div>',
         iconCls: 'add',
         iconMask: true,
         handler: function() {
             console.log('add patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
         },
-        margin: 30,
+        margin: DASHBOARD_BUTTON_MARGIN,
         flex: 1,
         // TODO: Hidden for now. Add support for patient search
-    // }, {
-    //     xtype: 'button',
-    //     text: 'Search',
-    //     iconCls: 'search',
-    //     iconMask: true,
-    //     handler: function() {
-    //         console.log('search patient patientManagementDashboard button');
-    //         Ext.getCmp('patientManagementDashboard').hide();
-    //     },
-    //     margin: 30,
-    //     flex: 1,
+    }, {
+        xtype: 'button',
+        text: 'Search',
+        iconCls: 'search',
+        iconMask: true,
+        disabled: true,
+        handler: function() {
+            console.log('search patient patientManagementDashboard button');
+            Ext.getCmp('patientManagementDashboard').hide();
+        },
+        margin: DASHBOARD_BUTTON_MARGIN,
+        flex: 1,
     }]
     }
 });
