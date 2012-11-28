@@ -55,12 +55,8 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
 		// List item template
         // itemTpl: '{display}',
 		itemTpl: new Ext.XTemplate(
-            // '<div class="headshot" style="background-image:url({image});"></div>', '<div style="float:left;">', '{display}', '</div>',
-  //           '{display}',
-			// '<div class="headshot" style="background-image:url({image});"></div>', '<div style="float:left;width:25%;font-size:30px">', '{display}', '<span>Gender : {[this.gender(values.gender)]}</span>', '<span>From : ----</span>', '</div>', '<div style="float:left;width:25%;">', '<span>----</span>', '<span>Disease : ----</span>', '<span>Age : {age}</span>', '</div>', '<div style="float:left;height:32px;width:32px;background-image:url(resources/images/urgency.png);">8</div>', '<div style="float:right;width:25%;">', '<span>Last Visit : ----</span>', '<span>No. of Visits : --</span>', '<span>ID : ----</span>', '</div>',
             '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>', 
             '<div style="float:left;width:60%">', '{display}', '</div>', 
-            // '<div style="float:left">', '{display}', '</div>', 
             '<div style="float:left;width:30%;font-size:18px">', 
                 '<span>Gender : {[this.gender(values.gender)]}</span>',
                 '<span>Age : {age}</span>', 
