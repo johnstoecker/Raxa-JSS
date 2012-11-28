@@ -11,7 +11,7 @@ Ext.application({
     requires: ['Ext.MessageBox'],
 
     models: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign', 'diagnosis', 'diagnosedDisease', 'druglist', 'Observation', 'PostList'],
-    stores: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign', 'diagnosis', 'diagnosedDisease', 'druglist', 'PostLists', 'PatientsList', 'obs'],
+    stores: ['patientlist', 'Grid', 'medicationhistory', 'refertodoc', 'labresulthistory', 'drugpanel', 'cheifcomplain', 'sign', 'diagnosis', 'diagnosedDisease', 'druglist', 'PostLists', 'PatientsList', 'obs', 'opdEncounterPost', 'opdObs', 'DoctorOrder'],
     views: ['Viewport'],
     controllers: ['patientlist', 'AddPatient'],
 
