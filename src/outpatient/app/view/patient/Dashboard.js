@@ -18,8 +18,7 @@ var DASHBOARD_BUTTON_MARGIN = 50;
 Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     extend: 'Ext.Panel',    // TODO: Container
     xtype: 'opdDashboard',
-    id: 'patientManagementDashboard',
-
+    id: 'patientManagementDashboard',   
     config: {
 
     // We give it a left and top property to make it floating by default
@@ -35,8 +34,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
 
     // Set the width and height of the panel
     width: 768,
-    height: 200,
-
+    height: 250,
+    style: 'background: #136198;',
     layout: 'hbox',
     showAnimation: {
         type: 'slide',
