@@ -6,7 +6,7 @@
 //  - bridges via firing Ext events
 ///////////////////////////////////////////////////////////
 // Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
-var SAVE_LOAD_MASK_MAX_WAIT_TIME = 2000;
+var SAVE_LOAD_MASK_MAX_WAIT_TIME = 1000;
 Ext.define('KineticToSencha', {
 	mixins: ['Ext.mixin.Observable'],
 	id: 'k2s',
@@ -36,6 +36,7 @@ Ext.define('KineticToSencha', {
 		});
 
 		setTimeout(mask, SAVE_LOAD_MASK_MAX_WAIT_TIME);
+		Ext.getCmp('opdPatientDataEntry').setMasked(false);
 	},
 
 	// Saves just "drawable" portion of canvas
@@ -68,9 +69,12 @@ Ext.define('KineticToSencha', {
 						console.log('callback for dataUrl');
 					},
 					mimeType: 'image/jpeg',
-					quality: .3
+					quality: .2,
+					height: 32,
+					width: 32
 				});
-
+				console.log(dataUrl);
+				k2s.config.addDoctorRecordImage_TEMP_FOR_DEMO(dataUrl);
 				// Delete temp layer
 				temp_layer.remove();
 				
@@ -238,6 +242,18 @@ var k2s = Ext.create('KineticToSencha', {
 				});
 				DoctorOrderModel.data.obs.push(ObsModel.raw);
 	},
+	//Sending Stage JSON so that high quality doctor records can be generated again
+	addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
+
+				var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+					obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+					person: myRecord.data.uuid,
+					//need to set selected patient uuid in localStorage
+					concept: localStorage.patientRecordImageUuidconcept,
+					value: dataUrl
+				});
+				DoctorOrderModel.data.obs.push(ObsModel.raw);
+	},
 
 	// <Comment describing>
 	sendDoctorOrderEncounter: function() {
@@ -251,6 +267,19 @@ var k2s = Ext.create('KineticToSencha', {
 		console.log(Ext.getStore('DoctorOrder'));
 		DoctorOrderStore.add(DoctorOrderModel);
 		console.log(DoctorOrderStore);
+
+
+	//removes text layer
+	stage.getChildren()[1].getChildren().splice(0,stage.getChildren()[1].getChildren().length);
+	stage.getChildren()[2].getChildren().splice(0,stage.getChildren()[2].getChildren().length);
+	//remove only specific children on controlLayer (X on textboxes)
+	stage.getChildren()[4].getChildren().splice(7,stage.getChildren()[4].getChildren().length-7);
+	stage.draw();
+
+
+Ext.getCmp('contact').setHidden(false);
+
+
 		//makes the post call for creating the patient
 		DoctorOrderStore.sync({
 			success: function(response, records) {
@@ -260,6 +289,8 @@ var k2s = Ext.create('KineticToSencha', {
 				console.log(arguments);
 			}
 		});
+
+
 	},
 
 	// <Comment describing>
@@ -566,8 +597,9 @@ var setupCanvas = function() {
 	// Save - event handler
 	function onSaveCanvas() {
 		// Callback, since the stage toDataURL() method is asynchronous, 
-		k2s.saveLoadMask();
+
 		k2s.saveDrawableCanvas();
+		k2s.saveLoadMask();
 	}
 
 	////////////////////////////////////////////////
@@ -663,7 +695,17 @@ var setupCanvas = function() {
 		height: 35,
 		handler: function() {
 			console.log('sending Doctor Encounter');
-			k2s.config.sendDoctorOrderEncounter();
+			onSaveCanvas();
+
+			Ext.Msg.confirm('Confimation',
+				'Are you sure you wish to Finalise and end visit?',
+                function(btn){
+                    if (btn == 'yes'){
+     					k2s.config.sendDoctorOrderEncounter();               	
+                    }
+                }
+            ).setSize(300,200);
+            
 			//TODO Move to patientlist and clear canvas
 		},
 	}, {
@@ -821,7 +863,7 @@ var setupCanvas = function() {
 			x: DRAWABLE_X_MIN + 20 + 20,
 			y: highY,
 			text: TextArray[i].text,
-			fontSize: 14,
+			fontSize: 11,
 			fontFamily: 'Helvetica',
 			textFill: '#000',
 			align: 'left',
@@ -830,7 +872,7 @@ var setupCanvas = function() {
 			highY += ((complexText.textHeight * (complexText.textArr.length + 1)));	// length + title + space
 
 			//Drug order suggestion demo interface
-			if(TextArray[i].text==="SINUSITIS")
+			if(TextArray[i].text==="Sinusitis")
 			{
 				console.log('SINUSITIS Detected');
 				var SuggestDrugOrder = true;
@@ -950,7 +992,7 @@ var setupCanvas = function() {
                 function(btn){
                     if (btn == 'yes'){
                        Ext.getStore('drugpanel').add({
-							concept: "1ca5a9da-f770-11e1-a276-f23c91ae55df",
+							concept: "80049AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 							drugname: "Mometasone",
 							duration: "15",
 							frequency: "Twice Daily",
@@ -958,7 +1000,7 @@ var setupCanvas = function() {
 							instruction: "With Meals",
 							routeofadministration: "TABLET",
 							strength: "200",
-							uuid: "99a67cfa-810e-4563-8a2b-37e72bb064eb"
+							uuid: "a427c23f-7b85-4473-afa4-b8867e9733cf"
 						});
 					stage.fire('paintMedication');
                     }
