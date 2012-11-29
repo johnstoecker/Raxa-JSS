@@ -21,6 +21,8 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
     
     config: {
 
+        emptyText: 'No patients found',
+
         // Floating by default
         left: 0,
         top: 0,

@@ -19,8 +19,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 			id: 'visitHistory',
 
 			// We give it a left and top property to make it floating by default
-			left: 0,
-			top: 0,
+			left: 364,
+			top: 60,
 
 			// Make it modal so you can click the mask to hide the overlay
 			modal: true,
@@ -129,7 +129,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 
 					// Draw background.
 					// Background - blank white canvas
-					background = new Kinetic.Rect({
+					var background = new Kinetic.Rect({
 						x: 0,
 						y: 0,
 						width: stage.getWidth(),
@@ -139,7 +139,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 					backgroundLayer.add(background);
 
 					// Background - toolbar background
-					toolbarBackground = new Kinetic.Rect({
+					var toolbarBackground = new Kinetic.Rect({
 						x: 0,
 						y: 0,
 						width: stage.getWidth(),
@@ -161,6 +161,19 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 						width: 710,
 						height: 835
 					});
+
+					// Add button for History Dropdown
+					var rect = new Kinetic.Rect({
+						x: 600,
+						y: 10,
+						width: 120,
+						height: 30,
+						fill: "white"
+					});
+					var historyHandler = function() {Ext.getCmp('visitHistory').show();};
+					rect.on('click touchstart', historyHandler);
+
+					backgroundLayer.add(rect);
 
 					var visitHistoryStore = Ext.getStore('visitHistoryStore');
 					var tempMonth = 10;
