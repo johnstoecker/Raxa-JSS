@@ -27,6 +27,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosedlist', {
         items: [{
             xtype: 'toolbar',
             docked: 'top',
+            title: 'Diagosed Diseases',
             items: [{
                 xtype: 'spacer'
             },  {
@@ -34,7 +35,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosedlist', {
                 ui: 'plain',
                 iconCls: 'trash',
                 iconMask: true,
-                hidden: false,
+                hidden: true,
                 id: 'deleteDiagnosed'
             }]
         }]

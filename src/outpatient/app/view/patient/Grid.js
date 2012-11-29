@@ -18,16 +18,55 @@
  
 Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
     extend: 'Ext.ux.touch.grid.View',
+    extend: 'Ext.Container',  //HTML item is used to match current designs, though Grid CSS will handle pixel perfect desgins
     xtype: 'vitalsGrid',
     id: 'vitalsGrid',
 
-    requires: ['Ext.ux.touch.grid.feature.Feature', 'Ext.field.Number', 'RaxaEmr.Outpatient.store.Grid'],
+ //   requires: ['Ext.ux.touch.grid.feature.Feature', 'Ext.field.Number', 'RaxaEmr.Outpatient.store.Grid'],
 
     config: {
         title: 'Grid',
         store: 'Grid',
         scrollable: 'false',
-        columns: [{
+    items: [{
+            html:  '<table align="top" border="0" cellpadding="0" cellspacing="0" style="width: 380px;height:20px;font-size:10px; text-align: center;">'+
+            '<tbody>'+
+                '<tr>'+
+                    '<td>'+
+                        '<span style=";"><strong>Systolic Blood Pressure</strong></span></td>'+
+                    '<td>'+
+                        '<span><strong>Diastolic Blood Pressure</strong></span></td>'+
+                    '<td>'+
+                        '<span><strong>Temperature</strong></span></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td>'+
+                        '&nbsp;<b id="SBP"></b></td>'+
+                    '<td>'+
+                        '&nbsp;<b id="DBP"></b></td>'+
+                    '<td>'+
+                        '&nbsp;<b id="Temp"></b></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td>'+
+                        '<span><strong>Respiratory Rate</strong></span></td>'+
+                    '<td>'+
+                        '<span><strong>Pulse Rate</strong></span></td>'+
+                    '<td>'+
+                        '<span><strong>Oxygen Saturation</strong></span></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td>'+
+                        '&nbsp;<b id="RR"></b></td>'+
+                    '<td>'+
+                        '&nbsp;<b id="PR"></b></td>'+
+                    '<td>'+
+                        '&nbsp;<b id="O2Sat"></b></td>'+
+                '</tr>'+
+            '</tbody>'+
+        '</table>'
+    }]
+        //        columns: [{
         //     header: 'Height',
         //     dataIndex: 'height',
         //     width: '17%',
@@ -64,7 +103,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
         //     }
         // }, 
         // {
-            header: 'BP',
+          /*  header: 'BP',
             dataIndex: 'bp',
             width: '25%',
             cls: 'centered-cell',
@@ -99,6 +138,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Grid', {
             dataIndex: 'oxysat',
             width: '16%',
             cls: 'centered-cell'
-        }]
+        }]*/
     }
 });

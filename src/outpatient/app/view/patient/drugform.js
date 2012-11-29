@@ -28,6 +28,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.drugform', {
         hideOnMaskTap: true,
         title: 'Treatment',
         items: [{
+            xtype: 'titlebar',
+            docked: 'top',
+            title: 'Drug Order'
+            },{
             xtype: 'container',
             width: 500,
             layout: {
@@ -59,6 +63,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.drugform', {
                                 xtype: 'selectfield',
                                 label: 'Strength',
                                 id: 'drug-strength',
+                                hidden : true,
                                 valueField: 'value',
                                 displayField: 'title',
                                 store: {

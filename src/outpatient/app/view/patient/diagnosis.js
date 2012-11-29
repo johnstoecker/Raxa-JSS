@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
+Ext.Viewport.setStyleHtmlContent(true);  //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
 Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
     extend: 'Ext.Container',
     xtype: 'diagnosis-panel',
@@ -32,6 +32,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
         hideOnMaskTap: true,
         title: 'Diagnosis',
         items: [{
+            xtype: 'titlebar',
+            docked: 'top',
+            title: 'Diagnosis'
+          },{
             xtype: 'container',
             width: 500,
             layout: {
@@ -86,15 +90,17 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                     },
                     items: [{
                         xtype: 'Diagnosed-List',
-                    }]
-                }]
-            }, {
+                    },{
                 xtype: 'button',
                 text: 'Save',
+                docked: 'bottom',
+                align: 'center',
                 ui: 'confirm',
                 handler: function() {
                     stage.fire('paintDiagnosis');
                 }
+            }]
+                }]
             }]
         }]
     }
