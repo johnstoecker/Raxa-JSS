@@ -50,9 +50,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         xtype: 'button',
         text: 'Patient List',
         id: 'dashboardPatientListButton',
-        height: 130,
-        width: 130,
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_patient_queue.png" width="128" height="128"/></div>',
+        height: 120,
+        width: 128,
+        style: 'background: #53BF9A;',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient_cropped.png" width="126" height="113"/></div>',
         handler: function() {
             console.log('patientList patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -65,6 +66,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         id: 'addPatientButton',
         height: 128,
         width: 128,
+        style: 'background: #53BF9A;',
         html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="128" height="128"/></div>',
         handler: function() {
             console.log('add patient patientManagementDashboard button');
@@ -78,8 +80,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         text: 'Search',
         height: 128,
         width: 128,
+        style: 'background: #53BF9A;',
         html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient.png" width="128" height="128"/></div>',        
-        disabled: true,
+        //TODO Make this diabled after Demo as image is faded in view if button is diabled
+        disabled: false,
         handler: function() {
             console.log('search patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
