@@ -63,6 +63,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.drugform', {
                                 xtype: 'selectfield',
                                 label: 'Strength',
                                 id: 'drug-strength',
+                                hidden : true,
                                 valueField: 'value',
                                 displayField: 'title',
                                 store: {
