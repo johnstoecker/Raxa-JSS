@@ -242,10 +242,13 @@ var k2s = Ext.create('KineticToSencha', {
 				});
 				DoctorOrderModel.data.obs.push(ObsModel.raw);
 	},
-	//Sending Stage JSON so that high quality doctor records can be generated again
+	//Small icons to show as thumbnails
 	addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
 
-				var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+			//If no patient is selected
+			  if(myRecord.data)
+			  {
+			  		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
 					obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
 					person: myRecord.data.uuid,
 					//need to set selected patient uuid in localStorage
@@ -253,6 +256,7 @@ var k2s = Ext.create('KineticToSencha', {
 					value: dataUrl
 				});
 				DoctorOrderModel.data.obs.push(ObsModel.raw);
+			  }
 	},
 
 	// <Comment describing>
@@ -696,7 +700,16 @@ var setupCanvas = function() {
 		handler: function() {
 			console.log('sending Doctor Encounter');
 			onSaveCanvas();
+			console.log(myRecord.data);
+			if(!myRecord.data)
+			{
+				console.log('alert for no patient');
+				Ext.Msg.alert('Please select Patient from Patient list');
 
+			}
+			else
+			{
+			Ext.Msg.defaultAllowedConfig.maxWidth = 600;
 			Ext.Msg.confirm('Confimation',
 				'Are you sure you wish to Finalise and end visit?',
                 function(btn){
@@ -704,8 +717,8 @@ var setupCanvas = function() {
      					k2s.config.sendDoctorOrderEncounter();               	
                     }
                 }
-            ).setSize(300,200);
-            
+            ).setSize(500,200);
+			}
 			//TODO Move to patientlist and clear canvas
 		},
 	}, {
