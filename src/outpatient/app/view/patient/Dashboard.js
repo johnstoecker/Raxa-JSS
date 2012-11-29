@@ -50,8 +50,9 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         xtype: 'button',
         text: 'Patient List',
         id: 'dashboardPatientListButton',
-        iconCls: 'team',
-        iconMask: true,
+        height: 130,
+        width: 130,
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_patient_queue.png" width="128" height="128"/></div>',
         handler: function() {
             console.log('patientList patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -62,10 +63,9 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     }, {
         xtype: 'button',
         id: 'addPatientButton',
-        text: 'Add',
-        // html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="64" height="64"/></div>',
-        iconCls: 'add',
-        iconMask: true,
+        height: 128,
+        width: 128,
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="128" height="128"/></div>',
         handler: function() {
             console.log('add patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -76,8 +76,9 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     }, {
         xtype: 'button',
         text: 'Search',
-        iconCls: 'search',
-        iconMask: true,
+        height: 128,
+        width: 128,
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient.png" width="128" height="128"/></div>',        
         disabled: true,
         handler: function() {
             console.log('search patient patientManagementDashboard button');
