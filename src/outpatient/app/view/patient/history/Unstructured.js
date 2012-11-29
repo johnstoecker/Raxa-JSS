@@ -37,7 +37,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 			// Here we specify the #id of the element we created in `index.html`
 			// contentEl: 'content',
 			// Style the content and make it scrollable
-			styleHtmlContent: true,
+			
 			// scrollable: true,
 			layout: 'hbox',
 
@@ -46,6 +46,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 				docked: 'top',
 				xtype: 'toolbar',
 				title: 'History',
+				// styleHtmlContent: true,
 				items: [{
 					xtype: 'button',
 					text: 'Close',

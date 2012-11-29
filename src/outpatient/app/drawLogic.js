@@ -649,19 +649,19 @@ var setupCanvas = function() {
 			console.log('KEYBOARD: TODO');
 			// mode = "keyboard";
 		}
-	// }, {
-	// 	// Save
-	// 	image: 'resources/images/save.png',
-	// 	x: stage.getWidth() - 3 * (CONTROL_ITEM_SPACING + CONTROL_ITEM_DIM),
-	// 	y: CONTROL_BASE_Y,
-	// 	width: CONTROL_ITEM_DIM,
-	// 	height: CONTROL_ITEM_DIM,
-	// 	handler: function() {
-	// 		console.log('tapped save button');
-	// 		onSaveCanvas();
-	// 	},
 	}, {
-		//Temp: Sending OPD Encounter
+		// New
+		image: 'resources/images/new.png',
+		x: stage.getWidth() - 120 - 58 - TOOLBAR_ITEM_DIM,
+		y: CONTROL_BASE_Y + 1,
+		width: TOOLBAR_HEIGHT-6,
+		height: TOOLBAR_HEIGHT-6,
+		handler: function() {
+			console.log('tapped save button');
+			// onSaveCanvas();
+		},
+	}, {
+		// Sends OPD Encounter
 		image: 'resources/images/icons/button_finalize.png',
 		x: stage.getWidth() - 120 - 58,
 		y: TOOLBAR_ITEM_BASE_Y + 2,
