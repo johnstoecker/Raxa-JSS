@@ -596,17 +596,17 @@ var setupCanvas = function() {
 	});
 	backgroundLayer.add(toolbarBackground);
 
-	addImageToLayer("resources/images/paper_left.jpg", backgroundLayer, {
+	addImageToLayer("resources/images/bg/TODAY_710.png", backgroundLayer, {
 		x: 0,
 		y: DRAWABLE_Y_MIN,
-		width: 709,
+		width: 710,
 		height: 835
 	});
 	
-	addImageToLayer("resources/images/history_right.jpg", backgroundLayer, {
+	addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
 		x: stage.getWidth() - 36,
 		y: DRAWABLE_Y_MIN,
-		width: 36,
+		width: 35,
 		height: 835
 	});
 

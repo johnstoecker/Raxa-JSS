@@ -32,8 +32,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history', {
                 // Left bar
                 // "Today" view vs History View
                 xtype: 'image',
-                src: 'resources/images/today_left.png',
-                width: 58,
+                src: 'resources/images/bg/TODAY_35.png',
+                width: 35,
                 height: 835
             }]
         },
