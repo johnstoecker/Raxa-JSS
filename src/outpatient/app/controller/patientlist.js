@@ -1109,6 +1109,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
 
     getVisitHistory: function(encounterStore) {
+        return;
+        
         console.log("getVisitHistory");
         var visitHistoryStore = Ext.getStore('visitHistoryStore');
         visitHistoryStore.clearData();
