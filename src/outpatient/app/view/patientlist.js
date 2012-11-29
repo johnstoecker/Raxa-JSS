@@ -14,6 +14,7 @@
  * the License.
  */
 Ext.define('RaxaEmr.Outpatient.view.patientlist', {
+    // TODO: Change to panel to get nice outline and more similar look to the dashboard?
     extend: 'Ext.List',
     xtype: 'patientlist',
     id: 'contact',
@@ -31,7 +32,7 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
 
         // Size and layout
         width: 768,
-        height: 600,
+        height: 400,
 
         // Show / Hide Animations
         showAnimation: {
