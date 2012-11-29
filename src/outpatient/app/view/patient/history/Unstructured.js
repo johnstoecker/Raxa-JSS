@@ -95,7 +95,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 						var visitDate = record.get('date');
 						button.setText(visitDate);
 
-						Ext.getCmp('singleVisitHistory').show();
 					}
 				},
 			}]
@@ -163,7 +162,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 					});
 
 					var visitHistoryStore = Ext.getStore('visitHistoryStore');
-
+					var tempMonth = 10;
+					var tempDay = 24;
 					function addImageToHistoryStore(url) {	// TODO: add meta data
 						// Request to fetch DataURL from a file
 						// http://www.html5canvastutorials.com/advanced/html5-canvas-load-image-data-url/
@@ -179,13 +179,16 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 						  	// Add to history store
 						  	var visitHistoryItem = {
 			                    'title': "Fake Title",
-			                    'date' : '2012.5.24',
+			                    'date' : '2012.'+ tempMonth +'.'+ tempDay,
 			                    'uuid' : 'FAKE',
 			                    'diagnosisCount': 'd#',
 			                    'treatmentCount': 't#',
 			                    'imgSrc' : request.responseText,
 			                    'json' : ''
 			                };
+
+			                // tempMonth -= 2;
+			                tempDay -= 7;
 
 			                visitHistoryStore.add(visitHistoryItem);
 						  }
@@ -194,7 +197,11 @@ Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
 						request.send(null);
 					}
 					
-					var images = ['resources/images/dataUrl/hypertensionDataURL', 'resources/images/dataUrl/chickenpoxDataURL'];
+					var images = [
+						'resources/images/dataUrl/hypertensionDataURL', 
+						'resources/images/dataUrl/chickenpoxDataURL',
+						'resources/images/dataUrl/chickenpoxDataURL2',
+					];
 					for (var k=0; k < images.length; k++) {
 						addImageToHistoryStore(images[k]);
 					}
