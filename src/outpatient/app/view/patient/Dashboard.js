@@ -18,8 +18,7 @@ var DASHBOARD_BUTTON_MARGIN = 50;
 Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     extend: 'Ext.Panel',    // TODO: Container
     xtype: 'opdDashboard',
-    id: 'patientManagementDashboard',
-
+    id: 'patientManagementDashboard',   
     config: {
 
     // We give it a left and top property to make it floating by default
@@ -35,8 +34,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
 
     // Set the width and height of the panel
     width: 768,
-    height: 200,
-
+    height: 250,
+    style: 'background: #136198;',
     layout: 'hbox',
     showAnimation: {
         type: 'slide',
@@ -50,8 +49,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         xtype: 'button',
         text: 'Patient List',
         id: 'dashboardPatientListButton',
-        iconCls: 'team',
-        iconMask: true,
+        height: 128,
+        width: 128,
+        style: 'background: #53BF9A;',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient_cropped.png" width="126" height="113"/></div>',
         handler: function() {
             console.log('patientList patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -62,10 +63,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     }, {
         xtype: 'button',
         id: 'addPatientButton',
-        text: 'Add',
-        // html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="64" height="64"/></div>',
-        iconCls: 'add',
-        iconMask: true,
+        height: 128,
+        width: 128,
+        style: 'background: #53BF9A;',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="128" height="128"/></div>',
         handler: function() {
             console.log('add patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -76,9 +77,12 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
     }, {
         xtype: 'button',
         text: 'Search',
-        iconCls: 'search',
-        iconMask: true,
-        disabled: true,
+        height: 128,
+        width: 128,
+        style: 'background: #53BF9A;',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient.png" width="128" height="128"/></div>',        
+        //TODO Make this diabled after Demo as image is faded in view if button is diabled
+        disabled: false,
         handler: function() {
             console.log('search patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();

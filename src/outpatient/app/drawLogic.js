@@ -231,7 +231,7 @@ var k2s = Ext.create('KineticToSencha', {
 		});
 		DoctorOrderModel.data.obs.push(ObsModel.raw);
 	},
-	//Sending Stage JSON so that high quality doctor records can be generated again
+	//Small icons to show as thumbnails
 	addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
 
 		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {

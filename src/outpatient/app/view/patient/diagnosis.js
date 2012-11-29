@@ -23,8 +23,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
         layout: {
             type: 'vbox'
         },
-        width: 500,
-        height: 500,
         centered: true,
         modal: true,
         hidden: true,
@@ -51,7 +49,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                     xtype: 'formpanel',
                     border: '0 0 1 0',
                     padding: '0 0 0 0',
-                    style: 'border:solid #DADADA;',
                     scrollable: false,
                     items: [{
                         xtype: 'selectfield',
@@ -83,23 +80,43 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                     xtype: 'container',
                     margin: '0 0 20 0',
                     border: '0 0 0 3',
-                    style: 'border:solid #DADADA;',
-                    height: 476,
+                    //style: 'border:solid #DADADA;',
+                    height: 400,
                     layout: {
                         type: 'fit'
                     },
                     items: [{
                         xtype: 'Diagnosed-List',
+                    }]
+                }]
+            }, {
+                xtype: 'container',
+                docked: 'bottom',
+                items: [{
+                    xtype: 'container',
+                    margin: '0 0 20 0',
+                    style: 'background-color: #f7f7f7;',
+                    height: 50,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'spacer',
+                        width: '60%'
                     },{
                 xtype: 'button',
                 text: 'Save',
-                docked: 'bottom',
-                align: 'center',
+                flex: 1,
+                margin: '0 0 20 0',
+                width: '30%',
                 ui: 'confirm',
                 handler: function() {
                     stage.fire('paintDiagnosis');
                 }
-            }]
+            },{
+                        xtype: 'spacer',
+                        width: '10%'
+                    }]
                 }]
             }]
         }]
