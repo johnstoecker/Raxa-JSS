@@ -13,33 +13,34 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
+Ext.Viewport.setStyleHtmlContent(true);  //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
 Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
     extend: 'Ext.Container',
     xtype: 'diagnosis-panel',
-    requires: ['RaxaEmr.Outpatient.view.patient.diagnosedlist','RaxaEmr.Outpatient.view.patient.diagnosislist'],
+    requires: ['RaxaEmr.Outpatient.view.patient.diagnosedlist', 'RaxaEmr.Outpatient.view.patient.diagnosislist'],
     id: 'diagnosis-panel',
     config: {
         layout: {
             type: 'vbox'
         },
-        width: 500,
-        height: 500,
         centered: true,
         modal: true,
         hidden: true,
         floating: true,
         hideOnMaskTap: true,
         title: 'Diagnosis',
-        items: [
-{
+        items: [{
+            xtype: 'titlebar',
+            docked: 'top',
+            title: 'Diagnosis'
+          },{
             xtype: 'container',
             width: 500,
             layout: {
                 type: 'hbox'
             },
             items: [{
-                    xtype: 'container',
+                xtype: 'container',
                 flex: 1,
                 layout: {
                     type: 'vbox'
@@ -48,7 +49,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                     xtype: 'formpanel',
                     border: '0 0 1 0',
                     padding: '0 0 0 0',
-                    style: 'border:solid #DADADA;',
                     scrollable: false,
                     items: [{
                         xtype: 'selectfield',
@@ -80,8 +80,8 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                     xtype: 'container',
                     margin: '0 0 20 0',
                     border: '0 0 0 3',
-                    style: 'border:solid #DADADA;',
-                    height: 476,
+                    //style: 'border:solid #DADADA;',
+                    height: 400,
                     layout: {
                         type: 'fit'
                     },
@@ -89,29 +89,36 @@ Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
                         xtype: 'Diagnosed-List',
                     }]
                 }]
+            }, {
+                xtype: 'container',
+                docked: 'bottom',
+                items: [{
+                    xtype: 'container',
+                    margin: '0 0 20 0',
+                    style: 'background-color: #f7f7f7;',
+                    height: 50,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'spacer',
+                        width: '60%'
+                    },{
+                xtype: 'button',
+                text: 'Save',
+                flex: 1,
+                margin: '0 0 20 0',
+                width: '30%',
+                ui: 'confirm',
+                handler: function() {
+                    stage.fire('paintDiagnosis');
+                }
+            },{
+                        xtype: 'spacer',
+                        width: '10%'
+                    }]
+                }]
             }]
-        }
-//        , {// side buttons for refer to doc nad to add another diagnosis
-//            xtype: 'container',
-//            width: 60,
-//            items: [{
-//                xtype: 'button',
-//                height: 40,
-//                id: 'reftodocbutton',
-//                margin: '20 20 0 0',
-//                width: 40,
-//                icon: '../outpatient/resources/images/doclist.png',
-//                padding: '0 10 10 0'
-//            }, {
-//                xtype: 'button',
-//                height: 40,
-//		id : 'addDiagnosis',
-//                margin: '10 20 0 0',
-//                width: 40,
-//                icon: '../outpatient/resources/images/add.png',
-//                padding: '0 10 10 0'
-//            }]
-//        }
-    ]
+        }]
     }
 });

@@ -14,85 +14,56 @@
  * the License.
  */
 Ext.define('RaxaEmr.Outpatient.view.patientlist', {
+    // TODO: Change to panel to get nice outline and more similar look to the dashboard?
     extend: 'Ext.List',
     xtype: 'patientlist',
     id: 'contact',
-
+    
     config: {
-        title: 'Outpatient Department',
-        cls: 'x-contacts',
-        ui: 'round',
-		// patient list toolbars
-        items: [{
-            xtype: 'toolbar',
-            docked: 'top',
-            items: [{
-                xtype: 'segmentedbutton',
-                allowDepress: false,
-                items: [{
-                    xtype: 'button',
-                    ui: 'normal',
-                    text: 'Today\'s List',
-                    pressed: true,
-                    width: 150,
-                }, {
-                    xtype: 'button',
-                    text: 'All Patients',
-                    width: 150,
-                }, {
-                    xtype: 'button',
-                    text: 'Pending',
-                    width: 150,
-                }]
-            }, {
-                xtype: 'spacer'
-            }, {
-                xtype: 'searchfield',
-                id: 'searchfield',
-                placeHolder: 'Search...'
-            }]
-        }, {
-            xtype: 'toolbar',
-            docked: 'top',
 
-            items: [ {
-                xtype: 'segmentedbutton',
-                allowDepress: false,
-                items: [{
-                    xtype: 'button',
-                    width: 130,
-                    text: 'Name',
-                    id: 'name'
-                }, {
-                    xtype: 'button',
-                    width: 130,
-                    text: 'Doctor',
-                    id: 'docname'
-                }, {
-                    xtype: 'button',
-                    width: 130,
-                    text: 'Urgency',
-                    id: 'urgency'
-                }, {
-                    xtype: 'button',
-                    width: 130,
-                    text: 'Last Visit',
-                    id: 'lastvisit'
-                }]
-            },{
-                xtype: 'spacer'
-            },{
-                    xtype: 'button',
-                    width: 130,
-                    text: 'Refresh',
-                    id: 'refresh',
-                    action: 'refreshList',
-                    align: 'right'
-                }]
-        }],
-		//list items  are shown by this
+        emptyText: 'No patients found',
+
+        // Floating by default
+        left: 0,
+        top: 0,
+        
+        // Modal
+        modal: true,
+        hideOnMaskTap: true,
+        hidden: true,
+
+        // Size and layout
+        width: 768,
+        height: 400,
+
+        // Show / Hide Animations
+        showAnimation: {
+            type: 'slide',
+            direction: 'up'
+        },
+        hideAnimation: {
+            type: 'slideOut',
+            direction: 'down'
+        },
+
+        // CSS options
+        cls: 'x-contacts',
+        // ui: 'round',
+        styleHtmlContent:true,
+        styleHtmlCls:'testHtml',
+        overItemCls:'testOver',
+        selectedItemCls:'testSelect',
+        pressedCls:'testPress',
+
+		// List item template
+        // itemTpl: '{display}',
 		itemTpl: new Ext.XTemplate(
-			'<div class="headshot" style="background-image:url({image});"></div>', '<div style="float:left;width:25%;">', '{display}', '<span>Gender : {[this.gender(values.gender)]}</span>', '<span>From : ----</span>', '</div>', '<div style="float:left;width:25%;">', '<span>----</span>', '<span>Disease : ----</span>', '<span>Age : {age}</span>', '</div>', '<div style="float:left;height:32px;width:32px;background-image:url(resources/images/urgency.png);">8</div>', '<div style="float:right;width:25%;">', '<span>Last Visit : ----</span>', '<span>No. of Visits : --</span>', '<span>ID : ----</span>', '</div>',
+            '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>', 
+            '<div style="float:left;width:60%">', '{display}', '</div>', 
+            '<div style="float:left;width:30%;font-size:18px">', 
+                '<span>Gender : {[this.gender(values.gender)]}</span>',
+                '<span>Age : {age}</span>', 
+            '</div>',
 			{
 				date: function(str){
                     return str.encounters[0].encounterDatetime.split("T")[0];
@@ -104,7 +75,7 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
                         return 'Female';
 					}
 				  }
-			}
+			} 
 		)
 	}
 });

@@ -234,5 +234,10 @@
 		"sign": "Peptic ulcer disease ",
 		"id": "114262AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 		"type": "all"
+	},
+	{
+		"sign": "Sinusitis",
+		"id": "126423AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+		"type": "all"
 	}
 ]
