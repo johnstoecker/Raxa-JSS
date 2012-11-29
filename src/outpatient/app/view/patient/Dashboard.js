@@ -50,7 +50,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         xtype: 'button',
         text: 'Patient List',
         id: 'dashboardPatientListButton',
-        height: 120,
+        height: 128,
         width: 128,
         style: 'background: #53BF9A;',
         html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient_cropped.png" width="126" height="113"/></div>',
