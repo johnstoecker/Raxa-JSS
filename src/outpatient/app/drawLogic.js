@@ -427,9 +427,14 @@ var CONTROL_BASE_X = 2;
 var CONTROL_BASE_Y = 2;
 var CONTROL_ITEM_SPACING = 3;
 var CONTROL_ITEM_DIM = 50;
-var TOOLBAR_ITEM_DIM = 40;
-var TOOLBAR_ITEM_BASE_X = 6;
-var TOOLBAR_ITEM_BASE_Y = 6;
+// var TOOLBAR_ITEM_DIM = 40;
+// var TOOLBAR_ITEM_BASEh_X = 6;
+// var TOOLBAR_ITEM_BASE_Y = 6;
+var TOOLBAR_ITEM_DIM = 44;
+var TOOLBAR_ITEM_BASE_X = 4;
+var TOOLBAR_ITEM_BASE_Y = 1;
+var TOOLBAR_HEIGHT = 46;
+
 var HIGH_Y_OFFSET = 5; // a little extra space
 
 function isInDrawableArea(myX, myY) {
@@ -623,22 +628,23 @@ var setupCanvas = function() {
 		x: 0,
 		y: 0,
 		width: stage.getWidth(),
-		height: DRAWABLE_Y_MIN - 4,
+		// height: DRAWABLE_Y_MIN - 4,
+		height: TOOLBAR_HEIGHT,
 		fill: "#82b0e1"	// Light Blue.
 	});
 	backgroundLayer.add(toolbarBackground);
 
-	addImageToLayer("resources/images/paper_left.jpg", backgroundLayer, {
+	addImageToLayer("resources/images/bg/TODAY_710.png", backgroundLayer, {
 		x: 0,
 		y: DRAWABLE_Y_MIN,
-		width: 709,
+		width: 710,
 		height: 835
 	});
 	
-	addImageToLayer("resources/images/history_right.jpg", backgroundLayer, {
+	addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
 		x: stage.getWidth() - 36,
 		y: DRAWABLE_Y_MIN,
-		width: 36,
+		width: 35,
 		height: 835
 	});
 
@@ -689,10 +695,10 @@ var setupCanvas = function() {
 	}, {
 		//Temp: Sending OPD Encounter
 		image: 'resources/images/icons/button_finalize.png',
-		x: stage.getWidth() - 110 - 58,
-		y: TOOLBAR_ITEM_BASE_Y + 3,
-		width: 110,
-		height: 35,
+		x: stage.getWidth() - 120 - 58,
+		y: TOOLBAR_ITEM_BASE_Y + 2,
+		width: 120,
+		height: TOOLBAR_HEIGHT-6,
 		handler: function() {
 			console.log('sending Doctor Encounter');
 			onSaveCanvas();
@@ -1009,8 +1015,13 @@ var setupCanvas = function() {
 		}
 	}
 
+
+};
+
+// TODO: Quick Hack! Remove from global scope
 	// Cleanup calls to add images, a little
 	function addImageToLayer(file, layer, config) {
+		console.log('addImageToLayer', file, layer, config);
 		var imgObj = new Image();
 		imgObj.onload = function() {
 			config.image = imgObj;
@@ -1020,4 +1031,3 @@ var setupCanvas = function() {
 		}
 		imgObj.src = file;		
 	}
-};
