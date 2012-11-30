@@ -790,6 +790,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             });
         }
     },
+    
     //for searching in the signlist
     signFilterByOnSearchKeyUp: function (field) {
         Ext.getCmp('signList').setHidden(false);
@@ -904,7 +905,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         }
 
 	//Searches on drugList
-        Ext.getCmp('drugList').getStore().load();
+        // Ext.getCmp('drugList').getStore().load();
         this.onSearchKeyUp(Ext.getCmp('drugList').getStore(), field, 'drug', 'uuid');
         this.signFilter();
     },

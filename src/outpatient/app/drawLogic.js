@@ -979,9 +979,11 @@ var setupCanvas = function() {
 			//FOR DEMO UI OF DECISION SUPPORT
 			if(SuggestDrugOrder) {
 				Ext.Msg.defaultAllowedConfig.maxHeight = 300;
-				Ext.Msg.defaultAllowedConfig.maxWidth = 600;
+				Ext.Msg.defaultAllowedConfig.maxWidth = 400;
 
-				Ext.Msg.confirm('Confirmation for Raxa Decision Support Suggestion', 'Raxa Decision Support has suggested following Prescription \n' + '<font size="3" color="red"><br><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> for <b>SINUSITIS</b> </br>  \n Do you wish to accept this suggestion?', function(btn) {
+				Ext.Msg.confirm('Raxa Decision Support', 
+					'For <font size="3" color="green"><b>Sinusitis</b></font>, decision support suggests: <br /><br /> ' + '<font size="3" color="red"><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> <br /> <br /> Do you wish to accept this suggestion?', 
+					function(btn) {
 					if(btn == 'yes') {
 						Ext.getStore('drugpanel').add({
 							concept: "80049AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -996,8 +998,7 @@ var setupCanvas = function() {
 						});
 						stage.fire('paintMedication');
 					}
-				}); 
-				// .setSize(600, 300);
+				}).setSize(400, 300);
 			}
 		}
 
