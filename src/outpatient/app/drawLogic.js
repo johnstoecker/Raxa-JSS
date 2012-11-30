@@ -44,7 +44,7 @@ Ext.define('KineticToSencha', {
 		stage.toImage({
 			callback: function(i) {
 				i.id = "PatientRecord";
-				kineticImage = new Kinetic.Image({
+				var kineticImage = new Kinetic.Image({
 					image: i,
 					x: 0,
 					y: 0,
@@ -471,12 +471,6 @@ var setupCanvas = function() {
 			id: 'controlsLayer'
 		});
 
-		// Recreates stage saved in JSON : if there is '/n' in the code, we need to handle the case  
-		//var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
-		// create node using json string
-		//	var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"width":161,"height":52,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":2,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"#2c7cb9"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":709,"height":835},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":732,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":36,"height":835},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"lines"},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":135,"y":168.25758361816406},{"x":136,"y":168.25758361816406},{"x":137,"y":167.25758361816406},{"x":139,"y":167.25758361816406},{"x":140,"y":166.25758361816406},{"x":149,"y":163.25758361816406},{"x":159,"y":160.25758361816406},{"x":173,"y":154.25758361816406},{"x":223,"y":137.25758361816406},{"x":250,"y":130.25758361816406},{"x":297,"y":120.25758361816406},{"x":309,"y":120.25758361816406},{"x":323,"y":120.25758361816406},{"x":361,"y":120.25758361816406},{"x":374,"y":122.25758361816406},{"x":394,"y":130.25758361816406},{"x":399,"y":137.25758361816406},{"x":402,"y":144.25758361816406},{"x":403,"y":176.25758361816406},{"x":399,"y":203.25758361816406},{"x":394,"y":231.25758361816406}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"},{"attrs":{"points":[{"x":367,"y":340.25758361816406},{"x":368,"y":340.25758361816406},{"x":374,"y":340.25758361816406},{"x":395,"y":340.25758361816406},{"x":419,"y":336.25758361816406},{"x":456,"y":329.25758361816406},{"x":538,"y":306.25758361816406},{"x":581,"y":293.25758361816406},{"x":650,"y":270.25758361816406},{"x":690,"y":255.25758361816406},{"x":695,"y":248.25758361816406},{"x":687,"y":250.25758361816406},{"x":670,"y":257.25758361816406},{"x":661,"y":260.25758361816406},{"x":650,"y":262.25758361816406},{"x":632,"y":269.25758361816406},{"x":623,"y":271.25758361816406},{"x":585,"y":281.25758361816406},{"x":576,"y":283.25758361816406},{"x":567,"y":286.25758361816406},{"x":549,"y":290.25758361816406},{"x":539,"y":292.25758361816406},{"x":529,"y":293.25758361816406},{"x":509,"y":296.25758361816406},{"x":500,"y":297.25758361816406},{"x":491,"y":297.25758361816406},{"x":478,"y":298.25758361816406},{"x":471,"y":298.25758361816406},{"x":466,"y":297.25758361816406},{"x":455,"y":296.25758361816406},{"x":450,"y":296.25758361816406},{"x":447,"y":295.25758361816406},{"x":438,"y":292.25758361816406},{"x":433,"y":291.25758361816406},{"x":429,"y":290.25758361816406},{"x":422,"y":286.25758361816406},{"x":419,"y":284.25758361816406},{"x":415,"y":281.25758361816406},{"x":408,"y":276.25758361816406},{"x":404,"y":274.25758361816406},{"x":397,"y":269.25758361816406},{"x":393,"y":265.25758361816406},{"x":389,"y":261.25758361816406},{"x":380,"y":255.25758361816406},{"x":376,"y":251.25758361816406},{"x":372,"y":248.25758361816406},{"x":365,"y":241.25758361816406},{"x":361,"y":238.25758361816406},{"x":358,"y":234.25758361816406},{"x":350,"y":227.25758361816406},{"x":347,"y":223.25758361816406},{"x":343,"y":219.25758361816406},{"x":337,"y":211.25758361816406},{"x":333,"y":207.25758361816406},{"x":330,"y":203.25758361816406},{"x":327,"y":197.25758361816406},{"x":325,"y":195.25758361816406},{"x":324,"y":193.25758361816406},{"x":323,"y":191.25758361816406},{"x":323,"y":190.25758361816406},{"x":323,"y":190.25758361816406},{"x":324,"y":190.25758361816406},{"x":324,"y":190.25758361816406},{"x":324,"y":189.25758361816406},{"x":324,"y":189.25758361816406},{"x":324,"y":190.25758361816406},{"x":325,"y":190.25758361816406},{"x":326,"y":193.25758361816406},{"x":328,"y":196.25758361816406},{"x":329,"y":199.25758361816406},{"x":330,"y":203.25758361816406},{"x":331,"y":205.25758361816406},{"x":332,"y":206.25758361816406},{"x":331,"y":208.25758361816406}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"text"},"nodeType":"Layer","children":[{"attrs":{"fontFamily":"Calibri","text":"Diagnoses: * Fever\\n","fontSize":14,"align":"left","verticalAlign":"top","fontStyle":"italic","padding":10,"width":"auto","height":"auto","detectionType":"path","cornerRadius":10,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":80,"y":345.25758361816406,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"#555","strokeWidth":3,"fill":"#f44","textFill":"#000","shadow":{"color":"black","blur":1,"offset":{"x":10,"y":10},"opacity":0.2}},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"fontFamily":"Calibri","text":"Medications: * Paracetamol  60ml - 43 - 100 - 43 - Once Daily - After Meals\\n","fontSize":14,"align":"left","verticalAlign":"top","fontStyle":"italic","padding":10,"width":"auto","height":"auto","detectionType":"path","cornerRadius":10,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":80,"y":404.25758361816406,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"#555","strokeWidth":3,"fill":"#44f","textFill":"#000","shadow":{"color":"black","blur":1,"offset":{"x":10,"y":10},"opacity":0.2}},"nodeType":"Shape","shapeType":"Text"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"visible":true,"listening":true,"opacity":1,"x":2,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":55,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":108,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":609,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":662,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":7,"y":161,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":49},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":7,"y":214,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":49},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":7,"y":267,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":49},"nodeType":"Shape","shapeType":"Image"}]}]}';
-		//	var stage = Kinetic.Node.create(json, 'container');
-
 		// Setup stage, upon which all layers are built.
 		stage = new Kinetic.Stage({
 			id: "stage",
@@ -502,12 +496,12 @@ var setupCanvas = function() {
 		stage.on('mousemove touchmove', function() {
 			dragMove();
 		});
-		stage.on("mouseup", function() {
+		stage.on("mouseup touchend", function() {
 			dragComplete();
 		});
-		stage.on("touchend", function() {
-			dragComplete();
-		});
+		// stage.on("touchend", function() {
+		// 	dragComplete();
+		// });
 		stage.on("paintDiagnosis", function() {
 			console.log('printing Diagnosis');
 			console.log(g_diagnosis_list);
@@ -524,6 +518,9 @@ var setupCanvas = function() {
 			drawDiagnosis(PrintObject);
 		});
 
+
+      
+
 		////////////////////////
 		// Event Handlers
 		////////////////////////
@@ -532,6 +529,10 @@ var setupCanvas = function() {
 
 		function dragStart() {
 			var up = stage.getUserPosition();
+
+			console.log("dragStart", up);
+			// console.log(stage.getIntersections(up));
+
 			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 				return;
 			}
@@ -546,7 +547,14 @@ var setupCanvas = function() {
 				newLine = new Kinetic.Line({
 					points: newLinePoints,
 					stroke: "black",
+					
+					
+					// lineCap: 'round',
+     //    			lineJoin: 'round',
+					strokeWidth: 10,
+					// listening: true,
 				});
+
 				linesLayer.add(newLine);
 
 				moving = true;
@@ -558,8 +566,15 @@ var setupCanvas = function() {
 
 		function dragMove() {
 			var up = stage.getUserPosition();
-			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
+
+			// to draw, draw must be in progress
+			if(!moving || !up || mode !== 'draw') {
 				return;
+			}
+
+			// If draw in progress (moving == true) and go outside of DrawableArea, then complete the draw
+			if (moving && !isInDrawableArea(up.x, up.y)) {
+				dragComplete();
 			}
 
 			if(moving) {
@@ -570,19 +585,50 @@ var setupCanvas = function() {
 				updateBounds(mousePos);
 				prevPos = mousePos;
 
-				moving = true;
+				// moving = true;
 				linesLayer.drawScene();
 			}
 		}
 
 		// On release of mouse or touch, done dragging
-
-
+		// Note: this also is called when the use drags outside of the canvas's drawable area
 		function dragComplete() {
 			var up = stage.getUserPosition();
-			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
+			if(!up || mode !== 'draw' || !moving) {
 				return;
 			}
+
+			console.log('drag complete');
+			
+			// Draw complete. Add erase event on the newline..
+			var currentLine = newLine;
+
+			newLine.on('mouseover', function() {
+				console.log('Mouse over line');
+				
+				// Check if mouse is down...
+				console.log('TODO: Check if mouse is down');
+				if (mode == "erase") {
+					// find lines that intersect with current mouse position
+					var children = linesLayer.getChildren();
+					var index = children.indexOf(currentLine);
+					children.splice(index,1)
+					linesLayer.draw();
+				}
+			});
+
+			newLine.on('touchmove', function() {
+				console.log('touchmove over line');
+				if (mode == "erase") {
+					// find lines that intersect with current mouse position
+					var children = linesLayer.getChildren();
+					var index = children.indexOf(currentLine);
+					children.splice(index,1)
+					linesLayer.draw();
+				}
+			});
+
+			stage.draw();
 
 			moving = false;
 		}
@@ -665,14 +711,15 @@ var setupCanvas = function() {
 			}
 		}, {
 			// Eraser (Erase mode)
+			// TODO: Support toggleable image state
 			image: 'resources/images/icons/eraser_off.png',
 			x: TOOLBAR_ITEM_BASE_X + 1 * (TOOLBAR_ITEM_DIM),
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
 			handler: function() {
-				console.log('ERASER: TODO');
-				// mode = "erase";
+				console.log('mode = erase');
+				mode = "erase";
 			}
 		}, {
 			// Keyboard (typed text input)
