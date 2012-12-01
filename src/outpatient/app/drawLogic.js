@@ -548,10 +548,9 @@ var setupCanvas = function() {
 					points: newLinePoints,
 					stroke: "black",
 					
-					
 					// lineCap: 'round',
      //    			lineJoin: 'round',
-					strokeWidth: 10,
+					// strokeWidth: 10,
 					// listening: true,
 				});
 
@@ -789,6 +788,8 @@ var setupCanvas = function() {
 			handler: function() {
 				console.log("Bringing diagnoses modal window.")
 				onClickDiagnosis();
+				// this.setStroke('red');
+				// this.setStrokeWidth(5);
 			}
 		}, {
 			// Add medication
@@ -826,11 +827,10 @@ var setupCanvas = function() {
 					y: item.y,
 					width: item.width,
 					height: item.height,
-					// stroke: "black",
-					// strokeWidth: 1,
 					image: imageObj
 				});
 				box.on('click touchstart', item.handler);
+				GloBox = box;
 				controlsLayer.add(box);
 				controlsLayer.draw();
 			}
