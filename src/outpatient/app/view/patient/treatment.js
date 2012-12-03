@@ -48,7 +48,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.treatment', {
     extend: 'Ext.LockableCarousel',
 
     xtype: 'treatment-panel',
-    requires: ['RaxaEmr.Outpatient.view.patient.drugpanel', 'RaxaEmr.Outpatient.view.patient.treatmentsummery', 'Screener.store.druglist', 'Screener.model.druglist', 'RaxaEmr.Outpatient.view.patient.druglist', 'RaxaEmr.Outpatient.view.patient.drugform', 'RaxaEmr.Outpatient.view.patient.DrugGrid'],
+    requires: ['RaxaEmr.Outpatient.view.patient.drugpanel', 'Screener.store.druglist', 'Screener.model.druglist', 'RaxaEmr.Outpatient.view.patient.druglist', 'RaxaEmr.Outpatient.view.patient.drugform'],
     id: 'treatment-panel',
     
     config: {

@@ -17,7 +17,7 @@
 Ext.define('RaxaEmr.Outpatient.view.patient.more', {
     extend: 'Ext.Container',
     xtype: 'patientlist-show',
-    requires: ['RaxaEmr.Outpatient.view.patient.Grid', 'RaxaEmr.Outpatient.view.patient.medicationhistory', 'RaxaEmr.Outpatient.view.patient.refertodoc', 'RaxaEmr.Outpatient.view.patient.work', 'RaxaEmr.Outpatient.view.patient.labresulthistory'],
+    requires: ['RaxaEmr.Outpatient.view.patient.Grid', 'RaxaEmr.Outpatient.view.patient.refertodoc', 'RaxaEmr.Outpatient.view.patient.work'],
     config: {
         title: 'Outpatient Department',
         cls: 'x-show-contact',
