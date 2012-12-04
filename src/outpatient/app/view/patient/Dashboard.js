@@ -34,8 +34,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
 
     // Set the width and height of the panel
     width: 768,
-    height: 250,
-    style: 'background: #136198;',
+    height: 200,
     layout: 'hbox',
     showAnimation: {
         type: 'slide',
@@ -49,10 +48,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         xtype: 'button',
         text: 'Patient List',
         id: 'dashboardPatientListButton',
-        height: 128,
-        width: 128,
+        height: 64,
+        width: 64,
         style: 'background: #53BF9A;',
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_patient_queue_cropped.png" width="126" height="113"/></div>',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_patient_queue64x64.png" width="64" height="64"/></div>',
         handler: function() {
             console.log('patientList patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -60,27 +59,43 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
         },
         margin: DASHBOARD_BUTTON_MARGIN,
         flex: 1,
+        margin: '60 0 0 40',
     }, {
+
+        html: 'Select a patient from the queue',
+        width: 100,
+        margin: '60 20 0 5',
+        padding: 0
+
+    },{
         xtype: 'button',
         id: 'addPatientButton',
-        height: 128,
-        width: 128,
+        height: 64,
+        width: 64,
         style: 'background: #53BF9A;',
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient.png" width="128" height="128"/></div>',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient64x64.png" width="64" height="64"/></div>',
         handler: function() {
             console.log('add patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
         },
         margin: DASHBOARD_BUTTON_MARGIN,
         flex: 1,
+        margin: '60 0 0 40'
         // TODO: Hidden for now. Add support for patient search
+    },{
+
+        html: 'Add a new patient to EMR',
+        width: 100,
+        margin: '60 20 0 5',
+        padding: 0
+
     }, {
         xtype: 'button',
         text: 'Search',
-        height: 128,
-        width: 128,
+        height: 64,
+        width: 64,
         style: 'background: #53BF9A;',
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient.png" width="128" height="128"/></div>',        
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient64x64.png" width="64" height="64"/></div>',        
         //TODO Make this diabled after Demo as image is faded in view if button is diabled
         disabled: false,
         handler: function() {
@@ -88,7 +103,14 @@ Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
             Ext.getCmp('patientManagementDashboard').hide();
         },
         margin: DASHBOARD_BUTTON_MARGIN,
-        flex: 1,
+        flex: 1,        
+        margin: '60 0 0 40'
+    },{
+
+        html: 'Search for a patient in EMR',
+        width: 100,
+        margin: '60 20 0 5',
+        padding: 0,
     }]
     }
 });
