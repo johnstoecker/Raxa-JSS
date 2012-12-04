@@ -408,7 +408,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         if (!this.showContact) {
             console.log('creating show Contact screen')
 
-            // this.showContact = Ext.create('RaxaEmr.Outpatient.view.patient.more');
+            // this.showContact = Ext.create('RaxaEmr.Outpatient.view.today.more');
             this.showContact = Ext.getCmp('more');
         }
 
@@ -594,15 +594,15 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
     //to show the lab history of a patient
     labInfoAction: function () {
-        this.buttonAction('RaxaEmr.Outpatient.view.patient.labresulthistorypanel', 'confirmlabresulthistory');
+        this.buttonAction('RaxaEmr.Outpatient.view.today.labresulthistorypanel', 'confirmlabresulthistory');
     },
     //to show the medication history of a patient
     medicationHistoryAction: function () {
-        this.buttonAction('RaxaEmr.Outpatient.view.patient.medicationhistorypanel', 'confirmmedicationhistory');
+        this.buttonAction('RaxaEmr.Outpatient.view.today.medicationhistorypanel', 'confirmmedicationhistory');
     },
     //to show the doctors list for referal
     refToDocButton: function () {
-        this.buttonAction('RaxaEmr.Outpatient.view.patient.refertodocpanel', 'confirmrefertodoc');
+        this.buttonAction('RaxaEmr.Outpatient.view.today.refertodocpanel', 'confirmrefertodoc');
         var docList = Ext.create('Screener.store.Doctors', {
             storeId: 'docStore'
         });
@@ -790,6 +790,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             });
         }
     },
+    
     //for searching in the signlist
     signFilterByOnSearchKeyUp: function (field) {
         Ext.getCmp('signList').setHidden(false);
@@ -904,7 +905,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         }
 
 	//Searches on drugList
-        Ext.getCmp('drugList').getStore().load();
+        // Ext.getCmp('drugList').getStore().load();
         this.onSearchKeyUp(Ext.getCmp('drugList').getStore(), field, 'drug', 'uuid');
         this.signFilter();
     },
