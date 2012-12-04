@@ -29,7 +29,7 @@ var TABS = {
 Ext.define('RaxaEmr.Outpatient.view.patient.work', {
     extend: 'Ext.Container',
     xtype: 'work',
-    requires: ['RaxaEmr.Outpatient.view.patient.history','RaxaEmr.Outpatient.view.patient.treatment', 'RaxaEmr.Outpatient.view.patient.diagnosis', 'RaxaEmr.Outpatient.view.patient.draw'],
+    requires: ['RaxaEmr.Outpatient.view.patient.history.Overview','RaxaEmr.Outpatient.view.patient.treatment', 'RaxaEmr.Outpatient.view.patient.diagnosis', 'RaxaEmr.Outpatient.view.patient.draw'],
     config: {
         layout: {
             type: 'hbox'

@@ -1,4 +1,4 @@
-Ext.define('RaxaEmr.Outpatient.view.patient.history', {
+Ext.define('RaxaEmr.Outpatient.view.patient.history.Overview', {
     extend: 'Ext.Container',
     xtype: 'history-panel',
     requires: ['RaxaEmr.Outpatient.view.patient.history.Unstructured', 'RaxaEmr.Outpatient.view.patient.history.Diagnosis'],
