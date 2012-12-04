@@ -460,9 +460,9 @@ var setupCanvas = function() {
 		var backgroundLayer = new Kinetic.Layer({
 			id: 'backgroundLayer'
 		});
-		var loadedImageLayer = new Kinetic.Layer({
-			id: 'loadedImageLayer'
-		}); // For re-loaded thumbs
+		// var loadedImageLayer = new Kinetic.Layer({
+		// 	id: 'loadedImageLayer'
+		// }); // For re-loaded thumbs
 		var linesLayer = new Kinetic.Layer({
 			id: 'linesLayer'
 		});
@@ -485,7 +485,7 @@ var setupCanvas = function() {
 		stage.add(backgroundLayer);
 		stage.add(linesLayer);
 		stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
-		stage.add(loadedImageLayer);
+		// stage.add(loadedImageLayer);
 		stage.add(controlsLayer);
 		moving = false;
 
@@ -501,9 +501,6 @@ var setupCanvas = function() {
 		stage.on("mouseup touchend", function() {
 			dragComplete();
 		});
-		// stage.on("touchend", function() {
-		// 	dragComplete();
-		// });
 		stage.on("paintDiagnosis", function() {
 			console.log('printing Diagnosis');
 			console.log(g_diagnosis_list);
@@ -704,18 +701,6 @@ var setupCanvas = function() {
 			handler: function() {
 				console.log('mode = draw');
 				mode = "draw";
-
-				// if (this.image == 'resources/images/icons/pen_on.png') {
-					// var file = 'resources/images/icons/pen_off.png';
-					// var imgObj = new Image();
-					// imgObj.onload = function() {
-					// 	console.log('loaded')
-					// 	// this.setImage(imgObj);
-					// 	this.src = imgObj.src;
-					// 	controlsLayer.draw();
-					// }
-					// imgObj.src = file;
-				// }
 			}
 		}, {
 			// Eraser (Erase mode)
