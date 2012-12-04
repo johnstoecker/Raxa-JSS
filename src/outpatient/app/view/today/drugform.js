@@ -27,6 +27,15 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
         floating: true,
         hideOnMaskTap: true,
         title: 'Treatment',
+        listeners : {
+            hide: function()
+            {
+                if(Ext.getCmp('searchedDrugList'))
+                    {
+                        Ext.getCmp('searchedDrugList').setHidden(true);
+                    }
+            }
+        },
         items: [{
             xtype: 'titlebar',
             docked: 'top',
