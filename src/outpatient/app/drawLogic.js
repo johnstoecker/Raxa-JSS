@@ -87,6 +87,10 @@ Ext.define('KineticToSencha', {
 					imgSrc: dataUrl,
 					// id: 'PatientRecord'
 				});
+
+				// TODO: callback spaghetti code ... 
+				// Save via REST
+				k2s.config.sendDoctorOrderEncounter();
 			}
 		});
 	}
@@ -262,12 +266,11 @@ var k2s = Ext.create('KineticToSencha', {
 		stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
 		stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
 		//remove only specific children on controlLayer (X on textboxes)
-		stage.getChildren()[4].getChildren().splice(7, stage.getChildren()[4].getChildren().length - 7);
+		var CONTROL_LAYER = 3;
+		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - 7);
 		stage.draw();
 
-
 		Ext.getCmp('contact').setHidden(false);
-
 
 		//makes the post call for creating the patient
 		DoctorOrderStore.sync({
@@ -278,8 +281,6 @@ var k2s = Ext.create('KineticToSencha', {
 				console.log(arguments);
 			}
 		});
-
-
 	},
 
 	// <Comment describing>
@@ -768,12 +769,9 @@ var setupCanvas = function() {
 							console.log('set history item in UI');
 						});
 
+						// Saves image. Currently, also saves via REST using
+						// method k2s.config.sendDoctorOrderEncounter();
 						onSaveCanvas();
-
-
-
-						// Save via REST
-						// k2s.config.sendDoctorOrderEncounter();
 					}
 				});
 			},

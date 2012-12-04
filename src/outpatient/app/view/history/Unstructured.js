@@ -163,17 +163,27 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					});
 
 					// Add button for History Dropdown
-					var rect = new Kinetic.Rect({
+					var historyButtonText = new Kinetic.Text({
 						x: 600,
-						y: 10,
+						y: 5,
 						width: 120,
-						height: 30,
-						fill: "white"
+						height: 40,
+						text: 'History',
+						fontSize: 15,
+						padding: 10,
+						fontFamily: 'Helvetica',
+						align: 'center',
+						stroke: '#555',
+				        strokeWidth: 2,
+				        fill: '#0070C0',
+				        textFill: '#FFF',
+				        cornerRadius: 10
 					});
-					var historyHandler = function() {Ext.getCmp('visitHistory').show();};
-					rect.on('click touchstart', historyHandler);
 
-					backgroundLayer.add(rect);
+					var historyHandler = function() {Ext.getCmp('visitHistory').show();};
+					historyButtonText.on('click touchstart', historyHandler);
+					
+					backgroundLayer.add(historyButtonText);
 
 					var visitHistoryStore = Ext.getStore('visitHistoryStore');
 					var tempMonth = 10;
@@ -229,22 +239,22 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		},
 		fullscreen: true,
 		items: [{
-			// Button to view all history items
-			xtype: 'button',
-			id: 'unstructuredHistoryChooseDateButton',
+		// 	// Button to view all history items
+		// 	xtype: 'button',
+		// 	id: 'unstructuredHistoryChooseDateButton',
 
-			left: 600,
-			top: 10,
+		// 	left: 600,
+		// 	top: 10,
 
-			height: 20,
-			// width: 60,
-			text: 'Which Visit?',
-			//today's date
-			handler: function() {
-				Ext.getCmp('visitHistory').showBy(this);
-				console.log('open history view');
-			}
-		}, {
+		// 	height: 20,
+		// 	// width: 60,
+		// 	text: 'Which Visit?',
+		// 	//today's date
+		// 	handler: function() {
+		// 		Ext.getCmp('visitHistory').showBy(this);
+		// 		console.log('open history view');
+		// 	}
+		// }, {
 			xtype: 'container',
 			disabled: true,
 			id: 'opdHistoryMainContainer',
