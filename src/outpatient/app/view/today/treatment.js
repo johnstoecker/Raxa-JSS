@@ -28,7 +28,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.treatment', {
             // TODO: Instead, catch event where (if mouse over floating "tab" (or "thin bar"), then you can drag it)
             var RIGHT_SIDE_X = 710; // 58 pixels can be clicked, since full width is 768
             var LEFT_SIDE_X = 58;  
-            if (e.startX > RIGHT_SIDE_X || e.startX < LEFT_SIDE_X) {
+            var activeIndex = this.getActiveIndex();
+            var FIRST_PAGE = 0;
+            var LAST_PAGE = 1;
+            if ((e.startX > RIGHT_SIDE_X) && (activeIndex < LAST_PAGE) || (e.startX < LEFT_SIDE_X && activeIndex > FIRST_PAGE)) {
             // if(!this.locked) {
                 this.onDragOrig(e);
             }
