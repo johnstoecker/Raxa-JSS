@@ -37,10 +37,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.work', {
         height: 768,
         width: 1024,
         items: [{
-            // xtype: 'draw-panel',
-        // }, {
-        //     xtype: 'examination-panel',
-        // }, {
              xtype: 'diagnosis-panel',
              id: 'diagnosis-panel'
          }, {
