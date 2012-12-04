@@ -1,4 +1,4 @@
-Ext.define('RaxaEmr.Outpatient.view.patient.history.Unstructured', {
+Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	extend: 'Ext.Container',
 	xtype: 'history-unstructured-panel',
 	id: 'history-unstructured-panel',

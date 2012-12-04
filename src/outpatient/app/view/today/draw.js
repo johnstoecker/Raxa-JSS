@@ -1,7 +1,7 @@
 // A glorified Canvas, in Sencha
 // - The magic is created using KineticJS framework.
 // - Drawing and handling of canvas is managed in 'outpatient/app/drawLogic.js'
-Ext.define('RaxaEmr.Outpatient.view.patient.draw', {
+Ext.define('RaxaEmr.Outpatient.view.today.draw', {
   extend: 'Ext.Container',
   xtype: 'draw-panel',
   id: 'drawPanel',

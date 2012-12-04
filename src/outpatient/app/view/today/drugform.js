@@ -16,7 +16,7 @@
  * This view contains the form to add details about a drug order
  *
  */
-Ext.define('RaxaEmr.Outpatient.view.patient.drugform', {
+Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
     extend: 'Ext.Container',
     xtype: 'drug-panel',
     id: 'drugForm',

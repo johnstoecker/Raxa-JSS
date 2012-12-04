@@ -16,7 +16,7 @@
  * This contains list of diagnosed diseases, items to which are added on clicking on search result list on diagnosis (Diagnosis Tab)
  */
  
-Ext.define('RaxaEmr.Outpatient.view.patient.diagnosedlist', {
+Ext.define('RaxaEmr.Outpatient.view.today.diagnosedlist', {
     extend: 'Ext.dataview.List',
     xtype: 'Diagnosed-List',
     config: {

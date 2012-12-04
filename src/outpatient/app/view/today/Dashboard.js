@@ -15,7 +15,7 @@
  */
 
 var DASHBOARD_BUTTON_MARGIN = 50;
-Ext.define('RaxaEmr.Outpatient.view.patient.Dashboard', {
+Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
     extend: 'Ext.Panel',    // TODO: Container
     xtype: 'opdDashboard',
     id: 'patientManagementDashboard',   

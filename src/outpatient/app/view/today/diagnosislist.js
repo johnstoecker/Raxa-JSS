@@ -12,17 +12,18 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ * 
+ * This list shows result on diagnosis (in Diagnosis Tab)
  */
-
- //final lsit of the treatment tab
  
-Ext.define('RaxaEmr.Outpatient.view.patient.treatmentsummery', {
+ 
+Ext.define('RaxaEmr.Outpatient.view.today.diagnosislist', {
     extend: 'Ext.dataview.List',
-    xtype: 'Treatment-Summery',
-	id: 'drugList',
+    xtype: 'Diagnosis-List',
     config: {
-        store: 'drugpanel',
-        itemTpl: ['<div>{drugname} {strength} mg</br>{frequency} {instruction}</br>Continue for {duration} days</div>']
-    }
-
+        cls: 'x-exam',
+        id: 'diagnosisList',
+        store: 'diagnosis',
+        itemTpl: ['<div id="{id}">', '<strong>{sign}{duration}</strong>', '</div>']
+    },
 });
