@@ -441,9 +441,11 @@ function isInDrawableArea(myX, myY) {
 }
 
 // TODO: Remove if unneeded
-var stage = new Object;
+// var stage = new Object;
 
 var setupCanvas = function() {
+
+	var NO_CONTROL_GROUP = 'noControlGroup';
 
 		var lowY = DRAWABLE_Y_MIN;
 		var highY = DEFAULT_HIGH_Y;
@@ -518,15 +520,10 @@ var setupCanvas = function() {
 			drawDiagnosis(PrintObject);
 		});
 
-
-      
-
 		////////////////////////
 		// Event Handlers
 		////////////////////////
 		// First touch or click starts a drag event
-
-
 		function dragStart() {
 			var up = stage.getUserPosition();
 
@@ -561,8 +558,6 @@ var setupCanvas = function() {
 		}
 
 		// While user holding down the mouse clicker or touch, continue dragging
-
-
 		function dragMove() {
 			var up = stage.getUserPosition();
 
@@ -687,7 +682,7 @@ var setupCanvas = function() {
 			x: 0,
 			y: DRAWABLE_Y_MIN,
 			width: 710,
-			height: 835
+			height: 835,
 		});
 
 		addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
@@ -699,23 +694,39 @@ var setupCanvas = function() {
 
 		var controlItems = [{
 			// Pencil (Draw mode)
-			image: 'resources/images/icons/pen_on.png',
+			image: 'resources/images/icons/pen_off.png',
+			imageWhenToggledOn: 'resources/images/icons/pen_on.png',
 			x: TOOLBAR_ITEM_BASE_X,
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
+			controlGroup : 'drawingInput',
 			handler: function() {
 				console.log('mode = draw');
 				mode = "draw";
+
+				// if (this.image == 'resources/images/icons/pen_on.png') {
+					// var file = 'resources/images/icons/pen_off.png';
+					// var imgObj = new Image();
+					// imgObj.onload = function() {
+					// 	console.log('loaded')
+					// 	// this.setImage(imgObj);
+					// 	this.src = imgObj.src;
+					// 	controlsLayer.draw();
+					// }
+					// imgObj.src = file;
+				// }
 			}
 		}, {
 			// Eraser (Erase mode)
 			// TODO: Support toggleable image state
 			image: 'resources/images/icons/eraser_off.png',
+			imageWhenToggledOn: 'resources/images/icons/eraser_on.png',
 			x: TOOLBAR_ITEM_BASE_X + 1 * (TOOLBAR_ITEM_DIM),
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
+			controlGroup : 'drawingInput',
 			handler: function() {
 				console.log('mode = erase');
 				mode = "erase";
@@ -723,21 +734,23 @@ var setupCanvas = function() {
 		}, {
 			// Keyboard (typed text input)
 			image: 'resources/images/icons/text_off.png',
+			imageWhenToggledOn: 'resources/images/icons/text_on.png',
 			x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
+			controlGroup : 'drawingInput',
 			handler: function() {
 				console.log('KEYBOARD: TODO');
 				// mode = "keyboard";
 			}
 		}, {
 			// New
-			image: 'resources/images/new.png',
-			x: stage.getWidth() - 120 - 58 - TOOLBAR_ITEM_DIM,
-			y: CONTROL_BASE_Y + 1,
-			width: TOOLBAR_HEIGHT - 6,
-			height: TOOLBAR_HEIGHT - 6,
+			image: 'resources/images/button_New_off.png',
+			x: stage.getWidth() - 120 - 58 - 80,
+			y: TOOLBAR_ITEM_BASE_Y,
+			// width: 80,
+			// height: 44,
 			handler: function() {
 				console.log('tapped new button');
 				// TODO: Clear the canvas - for demo only
@@ -757,11 +770,11 @@ var setupCanvas = function() {
 			},
 		}, {
 			// Sends OPD Encounter
-			image: 'resources/images/icons/button_finalize.png',
+			image: 'resources/images/button_Finalize_off.png',
 			x: stage.getWidth() - 120 - 58,
-			y: TOOLBAR_ITEM_BASE_Y + 2,
-			width: 120,
-			height: TOOLBAR_HEIGHT - 6,
+			y: TOOLBAR_ITEM_BASE_Y,
+			// width: 120,
+			// height: 44
 			handler: function() {
 				console.log('sending Doctor Encounter');
 				Ext.Msg.confirm('', 'Save and complete this visit?', function(btn) {
@@ -801,36 +814,62 @@ var setupCanvas = function() {
 			handler: function() {
 				onClickMedication();
 			}
-		}, {
-			// Add investigation
-			image: 'resources/images/icons/add_investigation_off.png',
-			x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
-			y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-			width: 50,
-			height: 49,
-			handler: function() {
-				console.log('INVESTIGATIONS: TODO');
-			}
+		// }, {
+		// 	// Add investigation
+		// 	image: 'resources/images/icons/add_investigation_off.png',
+		// 	x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+		// 	y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+		// 	width: 50,
+		// 	height: 49,
+		// 	handler: function() {
+		// 		console.log('INVESTIGATIONS: TODO');
+		// 	}
 		}];
 
 		// Creates a 'clickable' item with a touch handler.
 		// requires parameters for item: x,y,width,height,src,handler
 
-
+		var	controlGroups = {};
 		function createControlItem(item) {
 			var imageObj = new Image();
 			imageObj.onload = function() {
+				console.log('controlGroup', item.controlGroup);
+				// Add all items to a controlGroup
+				var cg = item.controlGroup || NO_CONTROL_GROUP;
+
 				var box = new Kinetic.Image({
 					gid: item.gid,
 					storeId: item.storeId,
+					
+					// Needed to toggle images in a group of icons
+					controlGroup: cg,
+					imageWhenToggledOn: item.imageWhenToggledOn,
+					
 					x: item.x,
 					y: item.y,
 					width: item.width,
 					height: item.height,
-					image: imageObj
+					image: imageObj,
+
+					imageOff: imageObj,
+					imageOn: null,
 				});
-				box.on('click touchstart', item.handler);
-				GloBox = box;
+				box.on('click touchstart', function() {
+					item.handler(box);
+
+					// Update UI to show 1 item in the group being pressed
+					// must have an attr 'imageWhenToggledOn'
+					if(cg != NO_CONTROL_GROUP && box.attrs.imageWhenToggledOn) {
+						toggleItemInControlGroup(box);
+					}
+				});
+
+				// Add to control group. Create group if dne yet
+				if( ! controlGroups.hasOwnProperty(cg)) {
+					controlGroups[cg] = [];
+				} 
+				controlGroups[cg].push(box);
+			
 				controlsLayer.add(box);
 				controlsLayer.draw();
 			}
@@ -839,6 +878,32 @@ var setupCanvas = function() {
 
 		for(var i = 0; i < controlItems.length; i++) {
 			createControlItem(controlItems[i]);
+		}
+
+		function toggleItemInControlGroup(item) {
+			// Toggle "off" all items in Group 
+			var cg = item.attrs.controlGroup;
+			for (var i = 0; i < controlGroups[cg].length; i++) {
+				var box = controlGroups[cg][i];
+				box.setImage(box.attrs.imageOff);
+			}
+			
+			// Toggle "on" selected item
+			// requires controlItem to have an attribute called imageWhenToggledOn
+			// Notes: doesn't make a new image each time. just creats it once and then re-uses
+			if (item.attrs.imageOn) {
+				item.setImage(item.attrs.imageOn);
+				controlsLayer.draw();
+			} else {
+				var file = item.attrs.imageWhenToggledOn;
+				var imgObj = new Image();	
+				imgObj.onload = function() {
+					item.setImage(imgObj);
+					item.attrs.imageOn = imgObj;
+					controlsLayer.draw();
+				}
+				imgObj.src= file;
+			}
 		}
 
 		//
@@ -1049,7 +1114,7 @@ var setupCanvas = function() {
 			}
 		}
 
-
+		return stage;
 	};
 
 // TODO: Quick Hack! Must remove from global scope
