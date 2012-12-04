@@ -16,7 +16,7 @@
 
 //info about the patient when we click on a patient like weight, height etc. is shown by this grid
  
-Ext.define('RaxaEmr.Outpatient.view.patient.Vitals', {
+Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
     extend: 'Ext.Container',
     xtype: 'vitalsGrid',
     id: 'vitalsGrid',

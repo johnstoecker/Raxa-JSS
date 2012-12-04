@@ -14,10 +14,10 @@
  * the License.
  */
 //the view after clicking one of the patient in the patient list
-Ext.define('RaxaEmr.Outpatient.view.patient.more', {
+Ext.define('RaxaEmr.Outpatient.view.today.more', {
     extend: 'Ext.Container',
     xtype: 'patientlist-show',
-    requires: ['RaxaEmr.Outpatient.view.patient.Vitals', 'RaxaEmr.Outpatient.view.patient.work'],
+    requires: ['RaxaEmr.Outpatient.view.today.Vitals', 'RaxaEmr.Outpatient.view.today.work'],
     config: {
         title: 'Outpatient Department',
         cls: 'x-show-contact',

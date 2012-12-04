@@ -21,7 +21,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
     xtype: 'mainview',
     id: 'mainview',
 
-    requires: ['RaxaEmr.Outpatient.view.patientlist', 'RaxaEmr.Outpatient.view.patient.more', 'RaxaEmr.Outpatient.view.patient.diagnosis', 'RaxaEmr.Outpatient.view.patient.Dashboard'],
+    requires: ['RaxaEmr.Outpatient.view.patientlist', 'RaxaEmr.Outpatient.view.today.more', 'RaxaEmr.Outpatient.view.today.diagnosis', 'RaxaEmr.Outpatient.view.today.Dashboard'],
     config: {
         navigationBar: false,
         items: [{

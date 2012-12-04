@@ -1,4 +1,4 @@
-Ext.define('RaxaEmr.Outpatient.view.patient.history.DiagnosisGrid', {
+Ext.define('RaxaEmr.Outpatient.view.history.DiagnosisGrid', {
     extend: 'Ext.ux.touch.grid.View',
     xtype: 'history-diagnosis-grid',
     id: 'historyDiagnosisGrid',

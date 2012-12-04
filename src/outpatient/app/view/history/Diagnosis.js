@@ -1,7 +1,7 @@
-Ext.define('RaxaEmr.Outpatient.view.patient.history.Diagnosis', {
+Ext.define('RaxaEmr.Outpatient.view.history.Diagnosis', {
     extend: 'Ext.Container',
     xtype: 'history-diagnosis',
-    requires: ['RaxaEmr.Outpatient.view.patient.history.DiagnosisGrid'],
+    requires: ['RaxaEmr.Outpatient.view.history.DiagnosisGrid'],
     id: 'historyDiagnosis',
     initialize: function() {
         // this.config.items.add();

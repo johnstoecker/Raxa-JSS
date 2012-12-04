@@ -14,10 +14,10 @@
  * the License.
  */
 Ext.Viewport.setStyleHtmlContent(true);  //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
-Ext.define('RaxaEmr.Outpatient.view.patient.diagnosis', {
+Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
     extend: 'Ext.Container',
     xtype: 'diagnosis-panel',
-    requires: ['RaxaEmr.Outpatient.view.patient.diagnosedlist', 'RaxaEmr.Outpatient.view.patient.diagnosislist'],
+    requires: ['RaxaEmr.Outpatient.view.today.diagnosedlist', 'RaxaEmr.Outpatient.view.today.diagnosislist'],
     id: 'diagnosis-panel',
     config: {
         layout: {
