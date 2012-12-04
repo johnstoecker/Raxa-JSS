@@ -441,7 +441,7 @@ function isInDrawableArea(myX, myY) {
 }
 
 // TODO: Remove if unneeded
-// var stage = new Object;
+var stage = new Object;
 
 var setupCanvas = function() {
 
@@ -453,8 +453,8 @@ var setupCanvas = function() {
 		var newLine;
 		var newLinePoints = [];
 		var prevPos;
-		var mode = DEFAULT_MODE;
-
+		
+		var mode = DEFAULT_MODE;		
 		var historyYOffset = HISTORY_BASE_Y;
 
 		var backgroundLayer = new Kinetic.Layer({
@@ -593,23 +593,7 @@ var setupCanvas = function() {
 			
 			// Draw complete. Add erase event on the newline..
 			var currentLine = newLine;
-
-			newLine.on('mouseover', function() {
-				console.log('Mouse over line');
-				
-				// Check if mouse is down...
-				console.log('TODO: Check if mouse is down');
-				if (mode == "erase") {
-					// find lines that intersect with current mouse position
-					var children = linesLayer.getChildren();
-					var index = children.indexOf(currentLine);
-					children.splice(index,1)
-					linesLayer.draw();
-				}
-			});
-
-			newLine.on('touchmove', function() {
-				console.log('touchmove over line');
+			newLine.on('mouseover touchmove', function() {
 				if (mode == "erase") {
 					// find lines that intersect with current mouse position
 					var children = linesLayer.getChildren();
@@ -744,9 +728,11 @@ var setupCanvas = function() {
 						linesLayer.removeChildren();
 						textLayer.removeChildren();
 						//remove only specific children on controlLayer (X on textboxes)
-						var CONTROL_LAYER_BUTTON_COUNT = 8;	// Preserve this many buttons
-						stage.getChildren()[4].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
-						// drawControlsLayers.removeChildren();	// TODO: Add to another layer for clarity (if perf OK)
+						var CONTROL_LAYER_BUTTON_COUNT = 7;	// Preserve this many buttons
+						var CONTROL_LAYER = 3;
+						console.log('stage', stage);
+						stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
+						// drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
 						
 						highY = DEFAULT_HIGH_Y;
 						stage.draw();
@@ -769,7 +755,22 @@ var setupCanvas = function() {
 						// TODO: Saved image is wrong resolution
 						// - clears canvas
 						// - (doesnt yet) move to patientlist
+						
+						// TODO: scroll directly to item in store
+						//	This logic needs to get out of draw.js and into sencha, e.g. could
+						//	fire an event instead
+						var vhs = Ext.getStore('visitHistoryStore');
+						vhs.on('write', function() {
+							console.log('new item added');
+							// Scroll in UI
+							console.log('scroll');
+							// Set correct history item in UI
+							console.log('set history item in UI');
+						});
+
 						onSaveCanvas();
+
+
 
 						// Save via REST
 						// k2s.config.sendDoctorOrderEncounter();
@@ -818,7 +819,6 @@ var setupCanvas = function() {
 		function createControlItem(item) {
 			var imageObj = new Image();
 			imageObj.onload = function() {
-				console.log('controlGroup', item.controlGroup);
 				// Add all items to a controlGroup
 				var cg = item.controlGroup || NO_CONTROL_GROUP;
 
@@ -947,7 +947,7 @@ var setupCanvas = function() {
 				break;
 			}
 
-			var imageObj2 = new Image();
+			// var imageObj2 = new Image();
 			var myHighY = highY;
 			addImageToLayer(bullet_icon_link, textLayer, {
 				gid: gid,
@@ -1036,10 +1036,13 @@ var setupCanvas = function() {
 											//     complain: stage.getChildren()[i].getChildren()[j].attrs.text,
 											//     id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
 											// });
+	
+											// TODO: Global!! namespace this var, perhaps put this var in K2S
 											--DiagnosisPrinted;
 										}
 
 										if(stage.getChildren()[i].getChildren()[j].attrs.storeId === 'drugpanel') {
+											// TODO: Global!! namespace this var, perhaps put this var in K2S
 											--MedicationPrinted;
 										}
 									}
