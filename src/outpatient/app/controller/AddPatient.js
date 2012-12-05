@@ -50,19 +50,27 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     // TODO: For now, move this to a new controller in OPD called NewPatient, note that it was shared with 
     //  Screener, and aim to refactor ASAP.
 
-    // Opens form for creating new patient
-    addPerson: function () {
-        if (!this.newPatient) {
-            this.newPatient = Ext.create('Screener.view.NewPatient');
-            Ext.Viewport.add(this.newPatient);
-        }
-        // Set new FIFO id so patients come and go in the queue!
-        //this.getFormid().setValue(this.totalPatients);
-        this.newPatient.show();
-    },
-    
     // Adds new person to the NewPersons store
     savePerson: function () {
+        // TODO: Temporarily using a mask while patient is added to backend. 
+        // ideally, should just show patient details immediately
+        var mask = function() {
+            console.log('mask off');
+            Ext.getCmp('opdPatientDataEntry').setMasked(false)
+        }
+
+        console.log('mask on');
+        Ext.getCmp('opdPatientDataEntry').setMasked({
+            xtype: 'loadmask',
+            message: 'Adding patient...',
+            modal: true
+        });
+
+        // Unmask after default time
+        setTimeout(function(){
+            Ext.getCmp('opdPatientDataEntry').setMasked(false);
+        },SAVE_LOAD_MASK_MAX_WAIT_TIME);
+
         var formp = Ext.getCmp('newPatient').saveForm();
         if (formp.givenname && formp.familyname && formp.choice && (formp.patientAge || formp.dob  )) {
             var newPatient = {
@@ -79,6 +87,10 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                 newPatient.birthdate =  formp.dob;
             }
             var newPatientParam = Ext.encode(newPatient);
+            console.log('newPatient');
+            console.log(newPatient);
+            console.log('newPatientParam');
+            console.log(newPatientParam);
             Ext.Ajax.request({
                 scope:this,
                 url: HOST + '/ws/rest/v1/person',
@@ -180,7 +192,21 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         store.add(jsonencounter);
         store.sync();
         store.on('write', function () {
-            Ext.getStore('patientStore').load();
+            // CHANGED from SCREENER: If a patient was assigned, open that patient
+            var pStore = Ext.getStore('patientStore');
+            if (encountertype === localStorage.screenerUuidencountertype) {
+                console.log('was screenerUuidencountertype')
+                pStore.on('load', function() {
+                    console.log('was screenerUuidencountertype.. load event')
+                    var record = pStore.getAt(pStore.getCount()-1)
+                    var contactScreen = Ext.getCmp('more');
+                    contactScreen.setRecord(record);
+                    Ext.getCmp('opdPatientDataEntry').setMasked(false);
+                }, this);
+            }
+
+            console.log('encounter was posted... loading');
+            pStore.load();
         }, this);
         return store;
     },
@@ -190,6 +216,24 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     // MINOR REFACTORING OF WHAT WAS IN SCREENER "Application.js" //
     // Removed everything which relates to updating the UI //
     // Note: "Screener Vitals" encounter should be separated from "Screener" encounter in sendEncounterData()
+
+    // Opens form for creating new patient
+    addPerson: function () {
+        if (!this.newPatient) {
+            this.newPatient = Ext.create('Screener.view.NewPatient', {
+                // Changed location of the popup
+                modal: true,
+                floating: true,
+                left: (768-500) / 2,    // centered, based on screen width and modal width
+                top: 60,    // enough to not overlap with toolbar
+                width: 500,
+            });
+            Ext.Viewport.add(this.newPatient);
+        }
+        // Set new FIFO id so patients come and go in the queue!
+        //this.getFormid().setValue(this.totalPatients);
+        this.newPatient.show();
+    },
 
     // Creates a new patient using NewPatients store 
     makePatient: function (personUuid, identifierType, location) {
@@ -221,6 +265,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         
         // Show patient list, so user gets feedback that their patient was added successfully
         // TODO: Move this logic into view modification.. shouldn't be involved in the controller
-        Ext.getCmp('contact').show();
+        // Ext.getCmp('contact').show();
     },    
 });
