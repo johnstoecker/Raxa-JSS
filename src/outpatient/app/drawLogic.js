@@ -88,8 +88,26 @@ Ext.define('KineticToSencha', {
 					// id: 'PatientRecord'
 				});
 
-				// TODO: callback spaghetti code ... 
+				// Show most recently added item, from store
+				var record = visitHistoryStore.getAt(visitHistoryStore.getCount()-1)
+				var me = Ext.getCmp('history-unstructured-panel');
+				me.showVisitInView(record);
+
+				// Scroll to history view
+				
+				var UNSTRUCTURED_HISTORY_VIEW = 0;
+				Ext.getCmp('history-panel').setActiveItem(UNSTRUCTURED_HISTORY_VIEW);
+
+				// TODO: Animation isn't showing in Chrome. On device?
+				var HISTORY_OVERVIEW = 1;
+				Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
+   					type: 'slide',
+					direction: 'right'
+				});
+				
 				// Save via REST
+				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
+				// from onSaveCanvas... saveDrawableCanvas... etc
 				k2s.config.sendDoctorOrderEncounter();
 			}
 		});
@@ -724,7 +742,7 @@ var setupCanvas = function() {
 			handler: function() {
 				console.log('tapped new button');
 				// TODO: Clear the canvas - for demo only
-				Ext.Msg.confirm('', 'Erase current visit (without saving)?', function(btn) {
+				Ext.Msg.confirm('New', 'Erase current visit (without saving)?', function(btn) {
 					if(btn == 'yes') {
 						linesLayer.removeChildren();
 						textLayer.removeChildren();
@@ -734,6 +752,8 @@ var setupCanvas = function() {
 						console.log('stage', stage);
 						stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
 						// drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
+						
+						// TODO: Also reset the stores
 						
 						highY = DEFAULT_HIGH_Y;
 						stage.draw();
@@ -749,29 +769,19 @@ var setupCanvas = function() {
 			// height: 44
 			handler: function() {
 				console.log('sending Doctor Encounter');
-				Ext.Msg.confirm('', 'Save and complete this visit?', function(btn) {
+				Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
 					if(btn == 'yes') {
 						//For now,
 						// - saves image to history store
 						// TODO: Saved image is wrong resolution
-						// - clears canvas
-						// - (doesnt yet) move to patientlist
 						
-						// TODO: scroll directly to item in store
-						//	This logic needs to get out of draw.js and into sencha, e.g. could
-						//	fire an event instead
-						var vhs = Ext.getStore('visitHistoryStore');
-						vhs.on('write', function() {
-							console.log('new item added');
-							// Scroll in UI
-							console.log('scroll');
-							// Set correct history item in UI
-							console.log('set history item in UI');
-						});
-
-						// Saves image. Currently, also saves via REST using
-						// method k2s.config.sendDoctorOrderEncounter();
+						// Saves image to localStore
+						// Scrolls directly to see the history item in history view
+						// Also saves via REST using k2s.config.sendDoctorOrderEncounter();
 						onSaveCanvas();
+
+						// TODO: clear the canvas. needs to become ajax and on complete, clear canvas
+						// - clears canvas -> this can work same way as "new", above
 					}
 				});
 			},
