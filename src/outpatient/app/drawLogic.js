@@ -147,8 +147,6 @@ Ext.define('KineticToSencha', {
 				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
 				// from onSaveCanvas... saveDrawableCanvas... etc
 				k2s.config.sendDoctorOrderEncounter();
-
-				// TODO: Erase canvas when this is all done...
 			}
 		});
 	}
@@ -278,26 +276,8 @@ var k2s = Ext.create('KineticToSencha', {
 		this.addDoctorRecordVectorImage();
 		this.addOrder();
 
-		console.log(DoctorOrderStore);
 		DoctorOrderModel.data.patient = myRecord.data.uuid;
-		console.log(Ext.getStore('DoctorOrder'));
 		DoctorOrderStore.add(DoctorOrderModel);
-		console.log(DoctorOrderStore);
-
-		// //removes text layer
-
-		// // TODO: Refactor to have "initCanvas" do this for both new and finalize
-		// // TODO: Get layer by id rather than by index
-		// stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
-		// stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
-		// //remove only specific children on controlLayer (X on textboxes)
-		// var CONTROL_LAYER = 3;
-		// var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
-		// // TODO: create a new layer for delete buttons to simplify this logic
-		// stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
-		// stage.draw();
-
-		// Ext.getCmp('contact').setHidden(false);
 
 		//makes the post call for creating the patient
 		var that = this;
