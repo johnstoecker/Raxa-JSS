@@ -6,7 +6,7 @@
 //  - bridges via firing Ext events
 ///////////////////////////////////////////////////////////
 
-var SAVE_LOAD_MASK_MAX_WAIT_TIME = 1000;
+var SAVE_LOAD_MASK_MAX_WAIT_TIME = 15000;
 
 // TODO: take these out of global scope
 // var g_medication_list = [];
@@ -671,7 +671,7 @@ var setupCanvas = function() {
 		function onSaveCanvas() {
 			// Callback, since the stage toDataURL() method is asynchronous, 
 			k2s.saveDrawableCanvas();
-			k2s.saveLoadMask();
+			// k2s.saveLoadMask();
 		}
 
 		////////////////////////////////////////////////
