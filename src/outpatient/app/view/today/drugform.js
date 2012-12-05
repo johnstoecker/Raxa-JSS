@@ -26,6 +26,9 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
         hidden: true,
         floating: true,
         hideOnMaskTap: true,
+        left: (768-500) / 2,    // centered, based on screen width and modal width
+        top: 60,
+        width: 500,
         title: 'Treatment',
         listeners : {
             hide: function()
@@ -52,8 +55,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                 items: [{
                     xtype: 'container',
                     style: 'border:solid #DADADA;',
-                    height: 500,
-                    width: 500,
+                    height: 280,
                     layout: {
                         type: 'fit'
                     },
