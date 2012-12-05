@@ -24,16 +24,17 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
         emptyText: 'No patients found',
 
         // Floating by default
-        left: 0,
-        top: 0,
+        left: (768 - 700) / 2,
+        top: 60,
         
         // Modal
         modal: true,
+        floating: true,
         hideOnMaskTap: true,
         hidden: true,
 
         // Size and layout
-        width: 768,
+        width: 700,
         height: 400,
 
         // Show / Hide Animations
@@ -56,6 +57,11 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
         pressedCls:'testPress',
 
 		// List item template
+        items: [{
+            xtype: 'toolbar',
+            docked: 'top',
+            title: 'Patient List'
+        }],
         // itemTpl: '{display}',
 		itemTpl: new Ext.XTemplate(
             '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>', 
