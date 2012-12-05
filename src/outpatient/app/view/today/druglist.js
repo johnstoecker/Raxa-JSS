@@ -13,16 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
- //final lsit of the treatment tab
  
-Ext.define('RaxaEmr.Outpatient.view.patient.treatmentsummery', {
+Ext.define('RaxaEmr.Outpatient.view.today.druglist', {
     extend: 'Ext.dataview.List',
-    xtype: 'Treatment-Summery',
-	id: 'drugList',
+    xtype: 'Drug-List',
     config: {
-        store: 'drugpanel',
-        itemTpl: ['<div>{drugname} {strength} mg</br>{frequency} {instruction}</br>Continue for {duration} days</div>']
-    }
-
+        cls: 'x-exam',
+        id: 'drugList',
+        store: 'druglist',
+        itemTpl: ['<div id="{id}">', '<strong>{drug}</strong>', '</div>']
+    },
 });

@@ -13,22 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
- 
- //examination tab view
- 
-Ext.define('RaxaEmr.Outpatient.view.patient.examination', {
+Ext.Viewport.setStyleHtmlContent(true);  //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
+Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
     extend: 'Ext.Container',
-    xtype: 'examination-panel',
-    requires: ['RaxaEmr.Outpatient.view.patient.examinationlist', 'RaxaEmr.Outpatient.view.patient.signlist'],
-    id: 'examination-panel',
+    xtype: 'diagnosis-panel',
+    requires: ['RaxaEmr.Outpatient.view.today.diagnosedlist', 'RaxaEmr.Outpatient.view.today.diagnosislist'],
+    id: 'diagnosis-panel',
     config: {
         layout: {
-            type: 'card'
+            type: 'vbox'
         },
-        title: 'Examination',
-        activeItem: 0,
+        centered: true,
+        modal: true,
+        hidden: true,
+        floating: true,
+        hideOnMaskTap: true,
+        title: 'Diagnosis',
         items: [{
+            xtype: 'titlebar',
+            docked: 'top',
+            title: 'Diagnosis'
+          },{
             xtype: 'container',
+            width: 500,
             layout: {
                 type: 'hbox'
             },
@@ -42,14 +49,12 @@ Ext.define('RaxaEmr.Outpatient.view.patient.examination', {
                     xtype: 'formpanel',
                     border: '0 0 1 0',
                     padding: '0 0 0 0',
-                    style: 'border:solid #DADADA;',
                     scrollable: false,
-                    height: 93,
                     items: [{
                         xtype: 'selectfield',
                         label: 'Search In',
-                        id: 'signFilter',
                         hidden: true,
+                        id: 'diagnosisFilter',
                         border: '0 0 1 0',
                         style: 'border:solid #DADADA;',
                         valueField: 'filterBy',
@@ -62,10 +67,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.examination', {
                         }
                     }, {
                         xtype: 'searchfield',
-                        id: 'signfilterbysearchfield',
+                        id: 'diagnosisfilterbysearchfield',
                     }]
                 }, {
-                    xtype: 'Sign-List',
+                    xtype: 'Diagnosis-List',
                     flex: 1,
                 }]
             }, {
@@ -75,43 +80,42 @@ Ext.define('RaxaEmr.Outpatient.view.patient.examination', {
                     xtype: 'container',
                     margin: '0 0 20 0',
                     border: '0 0 0 3',
-                    style: 'border:solid #DADADA;',
-                    height: 576,
+                    //style: 'border:solid #DADADA;',
+                    height: 400,
                     layout: {
                         type: 'fit'
                     },
                     items: [{
-                        xtype: 'Examination-List'
-                    }, {
-                        xtype: 'actionsheet',
-                        id: 'durationPicker',
-                        hidden: true,
-                        items: [{
-                            xtype: 'formpanel',
-                            height: 100,
-                            width: '100%',
-                            items: [{
-                                xtype: 'numberfield',
-                                label: 'Duration',
-                                id: 'durationfield'
-                            }]
-                        }, {
-                            xtype: 'toolbar',
-                            docked: 'top',
-                            items: [{
-                                xtype: 'button',
-                                text: 'Save',
-                                id: 'saveDuration'
-                            }, {
-                                xtype: 'spacer'
-                            }, {
-                                xtype: 'button',
-                                text: 'Cancel',
-                                handler: function () {
-                                    Ext.getCmp('durationPicker').setHidden(true);// to hide the duration picker field
-                                }
-                            }]
-                        }]
+                        xtype: 'Diagnosed-List',
+                    }]
+                }]
+            }, {
+                xtype: 'container',
+                docked: 'bottom',
+                items: [{
+                    xtype: 'container',
+                    margin: '0 0 20 0',
+                    style: 'background-color: #f7f7f7;',
+                    height: 50,
+                    layout: {
+                        type: 'hbox'
+                    },
+                    items: [{
+                        xtype: 'spacer',
+                        width: '60%'
+                    },{
+                xtype: 'button',
+                text: 'Save',
+                flex: 1,
+                margin: '0 0 20 0',
+                width: '30%',
+                ui: 'confirm',
+                handler: function() {
+                    stage.fire('paintDiagnosis');
+                }
+            },{
+                        xtype: 'spacer',
+                        width: '10%'
                     }]
                 }]
             }]

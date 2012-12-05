@@ -44,7 +44,7 @@ Ext.define('KineticToSencha', {
 		stage.toImage({
 			callback: function(i) {
 				i.id = "PatientRecord";
-				kineticImage = new Kinetic.Image({
+				var kineticImage = new Kinetic.Image({
 					image: i,
 					x: 0,
 					y: 0,
@@ -87,6 +87,10 @@ Ext.define('KineticToSencha', {
 					imgSrc: dataUrl,
 					// id: 'PatientRecord'
 				});
+
+				// TODO: callback spaghetti code ... 
+				// Save via REST
+				k2s.config.sendDoctorOrderEncounter();
 			}
 		});
 	}
@@ -262,12 +266,11 @@ var k2s = Ext.create('KineticToSencha', {
 		stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
 		stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
 		//remove only specific children on controlLayer (X on textboxes)
-		stage.getChildren()[4].getChildren().splice(7, stage.getChildren()[4].getChildren().length - 7);
+		var CONTROL_LAYER = 3;
+		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - 7);
 		stage.draw();
 
-
 		Ext.getCmp('contact').setHidden(false);
-
 
 		//makes the post call for creating the patient
 		DoctorOrderStore.sync({
@@ -278,8 +281,6 @@ var k2s = Ext.create('KineticToSencha', {
 				console.log(arguments);
 			}
 		});
-
-
 	},
 
 	// <Comment describing>
@@ -445,22 +446,24 @@ var stage = new Object;
 
 var setupCanvas = function() {
 
+	var NO_CONTROL_GROUP = 'noControlGroup';
+
 		var lowY = DRAWABLE_Y_MIN;
 		var highY = DEFAULT_HIGH_Y;
 
 		var newLine;
 		var newLinePoints = [];
 		var prevPos;
-		var mode = DEFAULT_MODE;
-
+		
+		var mode = DEFAULT_MODE;		
 		var historyYOffset = HISTORY_BASE_Y;
 
 		var backgroundLayer = new Kinetic.Layer({
 			id: 'backgroundLayer'
 		});
-		var loadedImageLayer = new Kinetic.Layer({
-			id: 'loadedImageLayer'
-		}); // For re-loaded thumbs
+		// var loadedImageLayer = new Kinetic.Layer({
+		// 	id: 'loadedImageLayer'
+		// }); // For re-loaded thumbs
 		var linesLayer = new Kinetic.Layer({
 			id: 'linesLayer'
 		});
@@ -470,12 +473,6 @@ var setupCanvas = function() {
 		var controlsLayer = new Kinetic.Layer({
 			id: 'controlsLayer'
 		});
-
-		// Recreates stage saved in JSON : if there is '/n' in the code, we need to handle the case  
-		//var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":768,"height":880},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":36,"y":198.5833282470703},{"x":45,"y":199.5833282470703},{"x":56,"y":200.5833282470703},{"x":76,"y":201.5833282470703},{"x":101,"y":204.5833282470703},{"x":135,"y":208.5833282470703},{"x":172,"y":212.5833282470703},{"x":211,"y":215.5833282470703},{"x":252,"y":217.5833282470703},{"x":293,"y":217.5833282470703},{"x":337,"y":213.5833282470703},{"x":383,"y":209.5833282470703},{"x":429,"y":204.5833282470703},{"x":469,"y":198.5833282470703},{"x":500,"y":193.5833282470703},{"x":521,"y":190.5833282470703},{"x":532,"y":188.5833282470703},{"x":540,"y":186.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":542,"y":185.5833282470703},{"x":541,"y":184.5833282470703},{"x":540,"y":184.5833282470703},{"x":540,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":539,"y":183.5833282470703},{"x":538,"y":183.5833282470703}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":64,"height":64,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":700,"y":292,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"green","stroke":"black","strokeWidth":4},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"fontFamily":"ComicSans","text":"new","fontSize":21.333333333333332,"align":"left","verticalAlign":"top","fontStyle":"normal","padding":0,"width":"auto","height":"auto","detectionType":"path","cornerRadius":0,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":708,"y":313.3333333333333,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"textFill":"white"},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":90,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":145,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":200,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":128,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":708,"y":200,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":52,"height":52,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":350,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":150,"height":30,"stroke":"black","strokeWidth":1},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":700,"y":388,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":64,"height":64,"stroke":"black","strokeWidth":4,"id":"PatientRecord"},"nodeType":"Shape","shapeType":"Image"}]}]}';
-		// create node using json string
-		//	var json = '{"attrs":{"width":768,"height":1024,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"stage"},"nodeType":"Stage","children":[{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"width":768,"height":1024,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"white"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"width":161,"height":52,"cornerRadius":0,"visible":true,"listening":true,"opacity":1,"x":2,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"fill":"#2c7cb9"},"nodeType":"Shape","shapeType":"Rect"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":0,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":709,"height":835},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":732,"y":56,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":36,"height":835},"nodeType":"Shape","shapeType":"Image"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"lines"},"nodeType":"Layer","children":[{"attrs":{"points":[{"x":135,"y":168.25758361816406},{"x":136,"y":168.25758361816406},{"x":137,"y":167.25758361816406},{"x":139,"y":167.25758361816406},{"x":140,"y":166.25758361816406},{"x":149,"y":163.25758361816406},{"x":159,"y":160.25758361816406},{"x":173,"y":154.25758361816406},{"x":223,"y":137.25758361816406},{"x":250,"y":130.25758361816406},{"x":297,"y":120.25758361816406},{"x":309,"y":120.25758361816406},{"x":323,"y":120.25758361816406},{"x":361,"y":120.25758361816406},{"x":374,"y":122.25758361816406},{"x":394,"y":130.25758361816406},{"x":399,"y":137.25758361816406},{"x":402,"y":144.25758361816406},{"x":403,"y":176.25758361816406},{"x":399,"y":203.25758361816406},{"x":394,"y":231.25758361816406}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"},{"attrs":{"points":[{"x":367,"y":340.25758361816406},{"x":368,"y":340.25758361816406},{"x":374,"y":340.25758361816406},{"x":395,"y":340.25758361816406},{"x":419,"y":336.25758361816406},{"x":456,"y":329.25758361816406},{"x":538,"y":306.25758361816406},{"x":581,"y":293.25758361816406},{"x":650,"y":270.25758361816406},{"x":690,"y":255.25758361816406},{"x":695,"y":248.25758361816406},{"x":687,"y":250.25758361816406},{"x":670,"y":257.25758361816406},{"x":661,"y":260.25758361816406},{"x":650,"y":262.25758361816406},{"x":632,"y":269.25758361816406},{"x":623,"y":271.25758361816406},{"x":585,"y":281.25758361816406},{"x":576,"y":283.25758361816406},{"x":567,"y":286.25758361816406},{"x":549,"y":290.25758361816406},{"x":539,"y":292.25758361816406},{"x":529,"y":293.25758361816406},{"x":509,"y":296.25758361816406},{"x":500,"y":297.25758361816406},{"x":491,"y":297.25758361816406},{"x":478,"y":298.25758361816406},{"x":471,"y":298.25758361816406},{"x":466,"y":297.25758361816406},{"x":455,"y":296.25758361816406},{"x":450,"y":296.25758361816406},{"x":447,"y":295.25758361816406},{"x":438,"y":292.25758361816406},{"x":433,"y":291.25758361816406},{"x":429,"y":290.25758361816406},{"x":422,"y":286.25758361816406},{"x":419,"y":284.25758361816406},{"x":415,"y":281.25758361816406},{"x":408,"y":276.25758361816406},{"x":404,"y":274.25758361816406},{"x":397,"y":269.25758361816406},{"x":393,"y":265.25758361816406},{"x":389,"y":261.25758361816406},{"x":380,"y":255.25758361816406},{"x":376,"y":251.25758361816406},{"x":372,"y":248.25758361816406},{"x":365,"y":241.25758361816406},{"x":361,"y":238.25758361816406},{"x":358,"y":234.25758361816406},{"x":350,"y":227.25758361816406},{"x":347,"y":223.25758361816406},{"x":343,"y":219.25758361816406},{"x":337,"y":211.25758361816406},{"x":333,"y":207.25758361816406},{"x":330,"y":203.25758361816406},{"x":327,"y":197.25758361816406},{"x":325,"y":195.25758361816406},{"x":324,"y":193.25758361816406},{"x":323,"y":191.25758361816406},{"x":323,"y":190.25758361816406},{"x":323,"y":190.25758361816406},{"x":324,"y":190.25758361816406},{"x":324,"y":190.25758361816406},{"x":324,"y":189.25758361816406},{"x":324,"y":189.25758361816406},{"x":324,"y":190.25758361816406},{"x":325,"y":190.25758361816406},{"x":326,"y":193.25758361816406},{"x":328,"y":196.25758361816406},{"x":329,"y":199.25758361816406},{"x":330,"y":203.25758361816406},{"x":331,"y":205.25758361816406},{"x":332,"y":206.25758361816406},{"x":331,"y":208.25758361816406}],"lineCap":"butt","dashArray":[],"detectionType":"pixel","visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"red"},"nodeType":"Shape","shapeType":"Line"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"id":"text"},"nodeType":"Layer","children":[{"attrs":{"fontFamily":"Calibri","text":"Diagnoses: * Fever\\n","fontSize":14,"align":"left","verticalAlign":"top","fontStyle":"italic","padding":10,"width":"auto","height":"auto","detectionType":"path","cornerRadius":10,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":80,"y":345.25758361816406,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"#555","strokeWidth":3,"fill":"#f44","textFill":"#000","shadow":{"color":"black","blur":1,"offset":{"x":10,"y":10},"opacity":0.2}},"nodeType":"Shape","shapeType":"Text"},{"attrs":{"fontFamily":"Calibri","text":"Medications: * Paracetamol  60ml - 43 - 100 - 43 - Once Daily - After Meals\\n","fontSize":14,"align":"left","verticalAlign":"top","fontStyle":"italic","padding":10,"width":"auto","height":"auto","detectionType":"path","cornerRadius":10,"lineHeight":1.2,"visible":true,"listening":true,"opacity":1,"x":80,"y":404.25758361816406,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"stroke":"#555","strokeWidth":3,"fill":"#44f","textFill":"#000","shadow":{"color":"black","blur":1,"offset":{"x":10,"y":10},"opacity":0.2}},"nodeType":"Shape","shapeType":"Text"}]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[]},{"attrs":{"clearBeforeDraw":true,"visible":true,"listening":true,"opacity":1,"x":0,"y":0,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false},"nodeType":"Layer","children":[{"attrs":{"visible":true,"listening":true,"opacity":1,"x":2,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":55,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":108,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":609,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":662,"y":2,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":50},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":7,"y":161,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":49},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":7,"y":214,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":49},"nodeType":"Shape","shapeType":"Image"},{"attrs":{"visible":true,"listening":true,"opacity":1,"x":7,"y":267,"scale":{"x":1,"y":1},"rotation":0,"offset":{"x":0,"y":0},"draggable":false,"width":50,"height":49},"nodeType":"Shape","shapeType":"Image"}]}]}';
-		//	var stage = Kinetic.Node.create(json, 'container');
 
 		// Setup stage, upon which all layers are built.
 		stage = new Kinetic.Stage({
@@ -489,7 +486,7 @@ var setupCanvas = function() {
 		stage.add(backgroundLayer);
 		stage.add(linesLayer);
 		stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
-		stage.add(loadedImageLayer);
+		// stage.add(loadedImageLayer);
 		stage.add(controlsLayer);
 		moving = false;
 
@@ -502,10 +499,7 @@ var setupCanvas = function() {
 		stage.on('mousemove touchmove', function() {
 			dragMove();
 		});
-		stage.on("mouseup", function() {
-			dragComplete();
-		});
-		stage.on("touchend", function() {
+		stage.on("mouseup touchend", function() {
 			dragComplete();
 		});
 		stage.on("paintDiagnosis", function() {
@@ -528,10 +522,12 @@ var setupCanvas = function() {
 		// Event Handlers
 		////////////////////////
 		// First touch or click starts a drag event
-
-
 		function dragStart() {
 			var up = stage.getUserPosition();
+
+			console.log("dragStart", up);
+			// console.log(stage.getIntersections(up));
+
 			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 				return;
 			}
@@ -546,7 +542,13 @@ var setupCanvas = function() {
 				newLine = new Kinetic.Line({
 					points: newLinePoints,
 					stroke: "black",
+					
+					// lineCap: 'round',
+     //    			lineJoin: 'round',
+					// strokeWidth: 10,
+					// listening: true,
 				});
+
 				linesLayer.add(newLine);
 
 				moving = true;
@@ -554,12 +556,17 @@ var setupCanvas = function() {
 		}
 
 		// While user holding down the mouse clicker or touch, continue dragging
-
-
 		function dragMove() {
 			var up = stage.getUserPosition();
-			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
+
+			// to draw, draw must be in progress
+			if(!moving || !up || mode !== 'draw') {
 				return;
+			}
+
+			// If draw in progress (moving == true) and go outside of DrawableArea, then complete the draw
+			if (moving && !isInDrawableArea(up.x, up.y)) {
+				dragComplete();
 			}
 
 			if(moving) {
@@ -570,19 +577,34 @@ var setupCanvas = function() {
 				updateBounds(mousePos);
 				prevPos = mousePos;
 
-				moving = true;
+				// moving = true;
 				linesLayer.drawScene();
 			}
 		}
 
 		// On release of mouse or touch, done dragging
-
-
+		// Note: this also is called when the use drags outside of the canvas's drawable area
 		function dragComplete() {
 			var up = stage.getUserPosition();
-			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
+			if(!up || mode !== 'draw' || !moving) {
 				return;
 			}
+
+			console.log('drag complete');
+			
+			// Draw complete. Add erase event on the newline..
+			var currentLine = newLine;
+			newLine.on('mouseover touchmove', function() {
+				if (mode == "erase") {
+					// find lines that intersect with current mouse position
+					var children = linesLayer.getChildren();
+					var index = children.indexOf(currentLine);
+					children.splice(index,1)
+					linesLayer.draw();
+				}
+			});
+
+			stage.draw();
 
 			moving = false;
 		}
@@ -642,7 +664,7 @@ var setupCanvas = function() {
 			x: 0,
 			y: DRAWABLE_Y_MIN,
 			width: 710,
-			height: 835
+			height: 835,
 		});
 
 		addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
@@ -654,44 +676,51 @@ var setupCanvas = function() {
 
 		var controlItems = [{
 			// Pencil (Draw mode)
-			image: 'resources/images/icons/pen_on.png',
+			image: 'resources/images/icons/pen_off.png',
+			imageWhenToggledOn: 'resources/images/icons/pen_on.png',
 			x: TOOLBAR_ITEM_BASE_X,
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
+			controlGroup : 'drawingInput',
 			handler: function() {
 				console.log('mode = draw');
 				mode = "draw";
 			}
 		}, {
 			// Eraser (Erase mode)
+			// TODO: Support toggleable image state
 			image: 'resources/images/icons/eraser_off.png',
+			imageWhenToggledOn: 'resources/images/icons/eraser_on.png',
 			x: TOOLBAR_ITEM_BASE_X + 1 * (TOOLBAR_ITEM_DIM),
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
+			controlGroup : 'drawingInput',
 			handler: function() {
-				console.log('ERASER: TODO');
-				// mode = "erase";
+				console.log('mode = erase');
+				mode = "erase";
 			}
 		}, {
 			// Keyboard (typed text input)
 			image: 'resources/images/icons/text_off.png',
+			imageWhenToggledOn: 'resources/images/icons/text_on.png',
 			x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
 			y: TOOLBAR_ITEM_BASE_Y,
 			width: TOOLBAR_ITEM_DIM,
 			height: TOOLBAR_ITEM_DIM,
+			controlGroup : 'drawingInput',
 			handler: function() {
 				console.log('KEYBOARD: TODO');
 				// mode = "keyboard";
 			}
 		}, {
 			// New
-			image: 'resources/images/new.png',
-			x: stage.getWidth() - 120 - 58 - TOOLBAR_ITEM_DIM,
-			y: CONTROL_BASE_Y + 1,
-			width: TOOLBAR_HEIGHT - 6,
-			height: TOOLBAR_HEIGHT - 6,
+			image: 'resources/images/button_New_off.png',
+			x: stage.getWidth() - 120 - 58 - 80,
+			y: TOOLBAR_ITEM_BASE_Y,
+			// width: 80,
+			// height: 44,
 			handler: function() {
 				console.log('tapped new button');
 				// TODO: Clear the canvas - for demo only
@@ -700,9 +729,11 @@ var setupCanvas = function() {
 						linesLayer.removeChildren();
 						textLayer.removeChildren();
 						//remove only specific children on controlLayer (X on textboxes)
-						var CONTROL_LAYER_BUTTON_COUNT = 8;	// Preserve this many buttons
-						stage.getChildren()[4].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
-						// drawControlsLayers.removeChildren();	// TODO: Add to another layer for clarity (if perf OK)
+						var CONTROL_LAYER_BUTTON_COUNT = 7;	// Preserve this many buttons
+						var CONTROL_LAYER = 3;
+						console.log('stage', stage);
+						stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
+						// drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
 						
 						highY = DEFAULT_HIGH_Y;
 						stage.draw();
@@ -711,11 +742,11 @@ var setupCanvas = function() {
 			},
 		}, {
 			// Sends OPD Encounter
-			image: 'resources/images/icons/button_finalize.png',
+			image: 'resources/images/button_Finalize_off.png',
 			x: stage.getWidth() - 120 - 58,
-			y: TOOLBAR_ITEM_BASE_Y + 2,
-			width: 120,
-			height: TOOLBAR_HEIGHT - 6,
+			y: TOOLBAR_ITEM_BASE_Y,
+			// width: 120,
+			// height: 44
 			handler: function() {
 				console.log('sending Doctor Encounter');
 				Ext.Msg.confirm('', 'Save and complete this visit?', function(btn) {
@@ -725,10 +756,22 @@ var setupCanvas = function() {
 						// TODO: Saved image is wrong resolution
 						// - clears canvas
 						// - (doesnt yet) move to patientlist
-						onSaveCanvas();
+						
+						// TODO: scroll directly to item in store
+						//	This logic needs to get out of draw.js and into sencha, e.g. could
+						//	fire an event instead
+						var vhs = Ext.getStore('visitHistoryStore');
+						vhs.on('write', function() {
+							console.log('new item added');
+							// Scroll in UI
+							console.log('scroll');
+							// Set correct history item in UI
+							console.log('set history item in UI');
+						});
 
-						// Save via REST
-						// k2s.config.sendDoctorOrderEncounter();
+						// Saves image. Currently, also saves via REST using
+						// method k2s.config.sendDoctorOrderEncounter();
+						onSaveCanvas();
 					}
 				});
 			},
@@ -742,6 +785,8 @@ var setupCanvas = function() {
 			handler: function() {
 				console.log("Bringing diagnoses modal window.")
 				onClickDiagnosis();
+				// this.setStroke('red');
+				// this.setStrokeWidth(5);
 			}
 		}, {
 			// Add medication
@@ -753,37 +798,61 @@ var setupCanvas = function() {
 			handler: function() {
 				onClickMedication();
 			}
-		}, {
-			// Add investigation
-			image: 'resources/images/icons/add_investigation_off.png',
-			x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
-			y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
-			width: 50,
-			height: 49,
-			handler: function() {
-				console.log('INVESTIGATIONS: TODO');
-			}
+		// }, {
+		// 	// Add investigation
+		// 	image: 'resources/images/icons/add_investigation_off.png',
+		// 	x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+		// 	y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
+		// 	width: 50,
+		// 	height: 49,
+		// 	handler: function() {
+		// 		console.log('INVESTIGATIONS: TODO');
+		// 	}
 		}];
 
 		// Creates a 'clickable' item with a touch handler.
 		// requires parameters for item: x,y,width,height,src,handler
 
-
+		var	controlGroups = {};
 		function createControlItem(item) {
 			var imageObj = new Image();
 			imageObj.onload = function() {
+				// Add all items to a controlGroup
+				var cg = item.controlGroup || NO_CONTROL_GROUP;
+
 				var box = new Kinetic.Image({
 					gid: item.gid,
 					storeId: item.storeId,
+					
+					// Needed to toggle images in a group of icons
+					controlGroup: cg,
+					imageWhenToggledOn: item.imageWhenToggledOn,
+					
 					x: item.x,
 					y: item.y,
 					width: item.width,
 					height: item.height,
-					// stroke: "black",
-					// strokeWidth: 1,
-					image: imageObj
+					image: imageObj,
+
+					imageOff: imageObj,
+					imageOn: null,
 				});
-				box.on('click touchstart', item.handler);
+				box.on('click touchstart', function() {
+					item.handler(box);
+
+					// Update UI to show 1 item in the group being pressed
+					// must have an attr 'imageWhenToggledOn'
+					if(cg != NO_CONTROL_GROUP && box.attrs.imageWhenToggledOn) {
+						toggleItemInControlGroup(box);
+					}
+				});
+
+				// Add to control group. Create group if dne yet
+				if( ! controlGroups.hasOwnProperty(cg)) {
+					controlGroups[cg] = [];
+				} 
+				controlGroups[cg].push(box);
+			
 				controlsLayer.add(box);
 				controlsLayer.draw();
 			}
@@ -792,6 +861,32 @@ var setupCanvas = function() {
 
 		for(var i = 0; i < controlItems.length; i++) {
 			createControlItem(controlItems[i]);
+		}
+
+		function toggleItemInControlGroup(item) {
+			// Toggle "off" all items in Group 
+			var cg = item.attrs.controlGroup;
+			for (var i = 0; i < controlGroups[cg].length; i++) {
+				var box = controlGroups[cg][i];
+				box.setImage(box.attrs.imageOff);
+			}
+			
+			// Toggle "on" selected item
+			// requires controlItem to have an attribute called imageWhenToggledOn
+			// Notes: doesn't make a new image each time. just creats it once and then re-uses
+			if (item.attrs.imageOn) {
+				item.setImage(item.attrs.imageOn);
+				controlsLayer.draw();
+			} else {
+				var file = item.attrs.imageWhenToggledOn;
+				var imgObj = new Image();	
+				imgObj.onload = function() {
+					item.setImage(imgObj);
+					item.attrs.imageOn = imgObj;
+					controlsLayer.draw();
+				}
+				imgObj.src= file;
+			}
 		}
 
 		//
@@ -850,7 +945,7 @@ var setupCanvas = function() {
 				break;
 			}
 
-			var imageObj2 = new Image();
+			// var imageObj2 = new Image();
 			var myHighY = highY;
 			addImageToLayer(bullet_icon_link, textLayer, {
 				gid: gid,
@@ -939,10 +1034,13 @@ var setupCanvas = function() {
 											//     complain: stage.getChildren()[i].getChildren()[j].attrs.text,
 											//     id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
 											// });
+	
+											// TODO: Global!! namespace this var, perhaps put this var in K2S
 											--DiagnosisPrinted;
 										}
 
 										if(stage.getChildren()[i].getChildren()[j].attrs.storeId === 'drugpanel') {
+											// TODO: Global!! namespace this var, perhaps put this var in K2S
 											--MedicationPrinted;
 										}
 									}
@@ -979,9 +1077,11 @@ var setupCanvas = function() {
 			//FOR DEMO UI OF DECISION SUPPORT
 			if(SuggestDrugOrder) {
 				Ext.Msg.defaultAllowedConfig.maxHeight = 300;
-				Ext.Msg.defaultAllowedConfig.maxWidth = 600;
+				Ext.Msg.defaultAllowedConfig.maxWidth = 400;
 
-				Ext.Msg.confirm('Confirmation for Raxa Decision Support Suggestion', 'Raxa Decision Support has suggested following Prescription \n' + '<font size="3" color="red"><br><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> for <b>SINUSITIS</b> </br>  \n Do you wish to accept this suggestion?', function(btn) {
+				Ext.Msg.confirm('Raxa Decision Support', 
+					'For <font size="3" color="green"><b>Sinusitis</b></font>, decision support suggests: <br /><br /> ' + '<font size="3" color="red"><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> <br /> <br /> Do you wish to accept this suggestion?', 
+					function(btn) {
 					if(btn == 'yes') {
 						Ext.getStore('drugpanel').add({
 							concept: "80049AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -996,12 +1096,11 @@ var setupCanvas = function() {
 						});
 						stage.fire('paintMedication');
 					}
-				}); 
-				// .setSize(600, 300);
+				}).setSize(400, 300);
 			}
 		}
 
-
+		return stage;
 	};
 
 // TODO: Quick Hack! Must remove from global scope

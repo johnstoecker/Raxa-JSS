@@ -16,8 +16,7 @@
  * This list shows result on diagnosis (in Diagnosis Tab)
  */
  
- 
-Ext.define('RaxaEmr.Outpatient.view.patient.diagnosislist', {
+Ext.define('RaxaEmr.Outpatient.view.today.diagnosislist', {
     extend: 'Ext.dataview.List',
     xtype: 'Diagnosis-List',
     config: {

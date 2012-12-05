@@ -26,10 +26,10 @@ var TABS = {
     TREATMENT: 4
 }
 
-Ext.define('RaxaEmr.Outpatient.view.patient.work', {
+Ext.define('RaxaEmr.Outpatient.view.today.work', {
     extend: 'Ext.Container',
     xtype: 'work',
-    requires: ['RaxaEmr.Outpatient.view.patient.history', 'RaxaEmr.Outpatient.view.patient.examination', 'RaxaEmr.Outpatient.view.patient.dataPanel', 'RaxaEmr.Outpatient.view.patient.treatment', 'RaxaEmr.Outpatient.view.patient.diagnosis', 'RaxaEmr.Outpatient.view.patient.draw'],
+    requires: ['RaxaEmr.Outpatient.view.history.Overview','RaxaEmr.Outpatient.view.today.treatment', 'RaxaEmr.Outpatient.view.today.diagnosis', 'RaxaEmr.Outpatient.view.today.draw'],
     config: {
         layout: {
             type: 'hbox'
@@ -37,10 +37,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.work', {
         height: 768,
         width: 1024,
         items: [{
-            // xtype: 'draw-panel',
-        // }, {
-        //     xtype: 'examination-panel',
-        // }, {
              xtype: 'diagnosis-panel',
              id: 'diagnosis-panel'
          }, {
