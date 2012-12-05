@@ -1,14 +1,52 @@
 // TODO: Unwind this spaghetti code. 
 // Move controlling logic somewhere else, just fire events and listen to updates in view
-// ///////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////
 // Connection: Kinetic to Sencha
 //  - bridges via firing Ext events
 ///////////////////////////////////////////////////////////
-// Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
+
 var SAVE_LOAD_MASK_MAX_WAIT_TIME = 1000;
+
+// TODO: take these out of global scope
+// var g_medication_list = [];
+var g_diagnosis_list = [];
+var PrintObject;
+var order;
+var obs;
+var DoctorOrderStore;
+var DoctorOrderModel;
+var DiagnosisPrinted = 0;
+var MedicationPrinted = 0;
+
+
+// Print Class - Keep track of items to be displayed and saved on persist of the JSON
+function PrintClass() {
+	//This function is same as a constructor
+	//alert("Print Class");
+}
+
+PrintClass.prototype = {
+	PrintText: function() {
+		//create function to Print Text
+	},
+	TextGroupProperty: new Object(),
+	TextArray: new Array(new TextProperty()),
+}
+
+PrintClass.prototype.TextGroupProperty = {
+	type: null,
+	storeId: null,
+	gid: null
+}
+
+function TextProperty(text, uuid) {
+	this.text = text, this.uuid = uuid
+}
+
+// Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
 Ext.define('KineticToSencha', {
 	mixins: ['Ext.mixin.Observable'],
-	id: 'k2s',
 	config: {
 		fullName: ''
 	},
@@ -109,48 +147,15 @@ Ext.define('KineticToSencha', {
 				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
 				// from onSaveCanvas... saveDrawableCanvas... etc
 				k2s.config.sendDoctorOrderEncounter();
+
+				// TODO: Erase canvas when this is all done...
 			}
 		});
 	}
 });
 
-// TODO: take these out of global scope
-var g_medication_list = [];
-var g_diagnosis_list = [];
-
-function PrintClass() {
-	//This function is same as a constructor
-	//alert("Print Class");
-}
-
-PrintClass.prototype = {
-	PrintText: function() {
-		//create function to Print Text
-	},
-	TextGroupProperty: new Object(),
-	TextArray: new Array(new TextProperty()),
-}
-
-PrintClass.prototype.TextGroupProperty = {
-	type: null,
-	storeId: null,
-	gid: null
-}
-
-function TextProperty(text, uuid) {
-	this.text = text, this.uuid = uuid
-}
-
-var PrintObject = new PrintClass();
-
-var order;
-var obs;
-var DoctorOrderStore;
-var DoctorOrderModel;
-var DiagnosisPrinted = 0;
-var MedicationPrinted = 0;
 var k2s = Ext.create('KineticToSencha', {
-
+	id: 'k2s',
 	// TODO: Move all of these functions to the define() statement for k2s, and you can call via
 	//	k2s.method() instead of k2s.config.method()
 	// <TODO: Add Comment describing>
@@ -202,7 +207,7 @@ var k2s = Ext.create('KineticToSencha', {
 				//      value: Ext.getCmp('diagnosedList').getStore().data.all[i].data.complain
 			});
 			DoctorOrderModel.data.obs.push(ObsModel.raw);
-			console.log(ObsModel);
+			// console.log(ObsModel);
 		}
 		console.log(DoctorOrderModel);
 	},
@@ -279,30 +284,33 @@ var k2s = Ext.create('KineticToSencha', {
 		DoctorOrderStore.add(DoctorOrderModel);
 		console.log(DoctorOrderStore);
 
+		// //removes text layer
 
-		//removes text layer
-		stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
-		stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
-		//remove only specific children on controlLayer (X on textboxes)
-		var CONTROL_LAYER = 3;
-		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - 7);
-		stage.draw();
+		// // TODO: Refactor to have "initCanvas" do this for both new and finalize
+		// // TODO: Get layer by id rather than by index
+		// stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
+		// stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
+		// //remove only specific children on controlLayer (X on textboxes)
+		// var CONTROL_LAYER = 3;
+		// var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
+		// // TODO: create a new layer for delete buttons to simplify this logic
+		// stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
+		// stage.draw();
 
-		Ext.getCmp('contact').setHidden(false);
+		// Ext.getCmp('contact').setHidden(false);
 
 		//makes the post call for creating the patient
-		DoctorOrderStore.sync({
-			success: function(response, records) {
-				console.log(arguments);
-			},
-			failure: function(response, records) {
-				console.log(arguments);
-			}
+		var that = this;
+		DoctorOrderStore.on('write', function() {
+			console.log('doctor order store on WRITE event');
+			that.initCanvasData();
 		});
+		DoctorOrderStore.sync();
 	},
 
-	// <Comment describing>
-	initStore: function() {
+	// This function clears the canvas (UI) and resets all the models/stores which are tied ot the UI
+	initCanvasData: function() {
+		// Empty the stores which are used to send the data
 		DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
 		DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
 			//uuid:      //need to get myRecord variable of patientlist accessible here, so made it global variable
@@ -317,9 +325,37 @@ var k2s = Ext.create('KineticToSencha', {
 
 		DoctorOrderModel.data.obs = [];
 		DoctorOrderModel.data.orders = [];
+
+		// Reset stores for diagnoses and treatments
+		Ext.getStore('diagnosedDisease').clearData();
+		Ext.getStore('drugpanel').clearData();
+		
+		// Reset the print object 
+		// TODO: put print counts inside of the print Object, rather than separate floating vars
+		PrintObject = new PrintClass();
+		DiagnosisPrinted = 0;
+		MedicationPrinted = 0;
+
+		// Reset high Y
+		highY = DEFAULT_HIGH_Y;
+
+		// Clear layers on stage
+		// TODO: Get layer by id rather than by index (see 'resources/images/button_New_off.png' code)
+		stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
+		stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
+		//remove only specific children on controlLayer (X on textboxes)
+		var CONTROL_LAYER = 3;
+		var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
+		// TODO: create a new layer for delete buttons to simplify this logic
+		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
+		stage.draw();
 	},
 
 	listeners: {
+		resetCanvasStores: function() {
+			console.log('resetCanvasStores()');
+			this.config.initCanvasData();
+		},
 		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
 			// By default, "this" will be the object that fired the event.
 			console.log("k2s: clickAddMedication");
@@ -335,50 +371,35 @@ var k2s = Ext.create('KineticToSencha', {
 
 			for(var i = MedicationPrinted, index = 0; i < itemCount; i++, index++) {
 				var itemData = data.getAt(i).getData();
+
 				displayText = '';
 				// TODO: Consolidate following code into loop
 				if(!itemData.drugname) {
 					// If no drug name, skip to next loop iteration
 					continue;
 				} else {
-					displayText = (itemData.drugname);
+					displayText = (itemData.drugname + ' - ');
 				}
 
-				var strength = itemData.strength;
-				if(strength) {
-					displayText += (' ' + strength + 'mg ');
+				// Print all the details of the drug prescription
+				var detailTypes = ["strength", "frequency", "instruction", "duration"]
+				for (var j=0; j< detailTypes.length; j++) {
+					var details = itemData[detailTypes[j]];
+					if(details) {
+						displayText += (' ' + details);
+						if (detailTypes[j] == "duration") {
+							displayText += ' days';
+						}
+					}
 				}
 
-				var frequency = itemData.frequency;
-				if(frequency) {
-					displayText += (' ' + frequency);
-				}
-
-				var instruction = itemData.instruction;
-				if(instruction) {
-					displayText += (' ' + instruction);
-				}
-
-				var quantity = itemData.duration;
-				if(quantity) {
-					displayText += (' ' + quantity + ' days');
-				}
-				console.log(displayText)
-				// return itemData.drugname || "";
 				MedicationPrinted++;
 				var textForPrintObject = new TextProperty(displayText, itemData.uuid);
 				PrintObject.TextArray.push(textForPrintObject);
 			}
-			console.log(PrintObject);
 
-			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
-			g_medication_list = displayText;
-
-			//TODO UI Designers want prev Diagnosis to be showed (with different color    
-			// store.clearData(); // Prevents repeating.. now just need to create multiple prescription text boxes
 			Ext.getCmp('drugForm').setHidden(false);
 			Ext.getCmp('drugaddform').reset();
-			// Ext.getCmp('treatment-panel').setActiveItem(0);
 		},
 
 		clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
@@ -426,6 +447,8 @@ var DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" tex
 var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
 var DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
 var DEFAULT_HIGH_Y = DRAWABLE_Y_MIN + 15;
+var highY = DEFAULT_HIGH_Y;	// Not a constant
+
 var DRAWABLE_Y_MAX = 1024;
 var DEFAULT_MODE = "draw"; // undefined
 var STAGE_X = 768; //768
@@ -467,7 +490,6 @@ var setupCanvas = function() {
 	var NO_CONTROL_GROUP = 'noControlGroup';
 
 		var lowY = DRAWABLE_Y_MIN;
-		var highY = DEFAULT_HIGH_Y;
 
 		var newLine;
 		var newLinePoints = [];
@@ -530,7 +552,7 @@ var setupCanvas = function() {
 		stage.on("paintMedication", function() {
 			//To be refactored
 			console.log('printing Drug Order');
-			console.log(g_medication_list);
+			// console.log(g_medication_list);
 			k2s.fireEvent('clickAddMedication');
 			Ext.getCmp('drugForm').setHidden(true);
 			drawDiagnosis(PrintObject);
@@ -744,19 +766,20 @@ var setupCanvas = function() {
 				// TODO: Clear the canvas - for demo only
 				Ext.Msg.confirm('New', 'Erase current visit (without saving)?', function(btn) {
 					if(btn == 'yes') {
-						linesLayer.removeChildren();
-						textLayer.removeChildren();
-						//remove only specific children on controlLayer (X on textboxes)
-						var CONTROL_LAYER_BUTTON_COUNT = 7;	// Preserve this many buttons
-						var CONTROL_LAYER = 3;
-						console.log('stage', stage);
-						stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
-						// drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
+						// linesLayer.removeChildren();
+						// textLayer.removeChildren();
+						// //remove only specific children on controlLayer (X on textboxes)
+						// var CONTROL_LAYER_BUTTON_COUNT = 7;	// Preserve this many buttons
+						// var CONTROL_LAYER = 3;
+						// console.log('stage', stage);
+						// stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
+						// // drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
 						
-						// TODO: Also reset the stores
-						
-						highY = DEFAULT_HIGH_Y;
-						stage.draw();
+						// // TODO: Also reset the stores
+						k2s.fireEvent('resetCanvasStores');
+
+						// highY = DEFAULT_HIGH_Y;
+						// stage.draw();
 					}
 				});
 			},
@@ -996,7 +1019,8 @@ var setupCanvas = function() {
 				width: 32,
 				height: 32,
 				handler: function() {
-					gidToBeDeleted = this.attrs.gid;
+					// TODO: Warn user before deleting - are you sure?
+					var gidToBeDeleted = this.gid;
 					console.log('Deleting objects with gid= ' + gidToBeDeleted);
 
 					// Step 1 : Get Layers
@@ -1068,7 +1092,6 @@ var setupCanvas = function() {
 					}
 				}
 			});
-
 
 			var handDrawnLineY = highY; // + 20*(text.length-1);
 			addImageToLayer("resources/images/icons/line.png", textLayer, {

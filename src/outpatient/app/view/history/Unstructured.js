@@ -93,31 +93,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					itemtap: function(view, index, target, record, e, eOpts) {
 						var me = Ext.getCmp('history-unstructured-panel');
 						me.showVisitInView(record);
-						// var svh = Ext.getCmp('singleVisitHistory'); 
-						// var scroller = svh.getScrollable().getScroller();
-						// var HEIGHT_OF_STAGE = 1024;
-						// scroller.scrollTo(0, index*HEIGHT_OF_STAGE, true);
-						
-						// var me = Ext.getCmp('history-unstructured-panel');
-						// var imgSrc = record.get('imgSrc');
-					 //  	addImageToLayer(imgSrc, me.loadedImageLayer, {
-						// 	x: DRAWABLE_X_MIN+35,
-						// 	y: DRAWABLE_Y_MIN,
-						// 	width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
-						// 	height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
-						// });
-
-						// // var img = Ext.getCmp('singleVisitHistoryImage');
-						// // var imgSrc = record.get('imgSrc');
-						// // img.setSrc('imgSrc');
-
-						// // Close this window
-						// Ext.getCmp('visitHistory').hide();
-
-						// // var button = Ext.getCmp('unstructuredHistoryChooseDateButton');
-						// // var visitDate = record.get('date');
-						// // button.setText(visitDate);
-
 					}
 				},
 			}]

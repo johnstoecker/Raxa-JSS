@@ -27,7 +27,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.draw', {
             console.log("Setting up canvas")
             // TODO: Load canvas according to which patient is selected
             this.stage = setupCanvas();
-            k2s.config.initStore();
+            k2s.config.initCanvasData();
             this.isCanvasSetup = true;
           }
         },
