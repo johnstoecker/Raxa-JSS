@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-Ext.Viewport.setStyleHtmlContent(true);  //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
+Ext.Viewport.setStyleHtmlContent(true); //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
 Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
     extend: 'Ext.Container',
     xtype: 'diagnosis-panel',
@@ -23,19 +23,21 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
         layout: {
             type: 'vbox'
         },
-        centered: true,
+        // centered: true,
         modal: true,
         hidden: true,
         floating: true,
+        left: (768-500) / 2,    // centered, based on screen width and modal width
+        top: 60,    // enough to not overlap with toolbar
+        width: 500,
         hideOnMaskTap: true,
         title: 'Diagnosis',
         items: [{
             xtype: 'titlebar',
             docked: 'top',
             title: 'Diagnosis'
-          },{
+        }, {
             xtype: 'container',
-            width: 500,
             layout: {
                 type: 'hbox'
             },
@@ -81,7 +83,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     margin: '0 0 20 0',
                     border: '0 0 0 3',
                     //style: 'border:solid #DADADA;',
-                    height: 400,
+                    height: 200,
                     layout: {
                         type: 'fit'
                     },
@@ -96,26 +98,20 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     xtype: 'container',
                     margin: '0 0 20 0',
                     style: 'background-color: #f7f7f7;',
-                    height: 50,
+                    height: 60,
                     layout: {
                         type: 'hbox'
                     },
                     items: [{
-                        xtype: 'spacer',
-                        width: '60%'
-                    },{
-                xtype: 'button',
-                text: 'Save',
-                flex: 1,
-                margin: '0 0 20 0',
-                width: '30%',
-                ui: 'confirm',
-                handler: function() {
-                    stage.fire('paintDiagnosis');
-                }
-            },{
-                        xtype: 'spacer',
-                        width: '10%'
+                        xtype: 'button',
+                        text: 'Save',
+                        centered: true,
+                        flex: 1,
+                        margin: '20 0 20 0',
+                        ui: 'confirm',
+                        handler: function() {
+                            stage.fire('paintDiagnosis');
+                        }
                     }]
                 }]
             }]
