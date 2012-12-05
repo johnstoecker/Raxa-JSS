@@ -205,9 +205,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         var PatientStore = Ext.create('Screener.store.NewPatients')
         PatientStore.add(patient);
         PatientStore.sync();
-        console.log('WHOA! sync patient store');
         PatientStore.on('write', function () {
-            console.log('WHOA! write to patient store');
             // TODO: https://raxaemr.atlassian.net/browse/TODO-67
             // Need to add location to OpenMRS for screenerUuidlocation
             this.sendEncounterData(personUuid, localStorage.regUuidencountertype, localStorage.screenerUuidlocation, localStorage.loggedInUser);
@@ -219,11 +217,10 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
     // Assigns patient, pops-open the patient-list so you can select that patient
     assignPatient: function (patient, provider) {
-        console.log('WHOA! assign pat');
         var encounterSent = this.sendEncounterData(patient, localStorage.screenerUuidencountertype, localStorage.waitingUuidlocation, provider);
         
         // Show patient list, so user gets feedback that their patient was added successfully
         // TODO: Move this logic into view modification.. shouldn't be involved in the controller
-        
+        Ext.getCmp('contact').show();
     },    
 });
