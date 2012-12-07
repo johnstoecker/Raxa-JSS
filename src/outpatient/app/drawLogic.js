@@ -939,7 +939,7 @@ var setupCanvas = function() {
 			}
 
 			// Add "delete" button
-			// Note, this creates item on control Layer, not text layer
+			// Note, this creates item on tempControlLayer, not text layer
 			createControlItem({
 				layer: 'tempControlsLayer',
 				gid: gid,
@@ -954,71 +954,65 @@ var setupCanvas = function() {
 					console.log('Deleting objects with gid= ' + gidToBeDeleted);
 
 					// Step 1 : Get Layers
-					for(var i = 0; i < stage.getChildren().length; i++) {
-						//Children in only textLayer and controlsLayer to be removed
-						// TODO: How about you just use the existing vars "textLayer" and "controlsLayer"? 
-						if(stage.getChildren()[i].getId() === "textLayer" || stage.getChildren()[i].getId() === "tempControlsLayer") {
-							//To check on infinite loop , TODO: Remove after testing
-							var count = 0;
-							for(var j = 0; j < stage.getChildren()[i].getChildren().length; j++) {
-								count++;
-								if(count == 100) {
-									console.log('bad code.... infinite loop on');
-									break;
-								}
+					var layersToSearch = [textLayer, tempControlsLayer];
+					for(var i = 0; i < layersToSearch.length; i++) {		
+						var childrenToRemove = [];
+						for(var j = 0; j < layersToSearch[i].getChildren().length; j++) {							
+							//Step 2 : Select Children with help of group id and delete those chidren
+							var child = layersToSearch[i].getChildren()[j];
+							if(child.attrs.gid === gidToBeDeleted) {
+								childrenToRemove.push(child);
 
-								//Step 2 : Select Children with help of group id and delete those chidren
-								if(stage.getChildren()[i].getChildren()[j].attrs.gid === gidToBeDeleted) {
-									//Step 3 : Search & Delete related item from store from Store
-									//Checks if this item has any storeId & storeUuid linked
-									if(stage.getChildren()[i].getChildren()[j].attrs.storeId && stage.getChildren()[i].getChildren()[j].attrs.storeUuid) {
-										storeToBeDeleted = Ext.getStore(stage.getChildren()[i].getChildren()[j].attrs.storeId);
-										var SearchKey = stage.getChildren()[i].getChildren()[j].attrs.storeUuid;
-										var SearchOnId = '';
-										switch(stage.getChildren()[i].getChildren()[j].attrs.storeId) {
-										case 'diagnosedDisease':
-											SearchOnId = 'id'; //Can change mapping of all stores to remove this switch case
-											break;
-										case 'drugpanel':
-											SearchOnId = 'uuid';
-											break;
-										case 'LabOrder':
-											SearchOnId = 'uuid';
-											break;
-										}
-										//Remove item from relevant store
-										storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId, SearchKey));
+								//Step 3 : Search & Delete related item from store from Store
+								//Checks if this item has any storeId & storeUuid linked
+								if(child.attrs.storeId && child.attrs.storeUuid) {
+									storeToBeDeleted = Ext.getStore(child.attrs.storeId);
+									var SearchKey = child.attrs.storeUuid;
+									var SearchOnId = '';
+									switch(child.attrs.storeId) {
+									case 'diagnosedDisease':
+										SearchOnId = 'id'; //Can change mapping of all stores to remove this switch case
+										break;
+									case 'drugpanel':
+										SearchOnId = 'uuid';
+										break;
+									case 'LabOrder':
+										SearchOnId = 'uuid';
+										break;
+									}
+									//Remove item from relevant store
+									storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId, SearchKey));
 
-										//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
-										//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
-										//Doctor can re search already diagnosed disease and select, though that will not effect anything
-										if(stage.getChildren()[i].getChildren()[j].attrs.storeId === 'diagnosedDisease') {
-											// var diagnosedList = Ext.getCmp('diagnosisList');
-											// diagnosedList.getStore().add({
-											//     complain: stage.getChildren()[i].getChildren()[j].attrs.text,
-											//     id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
-											// });
-	
-											// TODO: Global!! namespace this var, perhaps put this var in K2S
-											--DiagnosisPrinted;
-										}
+									//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
+									//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
+									//Doctor can re search already diagnosed disease and select, though that will not effect anything
+									if(child.attrs.storeId === 'diagnosedDisease') {
+										// var diagnosedList = Ext.getCmp('diagnosisList');
+										// diagnosedList.getStore().add({
+										//     complain: child.attrs.text,
+										//     id: child.attrs.storeUuid,
+										// });
 
-										if(stage.getChildren()[i].getChildren()[j].attrs.storeId === 'drugpanel') {
-											// TODO: Global!! namespace this var, perhaps put this var in K2S
-											--MedicationPrinted;
-										}
+										// TODO: Global!! namespace this var, perhaps put this var in K2S
+										--DiagnosisPrinted;
 									}
 
-									//Removing child layer from stage
-									console.log('Deleted Child: ');
-									console.log(stage.getChildren()[i].getChildren().splice(j, 1));
-									--j;
+									if(child.attrs.storeId === 'drugpanel') {
+										// TODO: Global!! namespace this var, perhaps put this var in K2S
+										--MedicationPrinted;
+									}
 								}
-
-								//Refreshes stage to show changes made above
-								stage.getChildren()[i].draw();
-							}
+							}		
 						}
+
+						for (var k=0; k<childrenToRemove.length; k++) {
+							var children = layersToSearch[i].getChildren();
+							var index = children.indexOf(childrenToRemove[k]);
+							children.splice(index, 1);
+						}
+
+						//Refreshes stage to show changes
+						layersToSearch[i].draw();
 					}
 				}
 			});
