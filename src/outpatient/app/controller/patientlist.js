@@ -174,6 +174,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             saveduration: '#saveDuration',
             adddruginlist: '#addDrugInList',
             addMoreDrug: '#addMoreDrug',
+            adddiagnosisinlist: '#addDiagnosisInList',
+            addMoreDiagnosis: '#addMoreDiagnosis',
             submithistory: '#submit-history',
             submitdrugs: '#submitDrugs',
             adddiagnosis: '#addDiagnosis',
@@ -293,6 +295,12 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             },
             addMoreDrug: {
                 tap: 'adddruginlist'
+            },
+            adddiagnosisinlist: {
+                tap: 'adddiagnosisinlist'
+            },
+            addMoreDiagnosis: {
+                tap: 'adddiagnosisinlist'
             },
             submithistory: {
                 tap: 'submitHistory'
@@ -763,83 +771,32 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     refToDocOnSearchClearIconTap: function () {
         this.onSearchClearIconTap(Ext.getCmp('refToDocPanel').getStore());
     },
-    //called when sign list is clicked or selected
-    onSignListSelect: function (list, index, node, record) {
-        var sign = record.data.sign;
-        list.getStore().remove(record);
-        examlist = Ext.getCmp('examList');
-        examlist.getStore().add({
-            complain: sign,
-            id: sign,
-        });
-    },
-    // to filter the search in the signlist
-    signFilter: function () {
-        var value = Ext.getCmp('signFilter').getValue();
-        var store = Ext.getCmp('diagnosislist').getStore();
-
-        if (value) {
-            var searches = value.split(' ');
-            var regexps = [];
-            var i;
-
-            for (i = 0; i < searches.length; i++) {
-                if (!searches[i]) continue;
-                regexps.push(new RegExp(searches[i], 'i'));
-            }
-
-            store.filter(function (record) {
-                var matched = [];
-
-                for (i = 0; i < regexps.length; i++) {
-                    var search = regexps[i];
-                    var didMatch = record.get('type').match(search);
-                    matched.push(didMatch);
-                }
-
-                if (regexps.length > 1 && matched.indexOf(false) != -1) {
-                    return false;
-                } else {
-                    return matched[0];
-                }
-            });
-        }
-    },
-    
-    //for searching in the signlist
-    signFilterByOnSearchKeyUp: function (field) {
-        Ext.getCmp('signList').setHidden(false);
-        Ext.getCmp('signList').getStore().load({
-            scope: this,
-            callback: function(records, operation, success){
-                if(success){
-                }
-                else{
-                    Ext.Msg.alert("Error", Util.getMessageLoadError());
-                }
-            }
-        });
-        this.onSearchKeyUp(Ext.getCmp('signList').getStore(), field, 'sign', 'type');
-        this.signFilter();
-    },
-
-    signFilterByOnSearchClearIconTap: function () {
-        this.onSearchClearIconTap(Ext.getCmp('signList').getStore());
-    },
 
     //This function searches list of diagnosis. Since this list is very big, UI occasionally freezes
     //So, this function searches only after "Enter" button is detected
     diagnosisFilterByOnSearchKeyUp: function (field, e) {
 
-        //Searches only if Enter key is identified
+    //Panel is created on left side of searchfield if not created in any previous call
+        if (!Ext.getCmp('searchedDiagnosisList')) {
+            Ext.create('Ext.Panel', {
+                id: 'searchedDiagnosisList',
+                items: [{
+                    height: 280,
+                    xtype: 'Diagnosis-List',
+                    id: 'diagnosisList',
+                    scrollable: true,
+                    hidden: false
+                }],
+                width: 200,
+                height: 300,
+                padding: 10
+            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), "tc-bc?");
 
-        // Commented code to check if "Enter" Key is pressed or not as list of diagnosis is reduced to JSS prefered only
-//        if (e.event.keyIdentifier == "Enter") {
-            Ext.getCmp('diagnosisList').setHidden(false);
-            Ext.getCmp('diagnosisList').getStore().load();
-            this.onSearchKeyUp(Ext.getCmp('diagnosisList').getStore(), field, 'sign', 'type');
-            this.signFilter();
-//        }
+        } 
+        else {
+            Ext.getCmp('searchedDiagnosisList').setHidden(false);
+        }              
+           this.onSearchKeyUp(Ext.getCmp('diagnosisList').getStore(), field, 'sign', 'type');
     },
 
     //This function is called on every event on searchfield 
@@ -849,47 +806,24 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     //This function calls on selection of Diagnosis list and adds to Diagnosed List
     onDiagnosisListSelect: function (list, index, node, record) {
- //       var sign = record.data.sign;
+
+
+        console.log(arguments);
+        Ext.getCmp('diagnosisfilterbysearchfield').setValue(record.data.sign);
+        Ext.getCmp('searchedDiagnosisList').setHidden(true);
         var diagnosis = record.data;
-        list.getStore().remove(record);
-        diagnosislist = Ext.getCmp('diagnosedList');
-        diagnosislist.getStore().add({
+        diagnosedStore = Ext.getStore('diagnosedDisease');
+ 
+        diagnosedStore.add({
             complain: diagnosis.sign,
             id: diagnosis.id,
         });
-    },
 
-    //This function is triggered when items are selected in diagnosed list and Delete button is pressed (to remove diagnosed disease)
-    deleteDiagnosed: function () {
-        var diagnosedlist = Ext.getCmp('diagnosedList');
-        selectedRecord = examlist.getSelection();
-        examlist.getStore().remove(selectedRecord);
     },
 
     //This function enables button which is to remove selected Diagnosed Diseased from Diagnosed List
     onDiagnosedListSelect: function (list, index, node, record) {
         Ext.getCmp('deleteDiagnosed').setHidden(false);
-    },
-    // called when an opd encounter is submitted
-    submitOpdEncounter: function () {
-        var obsdate = new Date();
-        var time = Util.Datetime(obsdate, Util.getUTCGMTdiff());
-
-        var opdencounter = Ext.create('RaxaEmr.Outpatient.model.opdEncounter', {
-            patient: myRecord.data.uuid,
-            encounterType: localStorage.outUuidencountertype,
-            encounterDatetime: time,
-            provider: localStorage.loggedInUser,
-            obs: opd_observations
-        });
-
-        var encounterStore = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
-        encounterStore.add(opdencounter);
-        encounterStore.sync();
-        encounterStore.on('write', function () {
-            Ext.Msg.alert('successfull');
-        }, this);
-        Ext.getCmp('examList').getStore().removeAll();
     },
 
     drugFilterByOnSearchClearIconTap: function () {
@@ -898,7 +832,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     //for searching in the druglist
     drugFilterByOnSearchKeyUp: function (field) {
-
 	//Panel is created on left side of searchfield if not created in any previous call
         if (!Ext.getCmp('searchedDrugList')) {
             Ext.create('Ext.Panel', {
@@ -965,25 +898,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         for (i = 0; i < prob_num; i++) {
             this.addObservation(localStorage.examlistUuidconcept, examlist.getAt(i).data.complain + examlist.getAt(i).data.duration);
         }
-    },
-    // to add the diagnosis observations in the obs array
-    addDiagnosis: function () {
-        var obsdate = new Date();
-        var conceptType;
-        var diagnosis_category = Ext.getCmp('diagnosisCategory').getValue();
-        if (diagnosis_category == 'Neuro') {
-            conceptType = localStorage.neurologicalDiagnosisUuidconcept;
-        } else if (diagnosis_category == 'Cardio') {
-            conceptType = localStorage.cadiologicalDiagnosisUuidconcept;
-        }
-        this.addObservation(conceptType, Ext.getCmp('diagnosisField').getValue() + ' : ' + Ext.getCmp('diagnosisNotes').getValue());
-        Ext.getCmp('diagnosisForm').reset();
-    },
-    // to submit the diagnosis observations
-    submitDiagnosis: function () {
-        this.addDiagnosis();
-        this.submitExamination();
-        this.submitOpdEncounter();
     },
     // to add the drug order in the drug list and drug panel
     adddruginlist: function (obj) {
