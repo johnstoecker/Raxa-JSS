@@ -110,7 +110,7 @@ Ext.define('KineticToSencha', {
 					// height: 32,
 					// width: 32
 				});
-				// k2s.config.addDoctorRecordImage_TEMP_FOR_DEMO(dataUrl);
+				// k2s.addDoctorRecordImage_TEMP_FOR_DEMO(dataUrl);
 				// Delete temp layer
 				temp_layer.remove();
 
@@ -147,16 +147,11 @@ Ext.define('KineticToSencha', {
 				// Save via REST
 				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
 				// from onSaveCanvas... saveDrawableCanvas... etc
-				k2s.config.sendDoctorOrderEncounter();
+				k2s.sendDoctorOrderEncounter();
 			}
 		});
-	}
-});
+	},
 
-var k2s = Ext.create('KineticToSencha', {
-	id: 'k2s',
-	// TODO: Move all of these functions to the define() statement for k2s, and you can call via
-	//	k2s.method() instead of k2s.config.method()
 	// <TODO: Add Comment describing>
 	addOrder: function() {
 		//set persist of order true as Doctor may not always have a order
@@ -330,12 +325,192 @@ var k2s = Ext.create('KineticToSencha', {
 		// TODO: create a new layer for delete buttons to simplify this logic
 		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
 		stage.draw();
-	},
+	}
+});
+
+var k2s = Ext.create('KineticToSencha', {
+	id: 'k2s',
+	// // TODO: Move all of these functions to the define() statement for k2s, and you can call via
+	// //	k2s.method() instead of k2s.config.method()
+	// // <TODO: Add Comment describing>
+	// addOrder: function() {
+	// 	//set persist of order true as Doctor may not always have a order
+	// 	RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist = true; //6th field in orders (sorted)
+	// 	// RaxaEmr.Outpatient.model.DoctorOrder.getFields().get('orders').setPersist(true); //6th field in orders (sorted)
+	// 	var drugPanel = Ext.getStore('drugpanel');
+
+	// 	lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
+
+	// 	for(var i = 0; i < lengthOfDrugOrder; i++) {
+	// 		var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
+
+	// 		//Drug Orders here
+	// 		var OrderModel = Ext.create('RaxaEmr.Outpatient.model.drugOrder', {
+	// 			type: 'drugorder',
+	// 			patient: myRecord.data.uuid,
+	// 			concept: drugPanel.concept,
+	// 			drug: drugPanel.uuid,
+	// 			startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+	// 			autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
+	// 			instructions: drugPanel.routeofadministration,
+	// 			quantity: drugPanel.duration,
+	// 			//TODO Figure out why dose is creating problem while sending
+	// 			//dose: drugPanel.frequency,
+	// 			//Pharmacy is using dose. Remove inconsistency
+	// 			frequency: drugPanel.frequency,
+	// 			orderer: localStorage.loggedInUser
+	// 		});
+	// 		DoctorOrderModel.data.orders.push(OrderModel.raw);
+	// 	}
+	// },
+
+	// // <TODO: Add Comment describing>
+	// addObs: function() {
+	// 	//TODO set persit TRUE if first order 
+	// 	// RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
+	// 	//TODO set persist FALSE if no item in list
+	// 	DoctorOrderModel.data.obs = [];
+	// 	lengthOfDiagnosis = Ext.getCmp('diagnosedList').getStore().data.length;
+	// 	for(var i = 0; i < lengthOfDiagnosis; i++) {
+	// 		console.log(Ext.getCmp('diagnosedList').getStore().data.all[i].data);
+	// 		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+	// 			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+	// 			person: myRecord.data.uuid,
+	// 			//need to set selected patient uuid in localStuiorage
+	// 			concept: Ext.getCmp('diagnosedList').getStore().data.all[i].data.id,
+	// 			//      value: Ext.getCmp('diagnosedList').getStore().data.all[i].data.complain
+	// 		});
+	// 		DoctorOrderModel.data.obs.push(ObsModel.raw);
+	// 		// console.log(ObsModel);
+	// 	}
+	// 	console.log(DoctorOrderModel);
+	// },
+
+	// // <TODO: Add Comment describing>
+	// addDoctorRecordImage: function() {
+	// 	// TODO UNABLE TO access ControlsLayer here
+	// 	// children till 7 are already there and rest goes into 
+	// 	// console.log(controlsLayer.children[8].attrs.image.src)
+	// 	// DoctorOrderModel.data.obs = [];
+	// 	//    (document.getElementById('id-of-doctor-form').src)
+	// 	//TODO check all objects of canvas which are saved and then push it as obs 
+	// 	// OR store an array of image which can be sent
+	// 	//set Image in obs json
+	// 	console.log('checking patient records in stage and copying to DoctorOrder store');
+
+	// 	var PatientRecordHistory = Ext.getStore('visitHistoryStore').getData();
+
+	// 	for(var j = 0; j < Ext.getStore('visitHistoryStore').getData().all.length; j++) //j is always 4, but not now.
+	// 	{
+	// 		if(PatientRecordHistory.all[j].data.id == "PatientRecord") {
+	// 			//    if( PatientRecordHistory.all[j].imgSrc.length < 65000){   
+	// 			var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+	// 				obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+	// 				person: myRecord.data.uuid,
+	// 				//need to set selected patient uuid in localStorage
+	// 				concept: localStorage.patientRecordImageUuidconcept,
+	// 				value: PatientRecordHistory.all[j].data.imgSrc
+	// 			});
+	// 			DoctorOrderModel.data.obs.push(ObsModel.raw);
+	// 			//  }
+	// 			//    else {
+	// 			//    Ext.Msg.alert('Error','Can\'t save data on server');
+	// 			//    }
+	// 		}
+	// 	}
+	// 	console.log(Ext.getStore('DoctorOrder'));
+	// },
+	// //Sending Stage JSON so that high quality doctor records can be generated again
+	// addDoctorRecordVectorImage: function() {
+
+	// 	var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+	// 		obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+	// 		person: myRecord.data.uuid,
+	// 		//need to set selected patient uuid in localStorage
+	// 		concept: localStorage.patientRecordVectorImageUuidconcept,
+	// 		value: stage.toJSON()
+	// 	});
+	// 	DoctorOrderModel.data.obs.push(ObsModel.raw);
+	// },
+	// //Small icons to show as thumbnails
+	// addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
+
+	// 	var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+	// 		obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+	// 		person: myRecord.data.uuid,
+	// 		//need to set selected patient uuid in localStorage
+	// 		concept: localStorage.patientRecordImageUuidconcept,
+	// 		value: dataUrl
+	// 	});
+	// 	DoctorOrderModel.data.obs.push(ObsModel.raw);
+	// },
+
+	// // <Comment describing>
+	// sendDoctorOrderEncounter: function() {
+	// 	this.addObs();
+	// 	this.addDoctorRecordImage();
+	// 	this.addDoctorRecordVectorImage();
+	// 	this.addOrder();
+
+	// 	DoctorOrderModel.data.patient = myRecord.data.uuid;
+	// 	DoctorOrderStore.add(DoctorOrderModel);
+
+	// 	//makes the post call for creating the patient
+	// 	var that = this;
+	// 	DoctorOrderStore.on('write', function() {
+	// 		console.log('doctor order store on WRITE event');
+	// 		that.initCanvasData();
+	// 	});
+	// 	DoctorOrderStore.sync();
+	// },
+
+	// // This function clears the canvas (UI) and resets all the models/stores which are tied ot the UI
+	// initCanvasData: function() {
+	// 	// Empty the stores which are used to send the data
+	// 	DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
+	// 	DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
+	// 		//uuid:      //need to get myRecord variable of patientlist accessible here, so made it global variable
+	// 		//may need to set it later if new patient is created using DoctorOrder view (currently view/patient/draw.js)
+	// 		//other way is to create method in Controller which returns myRecord.data.uuid
+	// 		encounterType: localStorage.outUuidencountertype,
+	// 		// TODO figure out if should be prescription fill ?
+	// 		encounterDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+	// 		//Should encounterDatetime be time encounter starts or ends?
+	// 		provider: localStorage.loggedInUser
+	// 	});
+
+	// 	DoctorOrderModel.data.obs = [];
+	// 	DoctorOrderModel.data.orders = [];
+
+	// 	// Reset stores for diagnoses and treatments
+	// 	Ext.getStore('diagnosedDisease').clearData();
+	// 	Ext.getStore('drugpanel').clearData();
+		
+	// 	// Reset the print object 
+	// 	// TODO: put print counts inside of the print Object, rather than separate floating vars
+	// 	PrintObject = new PrintClass();
+	// 	DiagnosisPrinted = 0;
+	// 	MedicationPrinted = 0;
+
+	// 	// Reset high Y
+	// 	highY = DEFAULT_HIGH_Y;
+
+	// 	// Clear layers on stage
+	// 	// TODO: Get layer by id rather than by index (see 'resources/images/button_New_off.png' code)
+	// 	stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
+	// 	stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
+	// 	//remove only specific children on controlLayer (X on textboxes)
+	// 	var CONTROL_LAYER = 3;
+	// 	var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
+	// 	// TODO: create a new layer for delete buttons to simplify this logic
+	// 	stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
+	// 	stage.draw();
+	// },
 
 	listeners: {
 		resetCanvas: function() {
 			console.log('resetCanvas()');
-			this.config.initCanvasData();
+			this.initCanvasData();
 		},
 		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
 			// By default, "this" will be the object that fired the event.
@@ -745,7 +920,7 @@ var setupCanvas = function() {
 						
 						// Saves image to localStore
 						// Scrolls directly to see the history item in history view
-						// Also saves via REST using k2s.config.sendDoctorOrderEncounter();
+						// Also saves via REST using k2s.sendDoctorOrderEncounter();
 						// Clear "today" canvas, after saving via REST
 						onSaveCanvas();
 					}
@@ -949,71 +1124,74 @@ var setupCanvas = function() {
 				width: 32,
 				height: 32,
 				handler: function() {
-					// TODO: Warn user before deleting - are you sure?
-					var gidToBeDeleted = this.gid;
-					console.log('Deleting objects with gid= ' + gidToBeDeleted);
+					Ext.Msg.confirm('Delete', 'Are you sure?', function(btn) {
+						if(btn == 'yes') {
+							var gidToBeDeleted = this.gid;
+							console.log('Deleting objects with gid= ' + gidToBeDeleted);
 
-					// Step 1 : Get Layers
-					var layersToSearch = [textLayer, tempControlsLayer];
-					for(var i = 0; i < layersToSearch.length; i++) {		
-						var childrenToRemove = [];
-						for(var j = 0; j < layersToSearch[i].getChildren().length; j++) {							
-							//Step 2 : Select Children with help of group id and delete those chidren
-							var child = layersToSearch[i].getChildren()[j];
-							if(child.attrs.gid === gidToBeDeleted) {
-								childrenToRemove.push(child);
+							// Step 1 : Get Layers
+							var layersToSearch = [textLayer, tempControlsLayer];
+							for(var i = 0; i < layersToSearch.length; i++) {		
+								var childrenToRemove = [];
+								for(var j = 0; j < layersToSearch[i].getChildren().length; j++) {							
+									//Step 2 : Select Children with help of group id and delete those chidren
+									var child = layersToSearch[i].getChildren()[j];
+									if(child.attrs.gid === gidToBeDeleted) {
+										childrenToRemove.push(child);
 
-								//Step 3 : Search & Delete related item from store from Store
-								//Checks if this item has any storeId & storeUuid linked
-								if(child.attrs.storeId && child.attrs.storeUuid) {
-									storeToBeDeleted = Ext.getStore(child.attrs.storeId);
-									var SearchKey = child.attrs.storeUuid;
-									var SearchOnId = '';
-									switch(child.attrs.storeId) {
-									case 'diagnosedDisease':
-										SearchOnId = 'id'; //Can change mapping of all stores to remove this switch case
-										break;
-									case 'drugpanel':
-										SearchOnId = 'uuid';
-										break;
-									case 'LabOrder':
-										SearchOnId = 'uuid';
-										break;
-									}
-									//Remove item from relevant store
-									storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId, SearchKey));
+										//Step 3 : Search & Delete related item from store from Store
+										//Checks if this item has any storeId & storeUuid linked
+										if(child.attrs.storeId && child.attrs.storeUuid) {
+											storeToBeDeleted = Ext.getStore(child.attrs.storeId);
+											var SearchKey = child.attrs.storeUuid;
+											var SearchOnId = '';
+											switch(child.attrs.storeId) {
+											case 'diagnosedDisease':
+												SearchOnId = 'id'; //Can change mapping of all stores to remove this switch case
+												break;
+											case 'drugpanel':
+												SearchOnId = 'uuid';
+												break;
+											case 'LabOrder':
+												SearchOnId = 'uuid';
+												break;
+											}
+											//Remove item from relevant store
+											storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId, SearchKey));
 
-									//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
-									//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
-									//Doctor can re search already diagnosed disease and select, though that will not effect anything
-									if(child.attrs.storeId === 'diagnosedDisease') {
-										// var diagnosedList = Ext.getCmp('diagnosisList');
-										// diagnosedList.getStore().add({
-										//     complain: child.attrs.text,
-										//     id: child.attrs.storeUuid,
-										// });
+											//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
+											//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
+											//Doctor can re search already diagnosed disease and select, though that will not effect anything
+											if(child.attrs.storeId === 'diagnosedDisease') {
+												// var diagnosedList = Ext.getCmp('diagnosisList');
+												// diagnosedList.getStore().add({
+												//     complain: child.attrs.text,
+												//     id: child.attrs.storeUuid,
+												// });
 
-										// TODO: Global!! namespace this var, perhaps put this var in K2S
-										--DiagnosisPrinted;
-									}
+												// TODO: Global!! namespace this var, perhaps put this var in K2S
+												--DiagnosisPrinted;
+											}
 
-									if(child.attrs.storeId === 'drugpanel') {
-										// TODO: Global!! namespace this var, perhaps put this var in K2S
-										--MedicationPrinted;
-									}
+											if(child.attrs.storeId === 'drugpanel') {
+												// TODO: Global!! namespace this var, perhaps put this var in K2S
+												--MedicationPrinted;
+											}
+										}
+									}		
 								}
-							}		
-						}
 
-						for (var k=0; k<childrenToRemove.length; k++) {
-							var children = layersToSearch[i].getChildren();
-							var index = children.indexOf(childrenToRemove[k]);
-							children.splice(index, 1);
-						}
+								for (var k=0; k<childrenToRemove.length; k++) {
+									var children = layersToSearch[i].getChildren();
+									var index = children.indexOf(childrenToRemove[k]);
+									children.splice(index, 1);
+								}
 
-						//Refreshes stage to show changes
-						layersToSearch[i].draw();
-					}
+								//Refreshes stage to show changes
+								layersToSearch[i].draw();
+							}
+						}
+					}, this);					
 				}
 			});
 

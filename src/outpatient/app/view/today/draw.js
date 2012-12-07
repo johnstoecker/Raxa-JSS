@@ -25,7 +25,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.draw', {
         painted: function() {
           if (!this.isCanvasSetup) {
             this.stage = setupCanvas();
-            k2s.config.initCanvasData();
+            k2s.initCanvasData();
             this.isCanvasSetup = true;
           }
         },
