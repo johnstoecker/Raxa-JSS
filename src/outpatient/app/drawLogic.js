@@ -1,14 +1,3 @@
-// TODO: Unwind this spaghetti code. 
-// Move controlling logic somewhere else, just fire events and listen to updates in view
-
-// TODO: take these out of global scope
-var SAVE_LOAD_MASK_MAX_WAIT_TIME = 15000;
-var PrintObject;
-// var order;
-// var obs;
-var DoctorOrderStore;
-var DoctorOrderModel;
-
 //////////////////////////////////////////////////////////////////////////////
 // Print Class
 //  - Keep track of items to be displayed and saved on persist of the JSON
@@ -60,6 +49,7 @@ Ext.define('KineticToSencha', {
 		this.fireEvent('clickOnDiagnosis');
 	},
 	saveLoadMask: function() {
+
 		var mask = function() {
 				console.log('mask off');
 				Ext.getCmp('opdPatientDataEntry').setMasked(false)
@@ -72,7 +62,7 @@ Ext.define('KineticToSencha', {
 			modal: true
 		});
 
-		setTimeout(mask, SAVE_LOAD_MASK_MAX_WAIT_TIME);
+		setTimeout(mask, Util.SAVE_LOAD_MASK_MAX_WAIT_TIME);
 		Ext.getCmp('opdPatientDataEntry').setMasked(false);
 	},
 
@@ -88,10 +78,10 @@ Ext.define('KineticToSencha', {
 					y: 0,
 					id: 'PatientRecord',
 					crop: {
-						x: DRAWABLE_X_MIN,
-						y: DRAWABLE_Y_MIN,
-						width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
-						height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+						x: kineticCanvas.DRAWABLE_X_MIN,
+						y: kineticCanvas.DRAWABLE_Y_MIN,
+						width: kineticCanvas.DRAWABLE_X_MAX - kineticCanvas.DRAWABLE_X_MIN,
+						height: DRAWABLE_Y_MAX - kineticCanvas.DRAWABLE_Y_MIN
 					}
 				});
 
@@ -312,7 +302,7 @@ Ext.define('KineticToSencha', {
 		PrintObject.MedicationPrinted = 0;
 
 		// Reset high Y
-		highY = DEFAULT_HIGH_Y;
+		highY = kineticCanvas.DEFAULT_HIGH_Y;
 
 		// Clear layers on stage
 		// TODO: Get layer by id rather than by index (see 'resources/images/button_New_off.png' code)
@@ -327,6 +317,7 @@ Ext.define('KineticToSencha', {
 	}
 });
 
+// Instance of k2s to listen for events from canvas
 var k2s = Ext.create('KineticToSencha', {
 	id: 'k2s',
 	listeners: {
@@ -418,26 +409,38 @@ var k2s = Ext.create('KineticToSencha', {
 ///////////////////////////////////////////////////////////
 // Kinetic JS, drawing Canvas
 ///////////////////////////////////////////////////////////
-imageCount = 0;
 
-var DRAWABLE_X_MIN = 60;
-var DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" text
-var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
-var DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
-var DEFAULT_HIGH_Y = DRAWABLE_Y_MIN + 15;
+// Globals / Constants
+var kineticCanvas = {
+	DRAWABLE_X_MIN : 60,	
+	DRAWABLE_X_MAX : 680, // 708 - strict border = 700 ... minus the "Today" text
+	DIFF : 144, // moving whole thing up a bit ... 1024 - 880 = 144
+	DRAWABLE_Y_MIN : 200 - this.DIFF, // 230 - strict border 
+	DEFAULT_HIGH_Y : this.DRAWABLE_Y_MIN + 15,
+};
+
+var PrintObject;
+var stage = new Object;	// TODO: Remove if unneeded
+// var imageCount = 0;
+
+// var kineticCanvas.DRAWABLE_X_MIN = 60;
+// var kineticCanvas.DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" text
+// var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
+// var kineticCanvas.DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
+// var kineticCanvas.DEFAULT_HIGH_Y = kineticCanvas.DRAWABLE_Y_MIN + 15;
 
 // Keep track of the current low and high bounds (y-axis) for where a user
 // has already added content onto the canvas. The idea is that we want to add
 // structured data (diagnoses, prescriptions, ...) into blank areas on the 
 // canvas where the user hasn't yet written.
-var highY = DEFAULT_HIGH_Y;	// Not a constant
+var highY = kineticCanvas.DEFAULT_HIGH_Y;	// Not a constant
 
 var DRAWABLE_Y_MAX = 1024;
 var DEFAULT_MODE = "draw"; // undefined
 var STAGE_X = 768; //768
 var STAGE_Y = 1024; //1024
-var HISTORY_BASE_X = DRAWABLE_X_MAX;
-var HISTORY_BASE_Y = DRAWABLE_Y_MIN + 196;
+var HISTORY_BASE_X = kineticCanvas.DRAWABLE_X_MAX;
+var HISTORY_BASE_Y = kineticCanvas.DRAWABLE_Y_MIN + 196;
 var HISTORY_ITEM_DIM = 64;
 
 var CONTROL_BASE_X = 2;
@@ -457,7 +460,7 @@ function isInDrawableArea(myX, myY) {
 		y: myY
 	};
 
-	if((DRAWABLE_X_MIN <= up.x && up.x <= DRAWABLE_X_MAX) && (DRAWABLE_Y_MIN <= up.y && up.y <= DRAWABLE_Y_MAX)) {
+	if((kineticCanvas.DRAWABLE_X_MIN <= up.x && up.x <= kineticCanvas.DRAWABLE_X_MAX) && (kineticCanvas.DRAWABLE_Y_MIN <= up.y && up.y <= DRAWABLE_Y_MAX)) {
 		return true;
 	} else {
 		// console.log("not in drawable area: ", up.x, up.y );  
@@ -465,8 +468,18 @@ function isInDrawableArea(myX, myY) {
 	}
 }
 
-// TODO: Remove if unneeded
-var stage = new Object;
+// TODO: Remove from global scope
+// 	This is being used in Unstructured.js view
+function addImageToLayer(file, layer, config) {
+	var imgObj = new Image();
+	imgObj.onload = function() {
+		config.image = imgObj;
+		var kineticImage = new Kinetic.Image(config);
+		layer.add(kineticImage);
+		layer.draw();
+	}
+	imgObj.src = file;
+}
 
 var setupCanvas = function() {
 
@@ -476,7 +489,7 @@ var setupCanvas = function() {
 	
 	var NO_CONTROL_GROUP = 'noControlGroup';
 
-		var lowY = DRAWABLE_Y_MIN;
+		var lowY = kineticCanvas.DRAWABLE_Y_MIN;
 
 		var newLine;
 		var newLinePoints = [];
@@ -651,7 +664,7 @@ var setupCanvas = function() {
 			x: 0,
 			y: 0,
 			width: stage.getWidth(),
-			// height: DRAWABLE_Y_MIN - 4,
+			// height: kineticCanvas.DRAWABLE_Y_MIN - 4,
 			height: TOOLBAR_HEIGHT,
 			fill: "#82b0e1" // Light Blue.
 		});
@@ -659,14 +672,14 @@ var setupCanvas = function() {
 
 		addImageToLayer("resources/images/bg/TODAY_710.png", backgroundLayer, {
 			x: 0,
-			y: DRAWABLE_Y_MIN,
+			y: kineticCanvas.DRAWABLE_Y_MIN,
 			width: 710,
 			height: 835,
 		});
 
 		addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
 			x: stage.getWidth() - 36,
-			y: DRAWABLE_Y_MIN,
+			y: kineticCanvas.DRAWABLE_Y_MIN,
 			width: 35,
 			height: 835
 		});
@@ -751,7 +764,7 @@ var setupCanvas = function() {
 		}, {
 			// Add diagnosis
 			image: 'resources/images/icons/add_D_off.png',
-			x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+			x: kineticCanvas.DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
 			y: CONTROL_BASE_Y + 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
 			width: 50,
 			height: 49,
@@ -762,7 +775,7 @@ var setupCanvas = function() {
 		}, {
 			// Add medication
 			image: 'resources/images/icons/add_drug_off.png',
-			x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+			x: kineticCanvas.DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
 			y: CONTROL_BASE_Y + 4 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
 			width: 50,
 			height: 49,
@@ -772,7 +785,7 @@ var setupCanvas = function() {
 		// }, {
 		// 	// Add investigation
 		// 	image: 'resources/images/icons/add_investigation_off.png',
-		// 	x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+		// 	x: kineticCanvas.DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
 		// 	y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
 		// 	width: 50,
 		// 	height: 49,
@@ -908,7 +921,7 @@ var setupCanvas = function() {
 			var myHighY = highY;
 			addImageToLayer(bullet_icon_link, textLayer, {
 				gid: gid,
-				x: DRAWABLE_X_MIN + 20,
+				x: kineticCanvas.DRAWABLE_X_MIN + 20,
 				y: myHighY,
 				width: 14,
 				height: 14
@@ -918,7 +931,7 @@ var setupCanvas = function() {
 					gid: gid,
 					storeId: storeId,
 					storeUuid: TextArray[i].uuid,
-					x: DRAWABLE_X_MIN + 20 + 20,
+					x: kineticCanvas.DRAWABLE_X_MIN + 20 + 20,
 					y: highY,
 					text: TextArray[i].text,
 					fontSize: 11,
@@ -941,7 +954,7 @@ var setupCanvas = function() {
 				layer: 'tempControlsLayer',
 				gid: gid,
 				image: "resources/images/icons/delete_bigger.png",
-				x: DRAWABLE_X_MAX - 140,
+				x: kineticCanvas.DRAWABLE_X_MAX - 140,
 				y: myHighY,
 				width: 32,
 				height: 32,
@@ -1020,7 +1033,7 @@ var setupCanvas = function() {
 			var handDrawnLineY = highY; // + 20*(text.length-1);
 			addImageToLayer("resources/images/icons/line.png", textLayer, {
 				gid: gid,
-				x: DRAWABLE_X_MIN + 20,
+				x: kineticCanvas.DRAWABLE_X_MIN + 20,
 				y: handDrawnLineY,
 				width: 529,
 				height: 9
@@ -1059,17 +1072,3 @@ var setupCanvas = function() {
 
 		return stage;
 	};
-
-// TODO: Quick Hack! Must remove from global scope
-// 	This is being used in Unstructured.js view
-
-function addImageToLayer(file, layer, config) {
-	var imgObj = new Image();
-	imgObj.onload = function() {
-		config.image = imgObj;
-		var kineticImage = new Kinetic.Image(config);
-		layer.add(kineticImage);
-		layer.draw();
-	}
-	imgObj.src = file;
-}
