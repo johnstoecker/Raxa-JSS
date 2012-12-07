@@ -1,35 +1,23 @@
 // TODO: Unwind this spaghetti code. 
 // Move controlling logic somewhere else, just fire events and listen to updates in view
 
-///////////////////////////////////////////////////////////
-// Connection: Kinetic to Sencha
-//  - bridges via firing Ext events
-///////////////////////////////////////////////////////////
-
-var SAVE_LOAD_MASK_MAX_WAIT_TIME = 15000;
-
 // TODO: take these out of global scope
-// var g_medication_list = [];
-var g_diagnosis_list = [];
+var SAVE_LOAD_MASK_MAX_WAIT_TIME = 15000;
 var PrintObject;
-var order;
-var obs;
+// var order;
+// var obs;
 var DoctorOrderStore;
 var DoctorOrderModel;
-var DiagnosisPrinted = 0;
-var MedicationPrinted = 0;
 
-
-// Print Class - Keep track of items to be displayed and saved on persist of the JSON
+//////////////////////////////////////////////////////////////////////////////
+// Print Class
+//  - Keep track of items to be displayed and saved on persist of the JSON
+//////////////////////////////////////////////////////////////////////////////
 function PrintClass() {
-	//This function is same as a constructor
-	//alert("Print Class");
+	// Constructor
 }
 
 PrintClass.prototype = {
-	PrintText: function() {
-		//create function to Print Text
-	},
 	TextGroupProperty: new Object(),
 	TextArray: new Array(new TextProperty()),
 }
@@ -40,17 +28,28 @@ PrintClass.prototype.TextGroupProperty = {
 	gid: null
 }
 
-function TextProperty(text, uuid) {
-	this.text = text, this.uuid = uuid
+PrintClass.prototype.Status = {
+	DiagnosisPrinted: 0,
+	MedicationPrinted: 0,
 }
 
-// Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
+function TextProperty(text, uuid) {
+	this.text = text;
+	this.uuid = uuid;
+}
+
+///////////////////////////////////////////////////////////
+// Connection: Kinetic to Sencha
+//  - bridges via firing Ext events
+//	- Triggers Sencha code when tapping on Kinetic items
+///////////////////////////////////////////////////////////
 Ext.define('KineticToSencha', {
 	mixins: ['Ext.mixin.Observable'],
 	config: {
 		fullName: ''
 	},
 	gidCounter: 0,
+	
 	constructor: function(config) {
 		this.initConfig(config); // We need to initialize the config options when the class is instantiated
 	},
@@ -309,8 +308,8 @@ Ext.define('KineticToSencha', {
 		// Reset the print object 
 		// TODO: put print counts inside of the print Object, rather than separate floating vars
 		PrintObject = new PrintClass();
-		DiagnosisPrinted = 0;
-		MedicationPrinted = 0;
+		PrintObject.DiagnosisPrinted = 0;
+		PrintObject.MedicationPrinted = 0;
 
 		// Reset high Y
 		highY = DEFAULT_HIGH_Y;
@@ -330,183 +329,6 @@ Ext.define('KineticToSencha', {
 
 var k2s = Ext.create('KineticToSencha', {
 	id: 'k2s',
-	// // TODO: Move all of these functions to the define() statement for k2s, and you can call via
-	// //	k2s.method() instead of k2s.config.method()
-	// // <TODO: Add Comment describing>
-	// addOrder: function() {
-	// 	//set persist of order true as Doctor may not always have a order
-	// 	RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist = true; //6th field in orders (sorted)
-	// 	// RaxaEmr.Outpatient.model.DoctorOrder.getFields().get('orders').setPersist(true); //6th field in orders (sorted)
-	// 	var drugPanel = Ext.getStore('drugpanel');
-
-	// 	lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
-
-	// 	for(var i = 0; i < lengthOfDrugOrder; i++) {
-	// 		var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
-
-	// 		//Drug Orders here
-	// 		var OrderModel = Ext.create('RaxaEmr.Outpatient.model.drugOrder', {
-	// 			type: 'drugorder',
-	// 			patient: myRecord.data.uuid,
-	// 			concept: drugPanel.concept,
-	// 			drug: drugPanel.uuid,
-	// 			startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-	// 			autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
-	// 			instructions: drugPanel.routeofadministration,
-	// 			quantity: drugPanel.duration,
-	// 			//TODO Figure out why dose is creating problem while sending
-	// 			//dose: drugPanel.frequency,
-	// 			//Pharmacy is using dose. Remove inconsistency
-	// 			frequency: drugPanel.frequency,
-	// 			orderer: localStorage.loggedInUser
-	// 		});
-	// 		DoctorOrderModel.data.orders.push(OrderModel.raw);
-	// 	}
-	// },
-
-	// // <TODO: Add Comment describing>
-	// addObs: function() {
-	// 	//TODO set persit TRUE if first order 
-	// 	// RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
-	// 	//TODO set persist FALSE if no item in list
-	// 	DoctorOrderModel.data.obs = [];
-	// 	lengthOfDiagnosis = Ext.getCmp('diagnosedList').getStore().data.length;
-	// 	for(var i = 0; i < lengthOfDiagnosis; i++) {
-	// 		console.log(Ext.getCmp('diagnosedList').getStore().data.all[i].data);
-	// 		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-	// 			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-	// 			person: myRecord.data.uuid,
-	// 			//need to set selected patient uuid in localStuiorage
-	// 			concept: Ext.getCmp('diagnosedList').getStore().data.all[i].data.id,
-	// 			//      value: Ext.getCmp('diagnosedList').getStore().data.all[i].data.complain
-	// 		});
-	// 		DoctorOrderModel.data.obs.push(ObsModel.raw);
-	// 		// console.log(ObsModel);
-	// 	}
-	// 	console.log(DoctorOrderModel);
-	// },
-
-	// // <TODO: Add Comment describing>
-	// addDoctorRecordImage: function() {
-	// 	// TODO UNABLE TO access ControlsLayer here
-	// 	// children till 7 are already there and rest goes into 
-	// 	// console.log(controlsLayer.children[8].attrs.image.src)
-	// 	// DoctorOrderModel.data.obs = [];
-	// 	//    (document.getElementById('id-of-doctor-form').src)
-	// 	//TODO check all objects of canvas which are saved and then push it as obs 
-	// 	// OR store an array of image which can be sent
-	// 	//set Image in obs json
-	// 	console.log('checking patient records in stage and copying to DoctorOrder store');
-
-	// 	var PatientRecordHistory = Ext.getStore('visitHistoryStore').getData();
-
-	// 	for(var j = 0; j < Ext.getStore('visitHistoryStore').getData().all.length; j++) //j is always 4, but not now.
-	// 	{
-	// 		if(PatientRecordHistory.all[j].data.id == "PatientRecord") {
-	// 			//    if( PatientRecordHistory.all[j].imgSrc.length < 65000){   
-	// 			var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-	// 				obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-	// 				person: myRecord.data.uuid,
-	// 				//need to set selected patient uuid in localStorage
-	// 				concept: localStorage.patientRecordImageUuidconcept,
-	// 				value: PatientRecordHistory.all[j].data.imgSrc
-	// 			});
-	// 			DoctorOrderModel.data.obs.push(ObsModel.raw);
-	// 			//  }
-	// 			//    else {
-	// 			//    Ext.Msg.alert('Error','Can\'t save data on server');
-	// 			//    }
-	// 		}
-	// 	}
-	// 	console.log(Ext.getStore('DoctorOrder'));
-	// },
-	// //Sending Stage JSON so that high quality doctor records can be generated again
-	// addDoctorRecordVectorImage: function() {
-
-	// 	var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-	// 		obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-	// 		person: myRecord.data.uuid,
-	// 		//need to set selected patient uuid in localStorage
-	// 		concept: localStorage.patientRecordVectorImageUuidconcept,
-	// 		value: stage.toJSON()
-	// 	});
-	// 	DoctorOrderModel.data.obs.push(ObsModel.raw);
-	// },
-	// //Small icons to show as thumbnails
-	// addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
-
-	// 	var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-	// 		obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-	// 		person: myRecord.data.uuid,
-	// 		//need to set selected patient uuid in localStorage
-	// 		concept: localStorage.patientRecordImageUuidconcept,
-	// 		value: dataUrl
-	// 	});
-	// 	DoctorOrderModel.data.obs.push(ObsModel.raw);
-	// },
-
-	// // <Comment describing>
-	// sendDoctorOrderEncounter: function() {
-	// 	this.addObs();
-	// 	this.addDoctorRecordImage();
-	// 	this.addDoctorRecordVectorImage();
-	// 	this.addOrder();
-
-	// 	DoctorOrderModel.data.patient = myRecord.data.uuid;
-	// 	DoctorOrderStore.add(DoctorOrderModel);
-
-	// 	//makes the post call for creating the patient
-	// 	var that = this;
-	// 	DoctorOrderStore.on('write', function() {
-	// 		console.log('doctor order store on WRITE event');
-	// 		that.initCanvasData();
-	// 	});
-	// 	DoctorOrderStore.sync();
-	// },
-
-	// // This function clears the canvas (UI) and resets all the models/stores which are tied ot the UI
-	// initCanvasData: function() {
-	// 	// Empty the stores which are used to send the data
-	// 	DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
-	// 	DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
-	// 		//uuid:      //need to get myRecord variable of patientlist accessible here, so made it global variable
-	// 		//may need to set it later if new patient is created using DoctorOrder view (currently view/patient/draw.js)
-	// 		//other way is to create method in Controller which returns myRecord.data.uuid
-	// 		encounterType: localStorage.outUuidencountertype,
-	// 		// TODO figure out if should be prescription fill ?
-	// 		encounterDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-	// 		//Should encounterDatetime be time encounter starts or ends?
-	// 		provider: localStorage.loggedInUser
-	// 	});
-
-	// 	DoctorOrderModel.data.obs = [];
-	// 	DoctorOrderModel.data.orders = [];
-
-	// 	// Reset stores for diagnoses and treatments
-	// 	Ext.getStore('diagnosedDisease').clearData();
-	// 	Ext.getStore('drugpanel').clearData();
-		
-	// 	// Reset the print object 
-	// 	// TODO: put print counts inside of the print Object, rather than separate floating vars
-	// 	PrintObject = new PrintClass();
-	// 	DiagnosisPrinted = 0;
-	// 	MedicationPrinted = 0;
-
-	// 	// Reset high Y
-	// 	highY = DEFAULT_HIGH_Y;
-
-	// 	// Clear layers on stage
-	// 	// TODO: Get layer by id rather than by index (see 'resources/images/button_New_off.png' code)
-	// 	stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
-	// 	stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
-	// 	//remove only specific children on controlLayer (X on textboxes)
-	// 	var CONTROL_LAYER = 3;
-	// 	var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
-	// 	// TODO: create a new layer for delete buttons to simplify this logic
-	// 	stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
-	// 	stage.draw();
-	// },
-
 	listeners: {
 		resetCanvas: function() {
 			console.log('resetCanvas()');
@@ -525,7 +347,7 @@ var k2s = Ext.create('KineticToSencha', {
 			PrintObject.TextGroupProperty.gid = this.gidCounter++;
 			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
-			for(var i = MedicationPrinted, index = 0; i < itemCount; i++, index++) {
+			for(var i = PrintObject.MedicationPrinted, index = 0; i < itemCount; i++, index++) {
 				var itemData = data.getAt(i).getData();
 
 				displayText = '';
@@ -549,7 +371,7 @@ var k2s = Ext.create('KineticToSencha', {
 					}
 				}
 
-				MedicationPrinted++;
+				PrintObject.MedicationPrinted++;
 				var textForPrintObject = new TextProperty(displayText, itemData.uuid);
 				PrintObject.TextArray.push(textForPrintObject);
 			}
@@ -566,19 +388,19 @@ var k2s = Ext.create('KineticToSencha', {
 			var data = store.getData();
 			var itemCount = data.getCount();
 			console.log('itemcount= ' + itemCount);
-			console.log('Diagnosis Printed=' + DiagnosisPrinted);
+			console.log('Diagnosis Printed=' + PrintObject.DiagnosisPrinted);
 			PrintObject.TextGroupProperty.type = 'Diagnosis';
 			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
 			PrintObject.TextGroupProperty.gid = this.gidCounter++;
 
 			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
-			for(var i = DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
+			for(var i = PrintObject.DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
 				var itemData = data.getAt(i).getData();
 				console.log(itemData);
 				console.log('index=' + index + ' i= ' + i);
 				displayText[index] = (itemData.complain);
-				DiagnosisPrinted++;
+				PrintObject.DiagnosisPrinted++;
 				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
 				PrintObject.TextArray.push(textForPrintObject);
 			}
@@ -1170,12 +992,12 @@ var setupCanvas = function() {
 												// });
 
 												// TODO: Global!! namespace this var, perhaps put this var in K2S
-												--DiagnosisPrinted;
+												--PrintObject.DiagnosisPrinted;
 											}
 
 											if(child.attrs.storeId === 'drugpanel') {
 												// TODO: Global!! namespace this var, perhaps put this var in K2S
-												--MedicationPrinted;
+												--PrintObject.MedicationPrinted;
 											}
 										}
 									}		
