@@ -50,6 +50,7 @@ Ext.define('KineticToSencha', {
 	config: {
 		fullName: ''
 	},
+	gidCounter: 0,
 	constructor: function(config) {
 		this.initConfig(config); // We need to initialize the config options when the class is instantiated
 	},
@@ -332,8 +333,8 @@ var k2s = Ext.create('KineticToSencha', {
 	},
 
 	listeners: {
-		resetCanvasStores: function() {
-			console.log('resetCanvasStores()');
+		resetCanvas: function() {
+			console.log('resetCanvas()');
 			this.config.initCanvasData();
 		},
 		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
@@ -346,7 +347,7 @@ var k2s = Ext.create('KineticToSencha', {
 
 			PrintObject.TextGroupProperty.type = 'DrugOrder';
 			PrintObject.TextGroupProperty.storeId = 'drugpanel';
-			PrintObject.TextGroupProperty.gid = Math.floor((Math.random() * 5000) + 1);
+			PrintObject.TextGroupProperty.gid = this.gidCounter++;
 			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
 			for(var i = MedicationPrinted, index = 0; i < itemCount; i++, index++) {
@@ -393,7 +394,7 @@ var k2s = Ext.create('KineticToSencha', {
 			console.log('Diagnosis Printed=' + DiagnosisPrinted);
 			PrintObject.TextGroupProperty.type = 'Diagnosis';
 			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
-			PrintObject.TextGroupProperty.gid = Math.floor((Math.random() * 5000) + 1);
+			PrintObject.TextGroupProperty.gid = this.gidCounter++;
 
 			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
@@ -499,6 +500,10 @@ var setupCanvas = function() {
 		var controlsLayer = new Kinetic.Layer({
 			id: 'controlsLayer'
 		});
+		var tempControlsLayer = new Kinetic.Layer({
+			id: 'tempControlsLayer'
+		});
+
 
 		// Setup stage, upon which all layers are built.
 		stage = new Kinetic.Stage({
@@ -513,6 +518,7 @@ var setupCanvas = function() {
 		stage.add(linesLayer);
 		stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
 		stage.add(controlsLayer);
+		stage.add(tempControlsLayer);
 		moving = false;
 
 		////////////////////////
@@ -720,20 +726,7 @@ var setupCanvas = function() {
 				// TODO: Clear the canvas - for demo only
 				Ext.Msg.confirm('New', 'Erase current visit (without saving)?', function(btn) {
 					if(btn == 'yes') {
-						// linesLayer.removeChildren();
-						// textLayer.removeChildren();
-						// //remove only specific children on controlLayer (X on textboxes)
-						// var CONTROL_LAYER_BUTTON_COUNT = 7;	// Preserve this many buttons
-						// var CONTROL_LAYER = 3;
-						// console.log('stage', stage);
-						// stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
-						// // drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
-						
-						// // TODO: Also reset the stores
-						k2s.fireEvent('resetCanvasStores');
-
-						// highY = DEFAULT_HIGH_Y;
-						// stage.draw();
+						k2s.fireEvent('resetCanvas');
 					}
 				});
 			},
@@ -748,17 +741,13 @@ var setupCanvas = function() {
 				console.log('sending Doctor Encounter');
 				Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
 					if(btn == 'yes') {
-						//For now,
-						// - saves image to history store
 						// TODO: Saved image is wrong resolution
 						
 						// Saves image to localStore
 						// Scrolls directly to see the history item in history view
 						// Also saves via REST using k2s.config.sendDoctorOrderEncounter();
+						// Clear "today" canvas, after saving via REST
 						onSaveCanvas();
-
-						// TODO: clear the canvas. needs to become ajax and on complete, clear canvas
-						// - clears canvas -> this can work same way as "new", above
 					}
 				});
 			},
@@ -772,8 +761,6 @@ var setupCanvas = function() {
 			handler: function() {
 				console.log("Bringing diagnoses modal window.")
 				onClickDiagnosis();
-				// this.setStroke('red');
-				// this.setStrokeWidth(5);
 			}
 		}, {
 			// Add medication
@@ -840,8 +827,14 @@ var setupCanvas = function() {
 				} 
 				controlGroups[cg].push(box);
 			
-				controlsLayer.add(box);
-				controlsLayer.draw();
+				if(item.layer == 'tempControlsLayer') {
+					tempControlsLayer.add(box);
+					tempControlsLayer.draw();
+				} else {
+					controlsLayer.add(box);
+					controlsLayer.draw();	
+				}
+				
 			}
 			imageObj.src = item.image;
 		}
@@ -860,7 +853,8 @@ var setupCanvas = function() {
 			
 			// Toggle "on" selected item
 			// requires controlItem to have an attribute called imageWhenToggledOn
-			// Notes: doesn't make a new image each time. just creats it once and then re-uses
+			// Notes: doesn't make a new image each time. just creates it once and then re-uses
+			// TODO: Initialize images once and always use those, rather than initalizing on the fly
 			if (item.attrs.imageOn) {
 				item.setImage(item.attrs.imageOn);
 				controlsLayer.draw();
@@ -889,23 +883,17 @@ var setupCanvas = function() {
 		}
 
 		function drawTextAtLowPoint(PrintObject) {
+			// If nothing to print, skip
 			if(! PrintObject.TextArray.length) {
 				return;
 			}
 
-			console.log(PrintObject);
-			// text = "Rheumatic Fever";
-			// Image on each line.
-			// TODO: Needs pointer to the related in the store, so "X" can call delete
-			console.log("drawTextAtLowPoint");
-
-			//PrintObject.TextGroupProperty['gid']
 			var type = PrintObject.TextGroupProperty.type;
 			var storeId = PrintObject.TextGroupProperty.storeId;
 			var gid = PrintObject.TextGroupProperty.gid;
 			var TextArray = PrintObject.TextArray;
 
-			//		Bullet icon is based on type of text to be printed	
+			// Bullet icon is based on type of text to be printed	
 			var bullet_icon_link = '';
 			switch(type) {
 				case 'Diagnosis':
@@ -919,7 +907,7 @@ var setupCanvas = function() {
 					break;
 			}
 
-			// var imageObj2 = new Image();
+			// Draw bullet icons and text
 			var myHighY = highY;
 			addImageToLayer(bullet_icon_link, textLayer, {
 				gid: gid,
@@ -928,7 +916,6 @@ var setupCanvas = function() {
 				width: 14,
 				height: 14
 			});
-			console.log(TextArray);
 			for(var i = 0; i < TextArray.length; i++) {
 				var complexText = new Kinetic.Text({
 					gid: gid,
@@ -944,15 +931,17 @@ var setupCanvas = function() {
 				});
 				textLayer.add(complexText);
 				highY += ((complexText.textHeight * (complexText.textArr.length + 1))); // length + title + space
-				//Drug order suggestion demo interface
+				
+				// Hook to show a demo for decision support. For now, we just have example for sinusitus.
 				if(TextArray[i].text === "Sinusitis") {
-					console.log('SINUSITIS Detected');
 					var SuggestDrugOrder = true;
 				}
 			}
+
 			// Add "delete" button
 			// Note, this creates item on control Layer, not text layer
 			createControlItem({
+				layer: 'tempControlsLayer',
 				gid: gid,
 				image: "resources/images/icons/delete_bigger.png",
 				x: DRAWABLE_X_MAX - 140,
@@ -968,7 +957,7 @@ var setupCanvas = function() {
 					for(var i = 0; i < stage.getChildren().length; i++) {
 						//Children in only textLayer and controlsLayer to be removed
 						// TODO: How about you just use the existing vars "textLayer" and "controlsLayer"? 
-						if(stage.getChildren()[i].getId() === "textLayer" || stage.getChildren()[i].getId() === "controlsLayer") {
+						if(stage.getChildren()[i].getId() === "textLayer" || stage.getChildren()[i].getId() === "tempControlsLayer") {
 							//To check on infinite loop , TODO: Remove after testing
 							var count = 0;
 							for(var j = 0; j < stage.getChildren()[i].getChildren().length; j++) {
