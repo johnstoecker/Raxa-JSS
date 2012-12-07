@@ -29,10 +29,8 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	},
 	initialize: function() {
 		// Save the scope
-		console.log('initHistoryUnstructured Component');
 		var that = this;
 		this.callParent(arguments);
-		console.log('overlay, on the way!');
 
 		var visitHistory = that.add({
 			xtype: 'panel',
@@ -102,7 +100,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		listeners: {
 			painted: function() {
 				if(!this.isCanvasSetup) {
-					console.log("Setting up for unstructured history");
 					var stage = new Kinetic.Stage({
 						id: "unstructuredHistoryStage",
 						container: "historyContainer",
@@ -119,7 +116,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 
 					this.loadedImageLayer = loadedImageLayer;
 
-					console.log('adding layers');
 					stage.add(backgroundLayer);
 					stage.add(loadedImageLayer);
 					stage.add(controlsLayer);

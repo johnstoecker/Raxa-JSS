@@ -54,9 +54,9 @@ Ext.define('KineticToSencha', {
 		this.initConfig(config); // We need to initialize the config options when the class is instantiated
 	},
 	addMedication: function() {
-		this.fireEvent('clickAddMedication');
+		this.fireEvent('clickAddMedication');	// firing in two places?
 	},
-	clickDiagnosis: function() {
+	addDiagnosis: function() {
 		this.fireEvent('clickOnDiagnosis');
 	},
 	saveLoadMask: function() {
@@ -427,6 +427,11 @@ var DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" tex
 var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
 var DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
 var DEFAULT_HIGH_Y = DRAWABLE_Y_MIN + 15;
+
+// Keep track of the current low and high bounds (y-axis) for where a user
+// has already added content onto the canvas. The idea is that we want to add
+// structured data (diagnoses, prescriptions, ...) into blank areas on the 
+// canvas where the user hasn't yet written.
 var highY = DEFAULT_HIGH_Y;	// Not a constant
 
 var DRAWABLE_Y_MAX = 1024;
@@ -467,6 +472,10 @@ var stage = new Object;
 
 var setupCanvas = function() {
 
+	// attach variables and functions that need to be accessed from outside canvas
+	// return this at end of setupCanvas
+	var drawLogic;	
+	
 	var NO_CONTROL_GROUP = 'noControlGroup';
 
 		var lowY = DRAWABLE_Y_MIN;
@@ -481,9 +490,6 @@ var setupCanvas = function() {
 		var backgroundLayer = new Kinetic.Layer({
 			id: 'backgroundLayer'
 		});
-		// var loadedImageLayer = new Kinetic.Layer({
-		// 	id: 'loadedImageLayer'
-		// }); // For re-loaded thumbs
 		var linesLayer = new Kinetic.Layer({
 			id: 'linesLayer'
 		});
@@ -506,7 +512,6 @@ var setupCanvas = function() {
 		stage.add(backgroundLayer);
 		stage.add(linesLayer);
 		stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
-		// stage.add(loadedImageLayer);
 		stage.add(controlsLayer);
 		moving = false;
 
@@ -523,19 +528,14 @@ var setupCanvas = function() {
 			dragComplete();
 		});
 		stage.on("paintDiagnosis", function() {
-			console.log('printing Diagnosis');
-			console.log(g_diagnosis_list);
 			k2s.fireEvent('clickOnDiagnosis');
-			Ext.getCmp('diagnosis-panel').setHidden(true);
-			drawDiagnosis(PrintObject);
+			Ext.getCmp('diagnosis-panel').hide();
+			drawTextAtLowPoint(PrintObject);
 		});
 		stage.on("paintMedication", function() {
-			//To be refactored
-			console.log('printing Drug Order');
-			// console.log(g_medication_list);
 			k2s.fireEvent('clickAddMedication');
-			Ext.getCmp('drugForm').setHidden(true);
-			drawDiagnosis(PrintObject);
+			Ext.getCmp('drugForm').hide();
+			drawTextAtLowPoint(PrintObject);
 		});
 
 		////////////////////////
@@ -544,9 +544,6 @@ var setupCanvas = function() {
 		// First touch or click starts a drag event
 		function dragStart() {
 			var up = stage.getUserPosition();
-
-			console.log("dragStart", up);
-			// console.log(stage.getIntersections(up));
 
 			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 				return;
@@ -557,20 +554,14 @@ var setupCanvas = function() {
 				backgroundLayer.draw();
 			} else {
 				newLinePoints = [];
-				prevPos = stage.getUserPosition(); // Mouse or touch
+				prevPos = up;	// Mouse or touch
+				// prevPos = stage.getUserPosition(); // Mouse or touch
 				newLinePoints.push(prevPos);
 				newLine = new Kinetic.Line({
 					points: newLinePoints,
-					stroke: "black",
-					
-					// lineCap: 'round',
-     //    			lineJoin: 'round',
-					// strokeWidth: 10,
-					// listening: true,
+					stroke: "black"
 				});
-
 				linesLayer.add(newLine);
-
 				moving = true;
 			}
 		}
@@ -591,13 +582,13 @@ var setupCanvas = function() {
 
 			if(moving) {
 				var mousePos = stage.getUserPosition(); // Mouse or touch
-				var x = mousePos.x;
-				var y = mousePos.y;
 				newLinePoints.push(mousePos);
-				updateBounds(mousePos);
+				var y = mousePos.y;
+				if(y > highY) {
+					highY = y + HIGH_Y_OFFSET;
+				}
 				prevPos = mousePos;
 
-				// moving = true;
 				linesLayer.drawScene();
 			}
 		}
@@ -612,11 +603,10 @@ var setupCanvas = function() {
 
 			console.log('drag complete');
 			
-			// Draw complete. Add erase event on the newline..
+			// Draw complete. Add erase event listener on the newline.
 			var currentLine = newLine;
 			newLine.on('mouseover touchmove', function() {
 				if (mode == "erase") {
-					// find lines that intersect with current mouse position
 					var children = linesLayer.getChildren();
 					var index = children.indexOf(currentLine);
 					children.splice(index,1)
@@ -627,22 +617,6 @@ var setupCanvas = function() {
 			stage.draw();
 
 			moving = false;
-		}
-
-		// Keep track of the current low and high bounds (y-axis) for where a user
-		// has already added content onto the canvas. The idea is that we want to add
-		// structured data (diagnoses, prescriptions, ...) into blank areas on the 
-		// canvas where the user hasn't yet written.
-
-
-		function updateBounds(mousePos) {
-			var y = mousePos.y;
-			if(y < lowY || lowY == undefined) {
-				lowY = y;
-			}
-			if(y > highY || highY == undefined) {
-				highY = y + HIGH_Y_OFFSET;
-			}
 		}
 
 		// SAVING 
@@ -907,31 +881,18 @@ var setupCanvas = function() {
 		//
 
 		function onClickDiagnosis() {
-			console.log("add diagnosis");
-			k2s.clickDiagnosis();
-			//        drawDiagnosis(g_diagnosis_list);
+			k2s.addDiagnosis();
 		}
 
 		function onClickMedication() {
-			// Get user input
-			console.log("add diagnosis")
-			// var input = window.prompt("What's the diagnosis?","Tuberculosis");
-			// Trigger launch of modal dialog in Sencha
 			k2s.addMedication();
-
-			// inserts a dianosis wherever there's untouched space on canvas
-			// drawTextAtLowPoint(input);
-			//drawDiagnosis(g_medication_list);
-		}
-
-		function drawDiagnosis(text) {
-			console.log('drawDiagnosis');
-			if(text.TextArray.length) {
-				drawTextAtLowPoint(text);
-			}
 		}
 
 		function drawTextAtLowPoint(PrintObject) {
+			if(! PrintObject.TextArray.length) {
+				return;
+			}
+
 			console.log(PrintObject);
 			// text = "Rheumatic Fever";
 			// Image on each line.
@@ -947,15 +908,15 @@ var setupCanvas = function() {
 			//		Bullet icon is based on type of text to be printed	
 			var bullet_icon_link = '';
 			switch(type) {
-			case 'Diagnosis':
-				bullet_icon_link = 'resources/images/icons/bullet_diagnosis.png';
-				break;
-			case 'DrugOrder':
-				bullet_icon_link = 'resources/images/icons/bullet_drug.png';
-				break;
-			case 'LabOrder':
-				bullet_icon_link = 'resources/images/icons/bullet_investigation.png';
-				break;
+				case 'Diagnosis':
+					bullet_icon_link = 'resources/images/icons/bullet_diagnosis.png';
+					break;
+				case 'DrugOrder':
+					bullet_icon_link = 'resources/images/icons/bullet_drug.png';
+					break;
+				case 'LabOrder':
+					bullet_icon_link = 'resources/images/icons/bullet_investigation.png';
+					break;
 			}
 
 			// var imageObj2 = new Image();

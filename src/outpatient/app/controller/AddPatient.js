@@ -35,7 +35,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     },
 
     init: function () {
-        console.log('AddPatient controller init');
     }, 
 
     launch: function () {
