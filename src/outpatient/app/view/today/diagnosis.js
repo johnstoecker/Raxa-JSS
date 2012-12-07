@@ -23,6 +23,20 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
         layout: {
             type: 'vbox'
         },
+        listeners : {
+            hide: function()
+            {
+                if(Ext.getCmp('searchedDiagnosisList'))
+                    {
+                        Ext.getCmp('searchedDiagnosisList').setHidden(true);
+                    }
+            },
+            show: function()
+            {
+                Ext.getCmp('diagnosisfilterbysearchfield').reset();
+                Ext.getCmp('diagnosisfilterbysearchfield').focus(); 
+            }
+        },
         // centered: true,
         modal: true,
         hidden: true,
@@ -38,12 +52,14 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             title: 'Diagnosis'
         }, {
             xtype: 'container',
+            style: 'background-color: #f7f7f7;',
             layout: {
                 type: 'hbox'
             },
             items: [{
                 xtype: 'container',
                 flex: 1,
+                margin: '20 40 20 40',
                 layout: {
                     type: 'vbox'
                 },
@@ -78,6 +94,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             }, {
                 xtype: 'container',
                 flex: 1,
+                hidden: true,
                 items: [{
                     xtype: 'container',
                     margin: '0 0 20 0',
@@ -98,21 +115,28 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     xtype: 'container',
                     margin: '0 0 20 0',
                     style: 'background-color: #f7f7f7;',
-                    height: 60,
                     layout: {
                         type: 'hbox'
                     },
                     items: [{
-                        xtype: 'button',
-                        text: 'Save',
-                        centered: true,
-                        flex: 1,
-                        margin: '20 0 20 0',
-                        ui: 'confirm',
-                        handler: function() {
-                            stage.fire('paintDiagnosis');
-                        }
-                    }]
+                                xtype: 'button',
+                                text: 'Save',
+                                id: 'addDiagnosisInList',
+                                margin: '30 80 30 80',
+                                ui: 'confirm',
+                                handler: function() {
+                                    stage.fire('paintDiagnosis');
+                                    }
+                            },{
+                                xtype: 'button',
+                                ui: 'confirm',
+                                text: 'Add More Diagnosis',
+                                id: 'addMoreDiagnosis',
+                                margin: '30 80 30 80',
+                                handler: function(){
+                                    Ext.getCmp('diagnosisfilterbysearchfield').reset();                                    
+                                }
+                            }]
                 }]
             }]
         }]
