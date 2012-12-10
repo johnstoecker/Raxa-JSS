@@ -17,14 +17,12 @@
 // TODO: move to util
 var DASHBOARD_CONSTANTS = {
     BUTTON_MARGIN: '44 0 0 30',
-    //'60 0 0 40',
     BUTTON_FLEX: 1,
     BUTTON_DIM: 96,
     BUTTON_IMG_DIM: 86,
 
     TEXT_WIDTH: 100,
     TEXT_MARGIN: '44 0 0 10',
-    // 60 20 0 5
     TEXT_FLEX: 1,
     TEXT_PADDING: 0,
 
@@ -32,16 +30,15 @@ var DASHBOARD_CONSTANTS = {
     FONT_STYLE: 'color:white;font-family:"Helvetica";font-size:16px',
     BUTTON_STYLE: 'background: #53BF9A;text-align:center;',
     BACKGROUND_STYLE: 'background-color: #11598c;border:solid #1159ac;'
-    // BACKGROUND_STYLE: 'background-color: #11598c;'
 };
 
 Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
-
     extend: 'Ext.Container',
     xtype: 'opdDashboard',
     id: 'patientManagementDashboard',
     config: {
         listeners: {
+            // Toggle arrow on button up/down when showing/hiding the dashboard
             show: function() {
                 Ext.getCmp('dashboardToggleButton').setIconCls('arrow_up');
             },

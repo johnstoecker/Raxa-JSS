@@ -26,17 +26,13 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
         navigationBar: false,
         items: [{
             xtype: 'toolbar',
-            title: 'dot',
             title: {
-                  title: 'Doctor Name...',
-                  // padding: '0 0 0 400',
-                  // align: 'right',
-                  // centered: false 
-                },
-            // title: 'yoyo',
+                // Can set title and padding dynamically for logged in doctor
+                id: 'mainviewToolbarTitle',
+                title: 'Doctor Name...',
+                padding: '0 0 0 30'
+            },
             layout: {
-                // align: 'right',
-                // pack: 'justify',
                 pack: 'left'
             },
             docked: 'top',
@@ -44,58 +40,57 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 xtype: 'button',
                 id: 'dashboardToggleButton',
                 iconCls: 'arrow_down',
-                // iconAlign: 'right',
+                iconAlign: 'right',
                 text: 'Dashboard',
                 iconMask: true,
                 handler: function() {
                     var dash = Ext.getCmp('patientManagementDashboard');
-                    var tb = Ext.getCmp('dashboardToggleButton');
                     var hidden = dash.getHidden();
                     if(hidden) {
                         dash.show();
-                        tb.setIconCls('arrow_up');
                     } else {
                         dash.hide();
-                        tb.setIconCls('arrow_down');
                     }
 
                     // Hide any other modals, like "patient list", "add new", "search"
-                    Ext.getCmp('contact').hide();   // patient list
-                    
+                    Ext.getCmp('contact').hide(); // patient list
                     var newPatientModal = Ext.getCmp('newPatient');
-                    if (newPatientModal) {
-                        newPatientModal.hide();    
+                    if(newPatientModal) {
+                        newPatientModal.hide();
                     }
-                    
+
                     // search
                 }
-            // }, {
-                // xtype: 'spacer',
-                // width: 450,
-            // }, {
-            //     xtype: 'text',
-            //     html: 'Dr. Name',
-            // }, {
-            //     xtype: 'spacer'
+            }, {
+                xtype: 'spacer',
+                width: 10
             }, {
                 xtype: 'button',
                 iconCls: 'settings',
                 iconMask: true,
-                // iconAlign: 'right',
+                iconAlign: 'right',
                 text: 'Options'
             }, {
                 xtype: 'spacer',
-                width: 450
+                width: 340
             }]
         }, {
             // Individual Patient record
             xtype: 'patientlist-show'
-        },{
+        }, {
             // OPD Dashboard to add, select, search patients. (Hidden by default)
             xtype: 'opdDashboard'
-        },{
+        }, {
             // Patient List. (Hidden by default)
-            xtype: 'patientlist' 
+            xtype: 'patientlist'
         }]
-    }
+    },
+
+    // Sets name of logged in doctor on titlebar, in top right of screen
+    setDoctorName: function(name) {
+        var doctorName = Ext.getCmp('mainviewToolbarTitle');
+        // Max doctor name length is < 20 characters before it will scroll off the screen of ipad2 resolution
+        doctorName.setTitle("Dr. " + name);
+        doctorName.setPadding('0 0 0 0')
+    } 
 });

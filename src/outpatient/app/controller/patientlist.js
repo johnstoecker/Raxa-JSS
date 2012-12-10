@@ -354,6 +354,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     // TODO: Must enforce that you cannot draw on canvas or press any buttons until
     //  an actual patient record is loaded, as this will throw errors.
     launch: function () {
+        var doctorName = Util.getSession().display;
+        Ext.getCmp('mainview').setDoctorName(doctorName);
+
         Ext.getCmp('patientManagementDashboard').show();
 
         // Set store for patient list in UI
