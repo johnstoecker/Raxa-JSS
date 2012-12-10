@@ -10,10 +10,10 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		var me = Ext.getCmp('history-unstructured-panel');
 		var imgSrc = record.get('imgSrc');
 	  	addImageToLayer(imgSrc, me.loadedImageLayer, {
-			x: kineticCanvas.DRAWABLE_X_MIN+35,
-			y: kineticCanvas.DRAWABLE_Y_MIN,
-			width: kineticCanvas.DRAWABLE_X_MAX - kineticCanvas.DRAWABLE_X_MIN,
-			height: DRAWABLE_Y_MAX - kineticCanvas.DRAWABLE_Y_MIN
+			x: DRAWABLE_X_MIN+35,
+			y: DRAWABLE_Y_MIN,
+			width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+			height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
 		});
 
 		// var img = Ext.getCmp('singleVisitHistoryImage');
@@ -143,14 +143,14 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					
 					addImageToLayer("resources/images/bg/TODAY_35.png", backgroundLayer, {
 						x: 0,
-						y: kineticCanvas.DRAWABLE_Y_MIN,
+						y: DRAWABLE_Y_MIN,
 						width: 35,
 						height: 835
 					});
 					
 					addImageToLayer("resources/images/bg/HISTORY_710.png", backgroundLayer, {
 						x: stage.getWidth()-711,
-						y: kineticCanvas.DRAWABLE_Y_MIN,
+						y: DRAWABLE_Y_MIN,
 						width: 710,
 						height: 835
 					});

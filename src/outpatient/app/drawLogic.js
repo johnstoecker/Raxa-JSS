@@ -1,323 +1,76 @@
-//////////////////////////////////////////////////////////////////////////////
-// Print Class
-//  - Keep track of items to be displayed and saved on persist of the JSON
-//////////////////////////////////////////////////////////////////////////////
-function PrintClass() {
-	// Constructor
-}
+///////////////////////////////////////////////////////////////////////////////
+// Kinetic JS, drawing Canvas
+// - Globals vars shared across all views using Kinetic and canvases
+// - k2s is an instance of KineticToSencha, which includes methods to track
+// 	what's drawn on the canvas and save it when user does "finalize" command
+// - setupCanvas initiatizes most of KineticJS (drawing items on the canvas, 
+// 	preparing event handlers, etc)
+///////////////////////////////////////////////////////////////////////////////
 
-PrintClass.prototype = {
-	TextGroupProperty: new Object(),
-	TextArray: new Array(new TextProperty()),
-}
+// Globals 
+// TODO: Continue refactoring to remove these
 
-PrintClass.prototype.TextGroupProperty = {
-	type: null,
-	storeId: null,
-	gid: null
-}
+var PrintObject;
+var stage = new Object;	// TODO: Remove if unneeded
 
-PrintClass.prototype.Status = {
-	DiagnosisPrinted: 0,
-	MedicationPrinted: 0,
-}
+var DRAWABLE_X_MIN = 60;
+var DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" text
+var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
+var DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
+var DEFAULT_HIGH_Y = DRAWABLE_Y_MIN + 15;
 
-function TextProperty(text, uuid) {
-	this.text = text;
-	this.uuid = uuid;
-}
+// Keep track of the current low and high bounds (y-axis) for where a user
+// has already added content onto the canvas. The idea is that we want to add
+// structured data (diagnoses, prescriptions, ...) into blank areas on the 
+// canvas where the user hasn't yet written.
+var highY = DEFAULT_HIGH_Y;	// Not a constant
 
-///////////////////////////////////////////////////////////
-// Connection: Kinetic to Sencha
-//  - bridges via firing Ext events
-//	- Triggers Sencha code when tapping on Kinetic items
-///////////////////////////////////////////////////////////
-Ext.define('KineticToSencha', {
-	mixins: ['Ext.mixin.Observable'],
-	config: {
-		fullName: ''
-	},
-	gidCounter: 0,
-	
-	constructor: function(config) {
-		this.initConfig(config); // We need to initialize the config options when the class is instantiated
-	},
-	addMedication: function() {
-		this.fireEvent('clickAddMedication');	// firing in two places?
-	},
-	addDiagnosis: function() {
-		this.fireEvent('clickOnDiagnosis');
-	},
-	saveLoadMask: function() {
+var DRAWABLE_Y_MAX = 1024;
+var DEFAULT_MODE = "draw"; // undefined
+var STAGE_X = 768; //768
+var STAGE_Y = 1024; //1024
+var HISTORY_BASE_X = DRAWABLE_X_MAX;
+var HISTORY_BASE_Y = DRAWABLE_Y_MIN + 196;
+var HISTORY_ITEM_DIM = 64;
 
-		var mask = function() {
-				console.log('mask off');
-				Ext.getCmp('opdPatientDataEntry').setMasked(false)
-			}
+var CONTROL_BASE_X = 2;
+var CONTROL_BASE_Y = 2;
+var CONTROL_ITEM_SPACING = 3;
+var CONTROL_ITEM_DIM = 50;
+var TOOLBAR_ITEM_DIM = 44;
+var TOOLBAR_ITEM_BASE_X = 4;
+var TOOLBAR_ITEM_BASE_Y = 1;
+var TOOLBAR_HEIGHT = 46;
 
-		console.log('mask on');
-		Ext.getCmp('opdPatientDataEntry').setMasked({
-			xtype: 'loadmask',
-			message: 'Saving...',
-			modal: true
-		});
+var HIGH_Y_OFFSET = 10; // a little extra space
 
-		setTimeout(mask, Util.SAVE_LOAD_MASK_MAX_WAIT_TIME);
-		Ext.getCmp('opdPatientDataEntry').setMasked(false);
-	},
+function isInDrawableArea(myX, myY) {
+	up = {
+		x: myX,
+		y: myY
+	};
 
-	// Saves just "drawable" portion of canvas
-	saveDrawableCanvas: function() {
-		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
-		stage.toImage({
-			callback: function(i) {
-				i.id = "PatientRecord";
-				var kineticImage = new Kinetic.Image({
-					image: i,
-					x: 0,
-					y: 0,
-					id: 'PatientRecord',
-					crop: {
-						x: kineticCanvas.DRAWABLE_X_MIN,
-						y: kineticCanvas.DRAWABLE_Y_MIN,
-						width: kineticCanvas.DRAWABLE_X_MAX - kineticCanvas.DRAWABLE_X_MIN,
-						height: DRAWABLE_Y_MAX - kineticCanvas.DRAWABLE_Y_MIN
-					}
-				});
-
-				// Create a temp layer and add the "screenshot" image. If it's not added to a layer,
-				// or added to the stage, then Kinetic won't allow you to call toDataUrl() on it.
-				var temp_layer = new Kinetic.Layer();
-				temp_layer.add(kineticImage);
-				stage.add(temp_layer);
-				var dataUrl = kineticImage.toDataURL({
-					callback: function(dataUrl) {
-						console.log('callback for dataUrl');
-					},
-					mimeType: 'image/jpeg',
-					quality: 1,
-					// height: 32,
-					// width: 32
-				});
-				// k2s.addDoctorRecordImage_TEMP_FOR_DEMO(dataUrl);
-				// Delete temp layer
-				temp_layer.remove();
-
-				// Adds it to history store (list is visible in history view)
-				var now = Ext.util.Format.date(Date(), 'Y.m.j - g:ia');
-				var visitHistoryStore = Ext.getStore('visitHistoryStore');
-				visitHistoryStore.add({
-					title: 'Visit <x>',
-					date: now,
-					uuid: 'FAKE-UUID-PUSHED',
-					diagnosisCount: 0,
-					treatmentCount: 0,
-					imgSrc: dataUrl,
-					// id: 'PatientRecord'
-				});
-
-				// Show most recently added item, from store
-				var record = visitHistoryStore.getAt(visitHistoryStore.getCount()-1)
-				var me = Ext.getCmp('history-unstructured-panel');
-				me.showVisitInView(record);
-
-				// Scroll to history view
-				
-				var UNSTRUCTURED_HISTORY_VIEW = 0;
-				Ext.getCmp('history-panel').setActiveItem(UNSTRUCTURED_HISTORY_VIEW);
-
-				// TODO: Animation isn't showing in Chrome. On device?
-				var HISTORY_OVERVIEW = 1;
-				Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
-   					type: 'slide',
-					direction: 'right'
-				});
-				
-				// Save via REST
-				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
-				// from onSaveCanvas... saveDrawableCanvas... etc
-				k2s.sendDoctorOrderEncounter();
-			}
-		});
-	},
-
-	// <TODO: Add Comment describing>
-	addOrder: function() {
-		//set persist of order true as Doctor may not always have a order
-		RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist = true; //6th field in orders (sorted)
-		// RaxaEmr.Outpatient.model.DoctorOrder.getFields().get('orders').setPersist(true); //6th field in orders (sorted)
-		var drugPanel = Ext.getStore('drugpanel');
-
-		lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
-
-		for(var i = 0; i < lengthOfDrugOrder; i++) {
-			var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
-
-			//Drug Orders here
-			var OrderModel = Ext.create('RaxaEmr.Outpatient.model.drugOrder', {
-				type: 'drugorder',
-				patient: myRecord.data.uuid,
-				concept: drugPanel.concept,
-				drug: drugPanel.uuid,
-				startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-				autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
-				instructions: drugPanel.routeofadministration,
-				quantity: drugPanel.duration,
-				//TODO Figure out why dose is creating problem while sending
-				//dose: drugPanel.frequency,
-				//Pharmacy is using dose. Remove inconsistency
-				frequency: drugPanel.frequency,
-				orderer: localStorage.loggedInUser
-			});
-			DoctorOrderModel.data.orders.push(OrderModel.raw);
-		}
-	},
-
-	// <TODO: Add Comment describing>
-	addObs: function() {
-		//TODO set persit TRUE if first order 
-		// RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
-		//TODO set persist FALSE if no item in list
-		DoctorOrderModel.data.obs = [];
-		lengthOfDiagnosis = Ext.getCmp('diagnosedList').getStore().data.length;
-		for(var i = 0; i < lengthOfDiagnosis; i++) {
-			console.log(Ext.getCmp('diagnosedList').getStore().data.all[i].data);
-			var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-				obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-				person: myRecord.data.uuid,
-				//need to set selected patient uuid in localStuiorage
-				concept: Ext.getCmp('diagnosedList').getStore().data.all[i].data.id,
-				//      value: Ext.getCmp('diagnosedList').getStore().data.all[i].data.complain
-			});
-			DoctorOrderModel.data.obs.push(ObsModel.raw);
-			// console.log(ObsModel);
-		}
-		console.log(DoctorOrderModel);
-	},
-
-	// <TODO: Add Comment describing>
-	addDoctorRecordImage: function() {
-		// TODO UNABLE TO access ControlsLayer here
-		// children till 7 are already there and rest goes into 
-		// console.log(controlsLayer.children[8].attrs.image.src)
-		// DoctorOrderModel.data.obs = [];
-		//    (document.getElementById('id-of-doctor-form').src)
-		//TODO check all objects of canvas which are saved and then push it as obs 
-		// OR store an array of image which can be sent
-		//set Image in obs json
-		console.log('checking patient records in stage and copying to DoctorOrder store');
-
-		var PatientRecordHistory = Ext.getStore('visitHistoryStore').getData();
-
-		for(var j = 0; j < Ext.getStore('visitHistoryStore').getData().all.length; j++) //j is always 4, but not now.
-		{
-			if(PatientRecordHistory.all[j].data.id == "PatientRecord") {
-				//    if( PatientRecordHistory.all[j].imgSrc.length < 65000){   
-				var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-					obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-					person: myRecord.data.uuid,
-					//need to set selected patient uuid in localStorage
-					concept: localStorage.patientRecordImageUuidconcept,
-					value: PatientRecordHistory.all[j].data.imgSrc
-				});
-				DoctorOrderModel.data.obs.push(ObsModel.raw);
-				//  }
-				//    else {
-				//    Ext.Msg.alert('Error','Can\'t save data on server');
-				//    }
-			}
-		}
-		console.log(Ext.getStore('DoctorOrder'));
-	},
-	//Sending Stage JSON so that high quality doctor records can be generated again
-	addDoctorRecordVectorImage: function() {
-
-		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			person: myRecord.data.uuid,
-			//need to set selected patient uuid in localStorage
-			concept: localStorage.patientRecordVectorImageUuidconcept,
-			value: stage.toJSON()
-		});
-		DoctorOrderModel.data.obs.push(ObsModel.raw);
-	},
-	//Small icons to show as thumbnails
-	addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
-
-		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			person: myRecord.data.uuid,
-			//need to set selected patient uuid in localStorage
-			concept: localStorage.patientRecordImageUuidconcept,
-			value: dataUrl
-		});
-		DoctorOrderModel.data.obs.push(ObsModel.raw);
-	},
-
-	// <Comment describing>
-	sendDoctorOrderEncounter: function() {
-		this.addObs();
-		this.addDoctorRecordImage();
-		this.addDoctorRecordVectorImage();
-		this.addOrder();
-
-		DoctorOrderModel.data.patient = myRecord.data.uuid;
-		DoctorOrderStore.add(DoctorOrderModel);
-
-		//makes the post call for creating the patient
-		var that = this;
-		DoctorOrderStore.on('write', function() {
-			console.log('doctor order store on WRITE event');
-			that.initCanvasData();
-		});
-		DoctorOrderStore.sync();
-	},
-
-	// This function clears the canvas (UI) and resets all the models/stores which are tied ot the UI
-	initCanvasData: function() {
-		// Empty the stores which are used to send the data
-		DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
-		DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
-			//uuid:      //need to get myRecord variable of patientlist accessible here, so made it global variable
-			//may need to set it later if new patient is created using DoctorOrder view (currently view/patient/draw.js)
-			//other way is to create method in Controller which returns myRecord.data.uuid
-			encounterType: localStorage.outUuidencountertype,
-			// TODO figure out if should be prescription fill ?
-			encounterDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			//Should encounterDatetime be time encounter starts or ends?
-			provider: localStorage.loggedInUser
-		});
-
-		DoctorOrderModel.data.obs = [];
-		DoctorOrderModel.data.orders = [];
-
-		// Reset stores for diagnoses and treatments
-		Ext.getStore('diagnosedDisease').clearData();
-		Ext.getStore('drugpanel').clearData();
-		
-		// Reset the print object 
-		// TODO: put print counts inside of the print Object, rather than separate floating vars
-		PrintObject = new PrintClass();
-		PrintObject.DiagnosisPrinted = 0;
-		PrintObject.MedicationPrinted = 0;
-
-		// Reset high Y
-		highY = kineticCanvas.DEFAULT_HIGH_Y;
-
-		// Clear layers on stage
-		// TODO: Get layer by id rather than by index (see 'resources/images/button_New_off.png' code)
-		stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
-		stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
-		//remove only specific children on controlLayer (X on textboxes)
-		var CONTROL_LAYER = 3;
-		var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
-		// TODO: create a new layer for delete buttons to simplify this logic
-		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
-		stage.draw();
+	if((DRAWABLE_X_MIN <= up.x && up.x <= DRAWABLE_X_MAX) && (DRAWABLE_Y_MIN <= up.y && up.y <= DRAWABLE_Y_MAX)) {
+		return true;
+	} else {
+		// console.log("not in drawable area: ", up.x, up.y );  
+		return false;
 	}
-});
+}
 
-// Instance of k2s to listen for events from canvas
+// TODO: Remove from global scope
+// 	This is being used in Unstructured.js view
+function addImageToLayer(file, layer, config) {
+	var imgObj = new Image();
+	imgObj.onload = function() {
+		config.image = imgObj;
+		var kineticImage = new Kinetic.Image(config);
+		layer.add(kineticImage);
+		layer.draw();
+	}
+	imgObj.src = file;
+}
+
 var k2s = Ext.create('KineticToSencha', {
 	id: 'k2s',
 	listeners: {
@@ -387,16 +140,19 @@ var k2s = Ext.create('KineticToSencha', {
 			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
 			for(var i = PrintObject.DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
+				console.log('defined??');
 				var itemData = data.getAt(i).getData();
+				console.log('defined2??');
 				console.log(itemData);
 				console.log('index=' + index + ' i= ' + i);
 				displayText[index] = (itemData.complain);
 				PrintObject.DiagnosisPrinted++;
+				console.log('defined3??');
 				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
 				PrintObject.TextArray.push(textForPrintObject);
 			}
-			console.log(PrintObject);
 
+			console.log('defined4??');
 			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
 			Ext.getCmp('diagnosis-panel').setHidden(false);
 			//      Ext.getCmp('drugaddform').reset();
@@ -405,91 +161,15 @@ var k2s = Ext.create('KineticToSencha', {
 	}
 });
 
-
-///////////////////////////////////////////////////////////
-// Kinetic JS, drawing Canvas
-///////////////////////////////////////////////////////////
-
-// Globals / Constants
-var kineticCanvas = {
-	DRAWABLE_X_MIN : 60,	
-	DRAWABLE_X_MAX : 680, // 708 - strict border = 700 ... minus the "Today" text
-	DIFF : 144, // moving whole thing up a bit ... 1024 - 880 = 144
-	DRAWABLE_Y_MIN : 200 - this.DIFF, // 230 - strict border 
-	DEFAULT_HIGH_Y : this.DRAWABLE_Y_MIN + 15,
-};
-
-var PrintObject;
-var stage = new Object;	// TODO: Remove if unneeded
-// var imageCount = 0;
-
-// var kineticCanvas.DRAWABLE_X_MIN = 60;
-// var kineticCanvas.DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" text
-// var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
-// var kineticCanvas.DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
-// var kineticCanvas.DEFAULT_HIGH_Y = kineticCanvas.DRAWABLE_Y_MIN + 15;
-
-// Keep track of the current low and high bounds (y-axis) for where a user
-// has already added content onto the canvas. The idea is that we want to add
-// structured data (diagnoses, prescriptions, ...) into blank areas on the 
-// canvas where the user hasn't yet written.
-var highY = kineticCanvas.DEFAULT_HIGH_Y;	// Not a constant
-
-var DRAWABLE_Y_MAX = 1024;
-var DEFAULT_MODE = "draw"; // undefined
-var STAGE_X = 768; //768
-var STAGE_Y = 1024; //1024
-var HISTORY_BASE_X = kineticCanvas.DRAWABLE_X_MAX;
-var HISTORY_BASE_Y = kineticCanvas.DRAWABLE_Y_MIN + 196;
-var HISTORY_ITEM_DIM = 64;
-
-var CONTROL_BASE_X = 2;
-var CONTROL_BASE_Y = 2;
-var CONTROL_ITEM_SPACING = 3;
-var CONTROL_ITEM_DIM = 50;
-var TOOLBAR_ITEM_DIM = 44;
-var TOOLBAR_ITEM_BASE_X = 4;
-var TOOLBAR_ITEM_BASE_Y = 1;
-var TOOLBAR_HEIGHT = 46;
-
-var HIGH_Y_OFFSET = 10; // a little extra space
-
-function isInDrawableArea(myX, myY) {
-	up = {
-		x: myX,
-		y: myY
-	};
-
-	if((kineticCanvas.DRAWABLE_X_MIN <= up.x && up.x <= kineticCanvas.DRAWABLE_X_MAX) && (kineticCanvas.DRAWABLE_Y_MIN <= up.y && up.y <= DRAWABLE_Y_MAX)) {
-		return true;
-	} else {
-		// console.log("not in drawable area: ", up.x, up.y );  
-		return false;
-	}
-}
-
-// TODO: Remove from global scope
-// 	This is being used in Unstructured.js view
-function addImageToLayer(file, layer, config) {
-	var imgObj = new Image();
-	imgObj.onload = function() {
-		config.image = imgObj;
-		var kineticImage = new Kinetic.Image(config);
-		layer.add(kineticImage);
-		layer.draw();
-	}
-	imgObj.src = file;
-}
-
 var setupCanvas = function() {
 
 	// attach variables and functions that need to be accessed from outside canvas
 	// return this at end of setupCanvas
-	var drawLogic;	
+	var publicAccessObject;	
 	
 	var NO_CONTROL_GROUP = 'noControlGroup';
 
-		var lowY = kineticCanvas.DRAWABLE_Y_MIN;
+		var lowY = DRAWABLE_Y_MIN;
 
 		var newLine;
 		var newLinePoints = [];
@@ -664,7 +344,7 @@ var setupCanvas = function() {
 			x: 0,
 			y: 0,
 			width: stage.getWidth(),
-			// height: kineticCanvas.DRAWABLE_Y_MIN - 4,
+			// height: DRAWABLE_Y_MIN - 4,
 			height: TOOLBAR_HEIGHT,
 			fill: "#82b0e1" // Light Blue.
 		});
@@ -672,14 +352,14 @@ var setupCanvas = function() {
 
 		addImageToLayer("resources/images/bg/TODAY_710.png", backgroundLayer, {
 			x: 0,
-			y: kineticCanvas.DRAWABLE_Y_MIN,
+			y: DRAWABLE_Y_MIN,
 			width: 710,
 			height: 835,
 		});
 
 		addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
 			x: stage.getWidth() - 36,
-			y: kineticCanvas.DRAWABLE_Y_MIN,
+			y: DRAWABLE_Y_MIN,
 			width: 35,
 			height: 835
 		});
@@ -764,7 +444,7 @@ var setupCanvas = function() {
 		}, {
 			// Add diagnosis
 			image: 'resources/images/icons/add_D_off.png',
-			x: kineticCanvas.DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+			x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
 			y: CONTROL_BASE_Y + 3 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
 			width: 50,
 			height: 49,
@@ -775,7 +455,7 @@ var setupCanvas = function() {
 		}, {
 			// Add medication
 			image: 'resources/images/icons/add_drug_off.png',
-			x: kineticCanvas.DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+			x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
 			y: CONTROL_BASE_Y + 4 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
 			width: 50,
 			height: 49,
@@ -785,7 +465,7 @@ var setupCanvas = function() {
 		// }, {
 		// 	// Add investigation
 		// 	image: 'resources/images/icons/add_investigation_off.png',
-		// 	x: kineticCanvas.DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
+		// 	x: DRAWABLE_X_MIN - CONTROL_ITEM_SPACING - CONTROL_ITEM_DIM,
 		// 	y: CONTROL_BASE_Y + 5 * (CONTROL_ITEM_DIM + CONTROL_ITEM_SPACING),
 		// 	width: 50,
 		// 	height: 49,
@@ -921,7 +601,7 @@ var setupCanvas = function() {
 			var myHighY = highY;
 			addImageToLayer(bullet_icon_link, textLayer, {
 				gid: gid,
-				x: kineticCanvas.DRAWABLE_X_MIN + 20,
+				x: DRAWABLE_X_MIN + 20,
 				y: myHighY,
 				width: 14,
 				height: 14
@@ -931,7 +611,7 @@ var setupCanvas = function() {
 					gid: gid,
 					storeId: storeId,
 					storeUuid: TextArray[i].uuid,
-					x: kineticCanvas.DRAWABLE_X_MIN + 20 + 20,
+					x: DRAWABLE_X_MIN + 20 + 20,
 					y: highY,
 					text: TextArray[i].text,
 					fontSize: 11,
@@ -954,7 +634,7 @@ var setupCanvas = function() {
 				layer: 'tempControlsLayer',
 				gid: gid,
 				image: "resources/images/icons/delete_bigger.png",
-				x: kineticCanvas.DRAWABLE_X_MAX - 140,
+				x: DRAWABLE_X_MAX - 140,
 				y: myHighY,
 				width: 32,
 				height: 32,
@@ -1033,7 +713,7 @@ var setupCanvas = function() {
 			var handDrawnLineY = highY; // + 20*(text.length-1);
 			addImageToLayer("resources/images/icons/line.png", textLayer, {
 				gid: gid,
-				x: kineticCanvas.DRAWABLE_X_MIN + 20,
+				x: DRAWABLE_X_MIN + 20,
 				y: handDrawnLineY,
 				width: 529,
 				height: 9

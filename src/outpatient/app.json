@@ -57,6 +57,10 @@
         // Slider + Text Input for screener vitals
         "path": "../lib/touch/Ext.field.SliderExtended/SliderFieldExtended.js"
     }, {
+        "path": "app/PrintToCanvas.js"
+    }, {
+        "path": "app/KineticToSencha.js"        
+    }, {
         "path": "app/drawLogic.js"
     }, {
         "path": "app.js",
