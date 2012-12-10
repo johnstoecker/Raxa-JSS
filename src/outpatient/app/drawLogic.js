@@ -65,6 +65,11 @@ function addImageToLayer(file, layer, config) {
 	imgObj.onload = function() {
 		config.image = imgObj;
 		var kineticImage = new Kinetic.Image(config);
+
+		if (config.handler && config.events) {
+			kineticImage.on(config.events, config.handler);
+		}
+
 		layer.add(kineticImage);
 		layer.draw();
 	}

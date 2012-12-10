@@ -158,27 +158,17 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					});
 
 					// Add button for History Dropdown
-					var historyButtonText = new Kinetic.Text({
-						x: 600,
-						y: 5,
-						width: 120,
-						height: 40,
-						text: 'History',
-						fontSize: 15,
-						padding: 10,
-						fontFamily: 'Helvetica',
-						align: 'center',
-						stroke: '#555',
-				        strokeWidth: 2,
-				        fill: '#0070C0',
-				        textFill: '#FFF',
-				        cornerRadius: 10
+					addImageToLayer("resources/images/button_History_off.png", controlsLayer, {
+						x: 660,
+						y: 0,
+						width: 80,
+						height: 44,
+						events: 'click touchstart',
+						handler: function() {
+							// Show visit history
+							Ext.getCmp('visitHistory').show();
+						}
 					});
-
-					var historyHandler = function() {Ext.getCmp('visitHistory').show();};
-					historyButtonText.on('click touchstart', historyHandler);
-
-					backgroundLayer.add(historyButtonText);
 
 					var visitHistoryStore = Ext.getStore('visitHistoryStore');
 					var tempMonth = 10;
