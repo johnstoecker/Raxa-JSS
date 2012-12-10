@@ -29,7 +29,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
             title: {
                 // Can set title and padding dynamically for logged in doctor
                 id: 'mainviewToolbarTitle',
-                title: 'Doctor Name...',
+                title: 'Login Error!',
                 padding: '0 0 0 30'
             },
             layout: {
@@ -69,7 +69,19 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 iconCls: 'settings',
                 iconMask: true,
                 iconAlign: 'right',
-                text: 'Options'
+                text: 'Options', 
+                handler: function(button, e, options) {
+                    // Hide dashboard if it's in the way
+                    var dash = Ext.getCmp('patientManagementDashboard');
+                    dash.hide();
+                    
+                    // Show logout dialog
+                    var logconfirm = button.LogoutButton;
+                    if (!logconfirm) {
+                        logconfirm = button.LogoutButton = Ext.widget('logoutConfirmPanel');
+                    }
+                    logconfirm.showBy(button);
+                }
             }, {
                 xtype: 'spacer',
                 width: 340
