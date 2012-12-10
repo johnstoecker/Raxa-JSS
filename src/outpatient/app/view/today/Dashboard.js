@@ -48,12 +48,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
             }
         },
 
-        // Constants
-        DASHBOARD: {
-            BUTTON_MARGIN: '44 0 0 30',
-            //'60 0 0 40';
-        },
-
         // Background color
         // style: 'background-color: #82b0e1;',
         // style: 'background-color: #11598c;',
