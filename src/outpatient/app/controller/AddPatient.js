@@ -35,7 +35,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     },
 
     init: function () {
-        console.log('AddPatient controller init');
     }, 
 
     launch: function () {
@@ -79,7 +78,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         // Unmask after default time
         setTimeout(function(){
             Ext.getCmp('opdPatientDataEntry').setMasked(false);
-        },SAVE_LOAD_MASK_MAX_WAIT_TIME);
+        },Util.SAVE_LOAD_MASK_MAX_WAIT_TIME);
 
         var formp = Ext.getCmp('newPatient').saveForm();
         // Sets Patient Name & Age on Screen while patient is created in the backend

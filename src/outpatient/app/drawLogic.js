@@ -1,432 +1,28 @@
-// TODO: Unwind this spaghetti code. 
-// Move controlling logic somewhere else, just fire events and listen to updates in view
-
-///////////////////////////////////////////////////////////
-// Connection: Kinetic to Sencha
-//  - bridges via firing Ext events
-///////////////////////////////////////////////////////////
-
-var SAVE_LOAD_MASK_MAX_WAIT_TIME = 15000;
-
-// TODO: take these out of global scope
-// var g_medication_list = [];
-var g_diagnosis_list = [];
-var PrintObject;
-var order;
-var obs;
-var DoctorOrderStore;
-var DoctorOrderModel;
-var DiagnosisPrinted = 0;
-var MedicationPrinted = 0;
-
-
-// Print Class - Keep track of items to be displayed and saved on persist of the JSON
-function PrintClass() {
-	//This function is same as a constructor
-	//alert("Print Class");
-}
-
-PrintClass.prototype = {
-	PrintText: function() {
-		//create function to Print Text
-	},
-	TextGroupProperty: new Object(),
-	TextArray: new Array(new TextProperty()),
-}
-
-PrintClass.prototype.TextGroupProperty = {
-	type: null,
-	storeId: null,
-	gid: null
-}
-
-function TextProperty(text, uuid) {
-	this.text = text, this.uuid = uuid
-}
-
-// Allows us to throw Ext events, triggering Sencha code when tapping on Kinetic items
-Ext.define('KineticToSencha', {
-	mixins: ['Ext.mixin.Observable'],
-	config: {
-		fullName: ''
-	},
-	constructor: function(config) {
-		this.initConfig(config); // We need to initialize the config options when the class is instantiated
-	},
-	addMedication: function() {
-		this.fireEvent('clickAddMedication');
-	},
-	clickDiagnosis: function() {
-		this.fireEvent('clickOnDiagnosis');
-	},
-	saveLoadMask: function() {
-		var mask = function() {
-				console.log('mask off');
-				Ext.getCmp('opdPatientDataEntry').setMasked(false)
-			}
-
-		console.log('mask on');
-		Ext.getCmp('opdPatientDataEntry').setMasked({
-			xtype: 'loadmask',
-			message: 'Saving...',
-			modal: true
-		});
-
-		setTimeout(mask, SAVE_LOAD_MASK_MAX_WAIT_TIME);
-		Ext.getCmp('opdPatientDataEntry').setMasked(false);
-	},
-
-	// Saves just "drawable" portion of canvas
-	saveDrawableCanvas: function() {
-		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
-		stage.toImage({
-			callback: function(i) {
-				i.id = "PatientRecord";
-				var kineticImage = new Kinetic.Image({
-					image: i,
-					x: 0,
-					y: 0,
-					id: 'PatientRecord',
-					crop: {
-						x: DRAWABLE_X_MIN,
-						y: DRAWABLE_Y_MIN,
-						width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
-						height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
-					}
-				});
-
-				// Create a temp layer and add the "screenshot" image. If it's not added to a layer,
-				// or added to the stage, then Kinetic won't allow you to call toDataUrl() on it.
-				var temp_layer = new Kinetic.Layer();
-				temp_layer.add(kineticImage);
-				stage.add(temp_layer);
-				var dataUrl = kineticImage.toDataURL({
-					callback: function(dataUrl) {
-						console.log('callback for dataUrl');
-					},
-					mimeType: 'image/jpeg',
-					quality: 1,
-					// height: 32,
-					// width: 32
-				});
-				// k2s.config.addDoctorRecordImage_TEMP_FOR_DEMO(dataUrl);
-				// Delete temp layer
-				temp_layer.remove();
-
-				// Adds it to history store (list is visible in history view)
-				var now = Ext.util.Format.date(Date(), 'Y.m.j - g:ia');
-				var visitHistoryStore = Ext.getStore('visitHistoryStore');
-				visitHistoryStore.add({
-					title: 'Visit <x>',
-					date: now,
-					uuid: 'FAKE-UUID-PUSHED',
-					diagnosisCount: 0,
-					treatmentCount: 0,
-					imgSrc: dataUrl,
-					// id: 'PatientRecord'
-				});
-
-				// Show most recently added item, from store
-				var record = visitHistoryStore.getAt(visitHistoryStore.getCount()-1)
-				var me = Ext.getCmp('history-unstructured-panel');
-				me.showVisitInView(record);
-
-				// Scroll to history view
-				
-				var UNSTRUCTURED_HISTORY_VIEW = 0;
-				Ext.getCmp('history-panel').setActiveItem(UNSTRUCTURED_HISTORY_VIEW);
-
-				// TODO: Animation isn't showing in Chrome. On device?
-				var HISTORY_OVERVIEW = 1;
-				Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
-   					type: 'slide',
-					direction: 'right'
-				});
-				
-				// Save via REST
-				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
-				// from onSaveCanvas... saveDrawableCanvas... etc
-				k2s.config.sendDoctorOrderEncounter();
-			}
-		});
-	}
-});
-
-var k2s = Ext.create('KineticToSencha', {
-	id: 'k2s',
-	// TODO: Move all of these functions to the define() statement for k2s, and you can call via
-	//	k2s.method() instead of k2s.config.method()
-	// <TODO: Add Comment describing>
-	addOrder: function() {
-		//set persist of order true as Doctor may not always have a order
-		RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[6].persist = true; //6th field in orders (sorted)
-		// RaxaEmr.Outpatient.model.DoctorOrder.getFields().get('orders').setPersist(true); //6th field in orders (sorted)
-		var drugPanel = Ext.getStore('drugpanel');
-
-		lengthOfDrugOrder = Ext.getStore('drugpanel').getData().all.length;
-
-		for(var i = 0; i < lengthOfDrugOrder; i++) {
-			var drugPanel = Ext.getStore('drugpanel').getData().all[i].data;
-
-			//Drug Orders here
-			var OrderModel = Ext.create('RaxaEmr.Outpatient.model.drugOrder', {
-				type: 'drugorder',
-				patient: myRecord.data.uuid,
-				concept: drugPanel.concept,
-				drug: drugPanel.uuid,
-				startDate: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-				autoExpireDate: Util.Datetime(new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate() + drugPanel.duration), Util.getUTCGMTdiff()),
-				instructions: drugPanel.routeofadministration,
-				quantity: drugPanel.duration,
-				//TODO Figure out why dose is creating problem while sending
-				//dose: drugPanel.frequency,
-				//Pharmacy is using dose. Remove inconsistency
-				frequency: drugPanel.frequency,
-				orderer: localStorage.loggedInUser
-			});
-			DoctorOrderModel.data.orders.push(OrderModel.raw);
-		}
-	},
-
-	// <TODO: Add Comment describing>
-	addObs: function() {
-		//TODO set persit TRUE if first order 
-		// RaxaEmr.Outpatient.model.DoctorOrder.getFields().items[5].persist= true; //5th field in obs (sorted)
-		//TODO set persist FALSE if no item in list
-		DoctorOrderModel.data.obs = [];
-		lengthOfDiagnosis = Ext.getCmp('diagnosedList').getStore().data.length;
-		for(var i = 0; i < lengthOfDiagnosis; i++) {
-			console.log(Ext.getCmp('diagnosedList').getStore().data.all[i].data);
-			var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-				obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-				person: myRecord.data.uuid,
-				//need to set selected patient uuid in localStuiorage
-				concept: Ext.getCmp('diagnosedList').getStore().data.all[i].data.id,
-				//      value: Ext.getCmp('diagnosedList').getStore().data.all[i].data.complain
-			});
-			DoctorOrderModel.data.obs.push(ObsModel.raw);
-			// console.log(ObsModel);
-		}
-		console.log(DoctorOrderModel);
-	},
-
-	// <TODO: Add Comment describing>
-	addDoctorRecordImage: function() {
-		// TODO UNABLE TO access ControlsLayer here
-		// children till 7 are already there and rest goes into 
-		// console.log(controlsLayer.children[8].attrs.image.src)
-		// DoctorOrderModel.data.obs = [];
-		//    (document.getElementById('id-of-doctor-form').src)
-		//TODO check all objects of canvas which are saved and then push it as obs 
-		// OR store an array of image which can be sent
-		//set Image in obs json
-		console.log('checking patient records in stage and copying to DoctorOrder store');
-
-		var PatientRecordHistory = Ext.getStore('visitHistoryStore').getData();
-
-		for(var j = 0; j < Ext.getStore('visitHistoryStore').getData().all.length; j++) //j is always 4, but not now.
-		{
-			if(PatientRecordHistory.all[j].data.id == "PatientRecord") {
-				//    if( PatientRecordHistory.all[j].imgSrc.length < 65000){   
-				var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-					obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-					person: myRecord.data.uuid,
-					//need to set selected patient uuid in localStorage
-					concept: localStorage.patientRecordImageUuidconcept,
-					value: PatientRecordHistory.all[j].data.imgSrc
-				});
-				DoctorOrderModel.data.obs.push(ObsModel.raw);
-				//  }
-				//    else {
-				//    Ext.Msg.alert('Error','Can\'t save data on server');
-				//    }
-			}
-		}
-		console.log(Ext.getStore('DoctorOrder'));
-	},
-	//Sending Stage JSON so that high quality doctor records can be generated again
-	addDoctorRecordVectorImage: function() {
-
-		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			person: myRecord.data.uuid,
-			//need to set selected patient uuid in localStorage
-			concept: localStorage.patientRecordVectorImageUuidconcept,
-			value: stage.toJSON()
-		});
-		DoctorOrderModel.data.obs.push(ObsModel.raw);
-	},
-	//Small icons to show as thumbnails
-	addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
-
-		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			person: myRecord.data.uuid,
-			//need to set selected patient uuid in localStorage
-			concept: localStorage.patientRecordImageUuidconcept,
-			value: dataUrl
-		});
-		DoctorOrderModel.data.obs.push(ObsModel.raw);
-	},
-
-	// <Comment describing>
-	sendDoctorOrderEncounter: function() {
-		this.addObs();
-		this.addDoctorRecordImage();
-		this.addDoctorRecordVectorImage();
-		this.addOrder();
-
-		DoctorOrderModel.data.patient = myRecord.data.uuid;
-		DoctorOrderStore.add(DoctorOrderModel);
-
-		//makes the post call for creating the patient
-		var that = this;
-		DoctorOrderStore.on('write', function() {
-			console.log('doctor order store on WRITE event');
-			that.initCanvasData();
-		});
-		DoctorOrderStore.sync();
-	},
-
-	// This function clears the canvas (UI) and resets all the models/stores which are tied ot the UI
-	initCanvasData: function() {
-		// Empty the stores which are used to send the data
-		DoctorOrderStore = Ext.create('RaxaEmr.Outpatient.store.DoctorOrder');
-		DoctorOrderModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrder', {
-			//uuid:      //need to get myRecord variable of patientlist accessible here, so made it global variable
-			//may need to set it later if new patient is created using DoctorOrder view (currently view/patient/draw.js)
-			//other way is to create method in Controller which returns myRecord.data.uuid
-			encounterType: localStorage.outUuidencountertype,
-			// TODO figure out if should be prescription fill ?
-			encounterDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			//Should encounterDatetime be time encounter starts or ends?
-			provider: localStorage.loggedInUser
-		});
-
-		DoctorOrderModel.data.obs = [];
-		DoctorOrderModel.data.orders = [];
-
-		// Reset stores for diagnoses and treatments
-		Ext.getStore('diagnosedDisease').clearData();
-		Ext.getStore('drugpanel').clearData();
-		
-		// Reset the print object 
-		// TODO: put print counts inside of the print Object, rather than separate floating vars
-		PrintObject = new PrintClass();
-		DiagnosisPrinted = 0;
-		MedicationPrinted = 0;
-
-		// Reset high Y
-		highY = DEFAULT_HIGH_Y;
-
-		// Clear layers on stage
-		// TODO: Get layer by id rather than by index (see 'resources/images/button_New_off.png' code)
-		stage.getChildren()[1].getChildren().splice(0, stage.getChildren()[1].getChildren().length);
-		stage.getChildren()[2].getChildren().splice(0, stage.getChildren()[2].getChildren().length);
-		//remove only specific children on controlLayer (X on textboxes)
-		var CONTROL_LAYER = 3;
-		var NUMBER_OF_VALID_CONTROL_BUTTONS = 7;
-		// TODO: create a new layer for delete buttons to simplify this logic
-		stage.getChildren()[CONTROL_LAYER].getChildren().splice(7, stage.getChildren()[CONTROL_LAYER].getChildren().length - NUMBER_OF_VALID_CONTROL_BUTTONS);
-		stage.draw();
-	},
-
-	listeners: {
-		resetCanvasStores: function() {
-			console.log('resetCanvasStores()');
-			this.config.initCanvasData();
-		},
-		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
-			// By default, "this" will be the object that fired the event.
-			console.log("k2s: clickAddMedication");
-			var displayText = new String();
-			var store = Ext.getStore('drugpanel');
-			var data = store.getData();
-			var itemCount = data.getCount();
-
-			PrintObject.TextGroupProperty.type = 'DrugOrder';
-			PrintObject.TextGroupProperty.storeId = 'drugpanel';
-			PrintObject.TextGroupProperty.gid = Math.floor((Math.random() * 5000) + 1);
-			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
-
-			for(var i = MedicationPrinted, index = 0; i < itemCount; i++, index++) {
-				var itemData = data.getAt(i).getData();
-
-				displayText = '';
-				// TODO: Consolidate following code into loop
-				if(!itemData.drugname) {
-					// If no drug name, skip to next loop iteration
-					continue;
-				} else {
-					displayText = (itemData.drugname + ' - ');
-				}
-
-				// Print all the details of the drug prescription
-				var detailTypes = ["strength", "frequency", "instruction", "duration"]
-				for (var j=0; j< detailTypes.length; j++) {
-					var details = itemData[detailTypes[j]];
-					if(details) {
-						displayText += (' ' + details);
-						if (detailTypes[j] == "duration") {
-							displayText += ' days';
-						}
-					}
-				}
-
-				MedicationPrinted++;
-				var textForPrintObject = new TextProperty(displayText, itemData.uuid);
-				PrintObject.TextArray.push(textForPrintObject);
-			}
-
-			Ext.getCmp('drugForm').setHidden(false);
-			Ext.getCmp('drugaddform').reset();
-		},
-
-		clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
-			console.log("k2s: clickOnDiagnosis");
-			// Print store. I'll have to pull info from this to print in Canvas
-			var displayText = [];
-			var store = Ext.getStore('diagnosedDisease');
-			var data = store.getData();
-			var itemCount = data.getCount();
-			console.log('itemcount= ' + itemCount);
-			console.log('Diagnosis Printed=' + DiagnosisPrinted);
-			PrintObject.TextGroupProperty.type = 'Diagnosis';
-			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
-			PrintObject.TextGroupProperty.gid = Math.floor((Math.random() * 5000) + 1);
-
-			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
-
-			for(var i = DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
-				var itemData = data.getAt(i).getData();
-				console.log(itemData);
-				console.log('index=' + index + ' i= ' + i);
-				displayText[index] = (itemData.complain);
-				DiagnosisPrinted++;
-				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
-				PrintObject.TextArray.push(textForPrintObject);
-			}
-			console.log(PrintObject);
-
-			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
-			Ext.getCmp('diagnosis-panel').setHidden(false);
-			//      Ext.getCmp('drugaddform').reset();
-			//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
-		}
-	}
-});
-
-
-///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Kinetic JS, drawing Canvas
-///////////////////////////////////////////////////////////
-imageCount = 0;
+// - Globals vars shared across all views using Kinetic and canvases
+// - k2s is an instance of KineticToSencha, which includes methods to track
+// 	what's drawn on the canvas and save it when user does "finalize" command
+// - setupCanvas initiatizes most of KineticJS (drawing items on the canvas, 
+// 	preparing event handlers, etc)
+///////////////////////////////////////////////////////////////////////////////
+
+// Globals 
+// TODO: Continue refactoring to remove these
+
+var PrintObject;
+var stage = new Object;	// TODO: Remove if unneeded
 
 var DRAWABLE_X_MIN = 60;
 var DRAWABLE_X_MAX = 680; // 708 - strict border = 700 ... minus the "Today" text
 var DIFF = 144; // moving whole thing up a bit ... 1024 - 880 = 144
 var DRAWABLE_Y_MIN = 200 - DIFF; // 230 - strict border 
 var DEFAULT_HIGH_Y = DRAWABLE_Y_MIN + 15;
+
+// Keep track of the current low and high bounds (y-axis) for where a user
+// has already added content onto the canvas. The idea is that we want to add
+// structured data (diagnoses, prescriptions, ...) into blank areas on the 
+// canvas where the user hasn't yet written.
 var highY = DEFAULT_HIGH_Y;	// Not a constant
 
 var DRAWABLE_Y_MAX = 1024;
@@ -462,11 +58,109 @@ function isInDrawableArea(myX, myY) {
 	}
 }
 
-// TODO: Remove if unneeded
-var stage = new Object;
+// TODO: Remove from global scope
+// 	This is being used in Unstructured.js view
+function addImageToLayer(file, layer, config) {
+	var imgObj = new Image();
+	imgObj.onload = function() {
+		config.image = imgObj;
+		var kineticImage = new Kinetic.Image(config);
+		layer.add(kineticImage);
+		layer.draw();
+	}
+	imgObj.src = file;
+}
+
+var k2s = Ext.create('KineticToSencha', {
+	id: 'k2s',
+	listeners: {
+		resetCanvas: function() {
+			console.log('resetCanvas()');
+			this.initCanvasData();
+		},
+		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
+			// By default, "this" will be the object that fired the event.
+			console.log("k2s: clickAddMedication");
+			var displayText = new String();
+			var store = Ext.getStore('drugpanel');
+			var data = store.getData();
+			var itemCount = data.getCount();
+
+			PrintObject.TextGroupProperty.type = 'DrugOrder';
+			PrintObject.TextGroupProperty.storeId = 'drugpanel';
+			PrintObject.TextGroupProperty.gid = this.gidCounter++;
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
+
+			for(var i = PrintObject.MedicationPrinted, index = 0; i < itemCount; i++, index++) {
+				var itemData = data.getAt(i).getData();
+
+				displayText = '';
+				// TODO: Consolidate following code into loop
+				if(!itemData.drugname) {
+					// If no drug name, skip to next loop iteration
+					continue;
+				} else {
+					displayText = (itemData.drugname + ' - ');
+				}
+
+				// Print all the details of the drug prescription
+				var detailTypes = ["strength", "frequency", "instruction", "duration"]
+				for (var j=0; j< detailTypes.length; j++) {
+					var details = itemData[detailTypes[j]];
+					if(details) {
+						displayText += (' ' + details);
+						if (detailTypes[j] == "duration") {
+							displayText += ' days';
+						}
+					}
+				}
+
+				PrintObject.MedicationPrinted++;
+				var textForPrintObject = new TextProperty(displayText, itemData.uuid);
+				PrintObject.TextArray.push(textForPrintObject);
+			}
+
+			Ext.getCmp('drugForm').setHidden(false);
+			Ext.getCmp('drugaddform').reset();
+		},
+
+		clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
+			console.log("k2s: clickOnDiagnosis");
+			// Print store. I'll have to pull info from this to print in Canvas
+			var displayText = [];
+			var store = Ext.getStore('diagnosedDisease');
+			var data = store.getData();
+			var itemCount = data.getCount();
+			console.log('itemcount= ' + itemCount);
+			console.log('Diagnosis Printed=' + PrintObject.DiagnosisPrinted);
+			PrintObject.TextGroupProperty.type = 'Diagnosis';
+			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
+			PrintObject.TextGroupProperty.gid = this.gidCounter++;
+
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
+
+			for(var i = PrintObject.DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
+				var itemData = data.getAt(i).getData();
+				displayText[index] = (itemData.complain);
+				PrintObject.DiagnosisPrinted++;
+				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
+				PrintObject.TextArray.push(textForPrintObject);
+			}
+
+			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
+			Ext.getCmp('diagnosis-panel').setHidden(false);
+			//      Ext.getCmp('drugaddform').reset();
+			//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
+		}
+	}
+});
 
 var setupCanvas = function() {
 
+	// attach variables and functions that need to be accessed from outside canvas
+	// return this at end of setupCanvas
+	var publicAccessObject;	
+	
 	var NO_CONTROL_GROUP = 'noControlGroup';
 
 		var lowY = DRAWABLE_Y_MIN;
@@ -481,9 +175,6 @@ var setupCanvas = function() {
 		var backgroundLayer = new Kinetic.Layer({
 			id: 'backgroundLayer'
 		});
-		// var loadedImageLayer = new Kinetic.Layer({
-		// 	id: 'loadedImageLayer'
-		// }); // For re-loaded thumbs
 		var linesLayer = new Kinetic.Layer({
 			id: 'linesLayer'
 		});
@@ -493,6 +184,10 @@ var setupCanvas = function() {
 		var controlsLayer = new Kinetic.Layer({
 			id: 'controlsLayer'
 		});
+		var tempControlsLayer = new Kinetic.Layer({
+			id: 'tempControlsLayer'
+		});
+
 
 		// Setup stage, upon which all layers are built.
 		stage = new Kinetic.Stage({
@@ -506,8 +201,8 @@ var setupCanvas = function() {
 		stage.add(backgroundLayer);
 		stage.add(linesLayer);
 		stage.add(textLayer); // in front of "draw" layer, i.e. cant draw on a diagnosis. for now.
-		// stage.add(loadedImageLayer);
 		stage.add(controlsLayer);
+		stage.add(tempControlsLayer);
 		moving = false;
 
 		////////////////////////
@@ -523,19 +218,14 @@ var setupCanvas = function() {
 			dragComplete();
 		});
 		stage.on("paintDiagnosis", function() {
-			console.log('printing Diagnosis');
-			console.log(g_diagnosis_list);
 			k2s.fireEvent('clickOnDiagnosis');
-			Ext.getCmp('diagnosis-panel').setHidden(true);
-			drawDiagnosis(PrintObject);
+			Ext.getCmp('diagnosis-panel').hide();
+			drawTextAtLowPoint(PrintObject);
 		});
 		stage.on("paintMedication", function() {
-			//To be refactored
-			console.log('printing Drug Order');
-			// console.log(g_medication_list);
 			k2s.fireEvent('clickAddMedication');
-			Ext.getCmp('drugForm').setHidden(true);
-			drawDiagnosis(PrintObject);
+			Ext.getCmp('drugForm').hide();
+			drawTextAtLowPoint(PrintObject);
 		});
 
 		////////////////////////
@@ -544,9 +234,6 @@ var setupCanvas = function() {
 		// First touch or click starts a drag event
 		function dragStart() {
 			var up = stage.getUserPosition();
-
-			console.log("dragStart", up);
-			// console.log(stage.getIntersections(up));
 
 			if(!up || !isInDrawableArea(up.x, up.y) || mode !== 'draw') {
 				return;
@@ -557,20 +244,14 @@ var setupCanvas = function() {
 				backgroundLayer.draw();
 			} else {
 				newLinePoints = [];
-				prevPos = stage.getUserPosition(); // Mouse or touch
+				prevPos = up;	// Mouse or touch
+				// prevPos = stage.getUserPosition(); // Mouse or touch
 				newLinePoints.push(prevPos);
 				newLine = new Kinetic.Line({
 					points: newLinePoints,
-					stroke: "black",
-					
-					// lineCap: 'round',
-     //    			lineJoin: 'round',
-					// strokeWidth: 10,
-					// listening: true,
+					stroke: "black"
 				});
-
 				linesLayer.add(newLine);
-
 				moving = true;
 			}
 		}
@@ -591,13 +272,13 @@ var setupCanvas = function() {
 
 			if(moving) {
 				var mousePos = stage.getUserPosition(); // Mouse or touch
-				var x = mousePos.x;
-				var y = mousePos.y;
 				newLinePoints.push(mousePos);
-				updateBounds(mousePos);
+				var y = mousePos.y;
+				if(y > highY) {
+					highY = y + HIGH_Y_OFFSET;
+				}
 				prevPos = mousePos;
 
-				// moving = true;
 				linesLayer.drawScene();
 			}
 		}
@@ -612,11 +293,10 @@ var setupCanvas = function() {
 
 			console.log('drag complete');
 			
-			// Draw complete. Add erase event on the newline..
+			// Draw complete. Add erase event listener on the newline.
 			var currentLine = newLine;
 			newLine.on('mouseover touchmove', function() {
 				if (mode == "erase") {
-					// find lines that intersect with current mouse position
 					var children = linesLayer.getChildren();
 					var index = children.indexOf(currentLine);
 					children.splice(index,1)
@@ -627,22 +307,6 @@ var setupCanvas = function() {
 			stage.draw();
 
 			moving = false;
-		}
-
-		// Keep track of the current low and high bounds (y-axis) for where a user
-		// has already added content onto the canvas. The idea is that we want to add
-		// structured data (diagnoses, prescriptions, ...) into blank areas on the 
-		// canvas where the user hasn't yet written.
-
-
-		function updateBounds(mousePos) {
-			var y = mousePos.y;
-			if(y < lowY || lowY == undefined) {
-				lowY = y;
-			}
-			if(y > highY || highY == undefined) {
-				highY = y + HIGH_Y_OFFSET;
-			}
 		}
 
 		// SAVING 
@@ -746,20 +410,7 @@ var setupCanvas = function() {
 				// TODO: Clear the canvas - for demo only
 				Ext.Msg.confirm('New', 'Erase current visit (without saving)?', function(btn) {
 					if(btn == 'yes') {
-						// linesLayer.removeChildren();
-						// textLayer.removeChildren();
-						// //remove only specific children on controlLayer (X on textboxes)
-						// var CONTROL_LAYER_BUTTON_COUNT = 7;	// Preserve this many buttons
-						// var CONTROL_LAYER = 3;
-						// console.log('stage', stage);
-						// stage.getChildren()[CONTROL_LAYER].getChildren().splice(CONTROL_LAYER_BUTTON_COUNT);
-						// // drawControlsLayers.removeChildren();	// TODO: Put delete buttons on another layer for clarity (if perf OK)
-						
-						// // TODO: Also reset the stores
-						k2s.fireEvent('resetCanvasStores');
-
-						// highY = DEFAULT_HIGH_Y;
-						// stage.draw();
+						k2s.fireEvent('resetCanvas');
 					}
 				});
 			},
@@ -774,17 +425,13 @@ var setupCanvas = function() {
 				console.log('sending Doctor Encounter');
 				Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
 					if(btn == 'yes') {
-						//For now,
-						// - saves image to history store
 						// TODO: Saved image is wrong resolution
 						
 						// Saves image to localStore
 						// Scrolls directly to see the history item in history view
-						// Also saves via REST using k2s.config.sendDoctorOrderEncounter();
+						// Also saves via REST using k2s.sendDoctorOrderEncounter();
+						// Clear "today" canvas, after saving via REST
 						onSaveCanvas();
-
-						// TODO: clear the canvas. needs to become ajax and on complete, clear canvas
-						// - clears canvas -> this can work same way as "new", above
 					}
 				});
 			},
@@ -798,8 +445,6 @@ var setupCanvas = function() {
 			handler: function() {
 				console.log("Bringing diagnoses modal window.")
 				onClickDiagnosis();
-				// this.setStroke('red');
-				// this.setStrokeWidth(5);
 			}
 		}, {
 			// Add medication
@@ -866,8 +511,14 @@ var setupCanvas = function() {
 				} 
 				controlGroups[cg].push(box);
 			
-				controlsLayer.add(box);
-				controlsLayer.draw();
+				if(item.layer == 'tempControlsLayer') {
+					tempControlsLayer.add(box);
+					tempControlsLayer.draw();
+				} else {
+					controlsLayer.add(box);
+					controlsLayer.draw();	
+				}
+				
 			}
 			imageObj.src = item.image;
 		}
@@ -886,7 +537,8 @@ var setupCanvas = function() {
 			
 			// Toggle "on" selected item
 			// requires controlItem to have an attribute called imageWhenToggledOn
-			// Notes: doesn't make a new image each time. just creats it once and then re-uses
+			// Notes: doesn't make a new image each time. just creates it once and then re-uses
+			// TODO: Initialize images once and always use those, rather than initalizing on the fly
 			if (item.attrs.imageOn) {
 				item.setImage(item.attrs.imageOn);
 				controlsLayer.draw();
@@ -907,58 +559,39 @@ var setupCanvas = function() {
 		//
 
 		function onClickDiagnosis() {
-			console.log("add diagnosis");
-			k2s.clickDiagnosis();
-			//        drawDiagnosis(g_diagnosis_list);
+			k2s.addDiagnosis();
 		}
 
 		function onClickMedication() {
-			// Get user input
-			console.log("add diagnosis")
-			// var input = window.prompt("What's the diagnosis?","Tuberculosis");
-			// Trigger launch of modal dialog in Sencha
 			k2s.addMedication();
-
-			// inserts a dianosis wherever there's untouched space on canvas
-			// drawTextAtLowPoint(input);
-			//drawDiagnosis(g_medication_list);
-		}
-
-		function drawDiagnosis(text) {
-			console.log('drawDiagnosis');
-			if(text.TextArray.length) {
-				drawTextAtLowPoint(text);
-			}
 		}
 
 		function drawTextAtLowPoint(PrintObject) {
-			console.log(PrintObject);
-			// text = "Rheumatic Fever";
-			// Image on each line.
-			// TODO: Needs pointer to the related in the store, so "X" can call delete
-			console.log("drawTextAtLowPoint");
+			// If nothing to print, skip
+			if(! PrintObject.TextArray.length) {
+				return;
+			}
 
-			//PrintObject.TextGroupProperty['gid']
 			var type = PrintObject.TextGroupProperty.type;
 			var storeId = PrintObject.TextGroupProperty.storeId;
 			var gid = PrintObject.TextGroupProperty.gid;
 			var TextArray = PrintObject.TextArray;
 
-			//		Bullet icon is based on type of text to be printed	
+			// Bullet icon is based on type of text to be printed	
 			var bullet_icon_link = '';
 			switch(type) {
-			case 'Diagnosis':
-				bullet_icon_link = 'resources/images/icons/bullet_diagnosis.png';
-				break;
-			case 'DrugOrder':
-				bullet_icon_link = 'resources/images/icons/bullet_drug.png';
-				break;
-			case 'LabOrder':
-				bullet_icon_link = 'resources/images/icons/bullet_investigation.png';
-				break;
+				case 'Diagnosis':
+					bullet_icon_link = 'resources/images/icons/bullet_diagnosis.png';
+					break;
+				case 'DrugOrder':
+					bullet_icon_link = 'resources/images/icons/bullet_drug.png';
+					break;
+				case 'LabOrder':
+					bullet_icon_link = 'resources/images/icons/bullet_investigation.png';
+					break;
 			}
 
-			// var imageObj2 = new Image();
+			// Draw bullet icons and text
 			var myHighY = highY;
 			addImageToLayer(bullet_icon_link, textLayer, {
 				gid: gid,
@@ -967,7 +600,6 @@ var setupCanvas = function() {
 				width: 14,
 				height: 14
 			});
-			console.log(TextArray);
 			for(var i = 0; i < TextArray.length; i++) {
 				var complexText = new Kinetic.Text({
 					gid: gid,
@@ -983,15 +615,17 @@ var setupCanvas = function() {
 				});
 				textLayer.add(complexText);
 				highY += ((complexText.textHeight * (complexText.textArr.length + 1))); // length + title + space
-				//Drug order suggestion demo interface
+				
+				// Hook to show a demo for decision support. For now, we just have example for sinusitus.
 				if(TextArray[i].text === "Sinusitis") {
-					console.log('SINUSITIS Detected');
 					var SuggestDrugOrder = true;
 				}
 			}
+
 			// Add "delete" button
-			// Note, this creates item on control Layer, not text layer
+			// Note, this creates item on tempControlLayer, not text layer
 			createControlItem({
+				layer: 'tempControlsLayer',
 				gid: gid,
 				image: "resources/images/icons/delete_bigger.png",
 				x: DRAWABLE_X_MAX - 140,
@@ -999,77 +633,74 @@ var setupCanvas = function() {
 				width: 32,
 				height: 32,
 				handler: function() {
-					// TODO: Warn user before deleting - are you sure?
-					var gidToBeDeleted = this.gid;
-					console.log('Deleting objects with gid= ' + gidToBeDeleted);
+					Ext.Msg.confirm('Delete', 'Are you sure?', function(btn) {
+						if(btn == 'yes') {
+							var gidToBeDeleted = this.gid;
+							console.log('Deleting objects with gid= ' + gidToBeDeleted);
 
-					// Step 1 : Get Layers
-					for(var i = 0; i < stage.getChildren().length; i++) {
-						//Children in only textLayer and controlsLayer to be removed
-						// TODO: How about you just use the existing vars "textLayer" and "controlsLayer"? 
-						if(stage.getChildren()[i].getId() === "textLayer" || stage.getChildren()[i].getId() === "controlsLayer") {
-							//To check on infinite loop , TODO: Remove after testing
-							var count = 0;
-							for(var j = 0; j < stage.getChildren()[i].getChildren().length; j++) {
-								count++;
-								if(count == 100) {
-									console.log('bad code.... infinite loop on');
-									break;
+							// Step 1 : Get Layers
+							var layersToSearch = [textLayer, tempControlsLayer];
+							for(var i = 0; i < layersToSearch.length; i++) {		
+								var childrenToRemove = [];
+								for(var j = 0; j < layersToSearch[i].getChildren().length; j++) {							
+									//Step 2 : Select Children with help of group id and delete those chidren
+									var child = layersToSearch[i].getChildren()[j];
+									if(child.attrs.gid === gidToBeDeleted) {
+										childrenToRemove.push(child);
+
+										//Step 3 : Search & Delete related item from store from Store
+										//Checks if this item has any storeId & storeUuid linked
+										if(child.attrs.storeId && child.attrs.storeUuid) {
+											storeToBeDeleted = Ext.getStore(child.attrs.storeId);
+											var SearchKey = child.attrs.storeUuid;
+											var SearchOnId = '';
+											switch(child.attrs.storeId) {
+											case 'diagnosedDisease':
+												SearchOnId = 'id'; //Can change mapping of all stores to remove this switch case
+												break;
+											case 'drugpanel':
+												SearchOnId = 'uuid';
+												break;
+											case 'LabOrder':
+												SearchOnId = 'uuid';
+												break;
+											}
+											//Remove item from relevant store
+											storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId, SearchKey));
+
+											//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
+											//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
+											//Doctor can re search already diagnosed disease and select, though that will not effect anything
+											if(child.attrs.storeId === 'diagnosedDisease') {
+												// var diagnosedList = Ext.getCmp('diagnosisList');
+												// diagnosedList.getStore().add({
+												//     complain: child.attrs.text,
+												//     id: child.attrs.storeUuid,
+												// });
+
+												// TODO: Global!! namespace this var, perhaps put this var in K2S
+												--PrintObject.DiagnosisPrinted;
+											}
+
+											if(child.attrs.storeId === 'drugpanel') {
+												// TODO: Global!! namespace this var, perhaps put this var in K2S
+												--PrintObject.MedicationPrinted;
+											}
+										}
+									}		
 								}
 
-								//Step 2 : Select Children with help of group id and delete those chidren
-								if(stage.getChildren()[i].getChildren()[j].attrs.gid === gidToBeDeleted) {
-									//Step 3 : Search & Delete related item from store from Store
-									//Checks if this item has any storeId & storeUuid linked
-									if(stage.getChildren()[i].getChildren()[j].attrs.storeId && stage.getChildren()[i].getChildren()[j].attrs.storeUuid) {
-										storeToBeDeleted = Ext.getStore(stage.getChildren()[i].getChildren()[j].attrs.storeId);
-										var SearchKey = stage.getChildren()[i].getChildren()[j].attrs.storeUuid;
-										var SearchOnId = '';
-										switch(stage.getChildren()[i].getChildren()[j].attrs.storeId) {
-										case 'diagnosedDisease':
-											SearchOnId = 'id'; //Can change mapping of all stores to remove this switch case
-											break;
-										case 'drugpanel':
-											SearchOnId = 'uuid';
-											break;
-										case 'LabOrder':
-											SearchOnId = 'uuid';
-											break;
-										}
-										//Remove item from relevant store
-										storeToBeDeleted.removeAt(storeToBeDeleted.findExact(SearchOnId, SearchKey));
-
-										//KNOWN BUG : After Diagnosis is deleted from diagnosed list, they are not coming back to diagnosis list.
-										//TODO: Put back in list of Diagnosis (they are removed from diagnosis list while inserting into diagnosis list);
-										//Doctor can re search already diagnosed disease and select, though that will not effect anything
-										if(stage.getChildren()[i].getChildren()[j].attrs.storeId === 'diagnosedDisease') {
-											// var diagnosedList = Ext.getCmp('diagnosisList');
-											// diagnosedList.getStore().add({
-											//     complain: stage.getChildren()[i].getChildren()[j].attrs.text,
-											//     id: stage.getChildren()[i].getChildren()[j].attrs.storeUuid,
-											// });
-	
-											// TODO: Global!! namespace this var, perhaps put this var in K2S
-											--DiagnosisPrinted;
-										}
-
-										if(stage.getChildren()[i].getChildren()[j].attrs.storeId === 'drugpanel') {
-											// TODO: Global!! namespace this var, perhaps put this var in K2S
-											--MedicationPrinted;
-										}
-									}
-
-									//Removing child layer from stage
-									console.log('Deleted Child: ');
-									console.log(stage.getChildren()[i].getChildren().splice(j, 1));
-									--j;
+								for (var k=0; k<childrenToRemove.length; k++) {
+									var children = layersToSearch[i].getChildren();
+									var index = children.indexOf(childrenToRemove[k]);
+									children.splice(index, 1);
 								}
 
-								//Refreshes stage to show changes made above
-								stage.getChildren()[i].draw();
+								//Refreshes stage to show changes
+								layersToSearch[i].draw();
 							}
 						}
-					}
+					}, this);					
 				}
 			});
 
@@ -1115,17 +746,3 @@ var setupCanvas = function() {
 
 		return stage;
 	};
-
-// TODO: Quick Hack! Must remove from global scope
-// 	This is being used in Unstructured.js view
-
-function addImageToLayer(file, layer, config) {
-	var imgObj = new Image();
-	imgObj.onload = function() {
-		config.image = imgObj;
-		var kineticImage = new Kinetic.Image(config);
-		layer.add(kineticImage);
-		layer.draw();
-	}
-	imgObj.src = file;
-}
