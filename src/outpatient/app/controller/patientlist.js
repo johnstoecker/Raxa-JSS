@@ -815,9 +815,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     //This function calls on selection of Diagnosis list and adds to Diagnosed List
     onDiagnosisListSelect: function (list, index, node, record) {
-
-
-        console.log(arguments);
         Ext.getCmp('diagnosisfilterbysearchfield').setValue(record.data.sign);
         Ext.getCmp('searchedDiagnosisList').setHidden(true);
         var diagnosis = record.data;
@@ -930,14 +927,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 // duration: 'fake dur',
                 // routeofadministration: 'fake route'
             });
-	 
-	    //Drug Form is reset after drug data is pushed into code
+	   
+            // Drug Form is reset after drug data is pushed into code
             Ext.getCmp('drugaddform').reset();
 
-            if (obj.id != 'addMoreDrug') {
-                Ext.getCmp('drugForm').setHidden(true);
-                        //Print prescription of drug order
-                        stage.fire('paintMedication');
+            Ext.getCmp('drugForm').hide();
+            stage.fire('paintMedication');
+                
+            // If 'add more', then reopen the form
+            if (obj.id == 'addMoreDrug') {
+                Ext.getCmp('drugForm').show();
             };   
         } 
         else {

@@ -146,7 +146,16 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                         text: 'Add Diagnosis and Continue',
                         id: 'addMoreDiagnosis',
                         handler: function() {
+                            // TODO: fire event. move handling to controller
+                            // TODO: Ideally, it should still group them together and only draw
+                            //  the line underneath once all diagnoses have been selected.
+                            stage.fire('paintDiagnosis');
+
+                            // Reset what's in the modal
                             Ext.getCmp('diagnosisfilterbysearchfield').reset();
+
+                            // Show modal again
+                            Ext.getCmp('diagnosis-panel').show();                           
                         },
                     }, {
                         xtype: 'spacer',
