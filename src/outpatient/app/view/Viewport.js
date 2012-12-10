@@ -26,22 +26,37 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
         navigationBar: false,
         items: [{
             xtype: 'toolbar',
+            title: 'dot',
+            title: {
+                  title: 'Doctor Name...',
+                  // padding: '0 0 0 400',
+                  // align: 'right',
+                  // centered: false 
+                },
+            // title: 'yoyo',
+            layout: {
+                // align: 'right',
+                // pack: 'justify',
+                pack: 'left'
+            },
             docked: 'top',
-            title: '',
             items: [{
                 xtype: 'button',
                 id: 'dashboardToggleButton',
                 iconCls: 'arrow_down',
-                iconAlign: 'right',
+                // iconAlign: 'right',
                 text: 'Dashboard',
                 iconMask: true,
                 handler: function() {
                     var dash = Ext.getCmp('patientManagementDashboard');
+                    var tb = Ext.getCmp('dashboardToggleButton');
                     var hidden = dash.getHidden();
                     if(hidden) {
                         dash.show();
+                        tb.setIconCls('arrow_up');
                     } else {
                         dash.hide();
+                        tb.setIconCls('arrow_down');
                     }
 
                     // Hide any other modals, like "patient list", "add new", "search"
@@ -54,6 +69,23 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                     
                     // search
                 }
+            // }, {
+                // xtype: 'spacer',
+                // width: 450,
+            // }, {
+            //     xtype: 'text',
+            //     html: 'Dr. Name',
+            // }, {
+            //     xtype: 'spacer'
+            }, {
+                xtype: 'button',
+                iconCls: 'settings',
+                iconMask: true,
+                // iconAlign: 'right',
+                text: 'Options'
+            }, {
+                xtype: 'spacer',
+                width: 450
             }]
         }, {
             // Individual Patient record
