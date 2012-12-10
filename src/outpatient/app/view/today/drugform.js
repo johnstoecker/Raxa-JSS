@@ -37,9 +37,11 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                     {
                         Ext.getCmp('searchedDrugList').setHidden(true);
                     }
+            },
+            show: function() {
+                Ext.getCmp('drugfilterbysearchfield').reset();
+                Ext.getCmp('drugfilterbysearchfield').focus();
             }
-            // TODO: Add auto-focus on first box
-            // TODO: Cause "days" to have a numeric input, like in Screener
         },
         items: [{
                 xtype: 'toolbar',
@@ -176,9 +178,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                     }]
                                 }
                             }, {
-                                xtype: 'textfield',
+                                // TODO: Cause "days" to have a numeric input, like in Screener
+                                xtype: 'numberfield',
                                 id: 'drug-duration',
-                                label: 'Duration (days)',
+                                label: 'Duration (days)'
                             }]
                         }, {
                             xtype: 'container',
