@@ -14,21 +14,32 @@
  * the License.
  */
 
-var DASHBOARD_BUTTON_MARGIN = '44 0 0 30';  //'60 0 0 40';
-var DASHBOARD_BUTTON_FLEX = 1;
-var DASHBOARD_BUTTON_DIM = 96;
-var DASHBOARD_BUTTON_IMG_DIM = 86;
+var DASHBOARD_CONSTANTS = {
+    BUTTON_MARGIN : '44 0 0 30',  //'60 0 0 40',
+    BUTTON_FLEX : 1,
+    BUTTON_DIM : 96,
+    BUTTON_IMG_DIM : 86,
 
-var DASHBOARD_TEXT_WIDTH = 100;
-var DASHBOARD_TEXT_MARGIN = '44 0 0 10'; // 60 20 0 5
-var DASHBOARD_TEXT_FLEX = 1;
-var DASHBOARD_TEXT_PADDING = 0;
+    TEXT_WIDTH : 100,
+    TEXT_MARGIN : '44 0 0 10', // 60 20 0 5
+    TEXT_FLEX : 1,
+    TEXT_PADDING : 0,  
+};
 
 Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
-    extend: 'Ext.Panel',    // TODO: Container
+
+    extend: 'Ext.Container',    // TODO: Container
     xtype: 'opdDashboard',
     id: 'patientManagementDashboard',   
     config: {
+
+    // Constants
+    DASHBOARD : {
+        BUTTON_MARGIN : '44 0 0 30',  //'60 0 0 40';
+    },
+
+    // Background color
+    style: 'background-color: #82b0e1;',
 
     // We give it a left and top property to make it floating by default
     left: 0,
@@ -57,12 +68,12 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
         xtype: 'button',
         text: 'Patient List',
         id: 'dashboardPatientListButton',
-        height: DASHBOARD_BUTTON_DIM,
-        width: DASHBOARD_BUTTON_DIM,
-        margin: DASHBOARD_BUTTON_MARGIN,
-        flex: DASHBOARD_BUTTON_FLEX,
+        height: DASHBOARD_CONSTANTS.BUTTON_DIM,
+        width: DASHBOARD_CONSTANTS.BUTTON_DIM,
+        margin: DASHBOARD_CONSTANTS.BUTTON_MARGIN,
+        flex: DASHBOARD_CONSTANTS.BUTTON_FLEX,
         style: 'background: #53BF9A;',
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_patient_queue64x64.png" width="' + DASHBOARD_BUTTON_IMG_DIM + '" height="' + DASHBOARD_BUTTON_IMG_DIM + '"/></div>',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_patient_queue64x64.png" width="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '" height="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '"/></div>',
         handler: function() {
             console.log('patientList patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
@@ -70,38 +81,38 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
         },
     }, {
         html: 'Select a patient from the queue',
-        width: DASHBOARD_TEXT_WIDTH,
-        flex: DASHBOARD_TEXT_FLEX,
-        margin: DASHBOARD_TEXT_MARGIN,
-        padding: DASHBOARD_TEXT_PADDING
+        width: DASHBOARD_CONSTANTS.TEXT_WIDTH,
+        flex: DASHBOARD_CONSTANTS.TEXT_FLEX,
+        margin: DASHBOARD_CONSTANTS.TEXT_MARGIN,
+        padding: DASHBOARD_CONSTANTS.TEXT_PADDING
     },{
         xtype: 'button',
         id: 'addPatientButton',
-        height: DASHBOARD_BUTTON_DIM,
-        width: DASHBOARD_BUTTON_DIM,
-        margin: DASHBOARD_BUTTON_MARGIN,
-        flex: DASHBOARD_BUTTON_FLEX,
+        height: DASHBOARD_CONSTANTS.BUTTON_DIM,
+        width: DASHBOARD_CONSTANTS.BUTTON_DIM,
+        margin: DASHBOARD_CONSTANTS.BUTTON_MARGIN,
+        flex: DASHBOARD_CONSTANTS.BUTTON_FLEX,
         style: 'background: #53BF9A;',
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient64x64.png" width="' + DASHBOARD_BUTTON_IMG_DIM + '" height="' + DASHBOARD_BUTTON_IMG_DIM + '"/></div>',
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_add_patient64x64.png" width="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '" height="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '"/></div>',
         handler: function() {
             console.log('add patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
         },
     },{
         html: 'Add a new patient to EMR',
-        width: DASHBOARD_TEXT_WIDTH,
-        flex: DASHBOARD_TEXT_FLEX,
-        margin: DASHBOARD_TEXT_MARGIN,
-        padding: DASHBOARD_TEXT_PADDING
+        width: DASHBOARD_CONSTANTS.TEXT_WIDTH,
+        flex: DASHBOARD_CONSTANTS.TEXT_FLEX,
+        margin: DASHBOARD_CONSTANTS.TEXT_MARGIN,
+        padding: DASHBOARD_CONSTANTS.TEXT_PADDING
     }, {
         xtype: 'button',
         text: 'Search',
-        height: DASHBOARD_BUTTON_DIM,
-        width: DASHBOARD_BUTTON_DIM,
-        margin: DASHBOARD_BUTTON_MARGIN,
-        flex: DASHBOARD_BUTTON_FLEX,
+        height: DASHBOARD_CONSTANTS.BUTTON_DIM,
+        width: DASHBOARD_CONSTANTS.BUTTON_DIM,
+        margin: DASHBOARD_CONSTANTS.BUTTON_MARGIN,
+        flex: DASHBOARD_CONSTANTS.BUTTON_FLEX,
         style: 'background: #53BF9A;',
-        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient64x64.png" width="' + DASHBOARD_BUTTON_IMG_DIM + '" height="' + DASHBOARD_BUTTON_IMG_DIM + '"/></div>',        
+        html: '<div style="text-align:center;"><img src="resources/images/icons/dashboard_search_patient64x64.png" width="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '" height="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '"/></div>',        
         //TODO Make this diabled after Demo as image is faded in view if button is diabled
         disabled: false,
         handler: function() {
@@ -110,10 +121,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
         },
     },{
         html: 'Search for a patient in EMR',
-        width: DASHBOARD_TEXT_WIDTH,
-        flex: DASHBOARD_TEXT_FLEX,
-        margin: DASHBOARD_TEXT_MARGIN,
-        padding: DASHBOARD_TEXT_PADDING
+        width: DASHBOARD_CONSTANTS.TEXT_WIDTH,
+        flex: DASHBOARD_CONSTANTS.TEXT_FLEX,
+        margin: DASHBOARD_CONSTANTS.TEXT_MARGIN,
+        padding: DASHBOARD_CONSTANTS.TEXT_PADDING
     }]
     }
 });
