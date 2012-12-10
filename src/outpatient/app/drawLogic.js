@@ -140,19 +140,13 @@ var k2s = Ext.create('KineticToSencha', {
 			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
 
 			for(var i = PrintObject.DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
-				console.log('defined??');
 				var itemData = data.getAt(i).getData();
-				console.log('defined2??');
-				console.log(itemData);
-				console.log('index=' + index + ' i= ' + i);
 				displayText[index] = (itemData.complain);
 				PrintObject.DiagnosisPrinted++;
-				console.log('defined3??');
 				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
 				PrintObject.TextArray.push(textForPrintObject);
 			}
 
-			console.log('defined4??');
 			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
 			Ext.getCmp('diagnosis-panel').setHidden(false);
 			//      Ext.getCmp('drugaddform').reset();
