@@ -6,7 +6,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Overview', {
     title: 'History',
     initialize: function() {
         // Save the scope
-        console.log('initHistoryComponent');
         var that = this;
         this.callParent(arguments);
     },
