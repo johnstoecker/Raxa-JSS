@@ -64,6 +64,9 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
         },{
             // Patient List. (Hidden by default)
             xtype: 'patientlist' 
+        },{
+            // Search Patient List. (Hidden by default)
+            xtype: 'searchpatient' 
         }]
     }
 });

@@ -28,6 +28,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
     extend: 'Ext.Panel',    // TODO: Container
     xtype: 'opdDashboard',
     id: 'patientManagementDashboard',   
+    requires: ['RaxaEmr.Outpatient.view.patient.searchpatient'],
     config: {
 
     // We give it a left and top property to make it floating by default
@@ -107,6 +108,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
         handler: function() {
             console.log('search patient patientManagementDashboard button');
             Ext.getCmp('patientManagementDashboard').hide();
+            Ext.getCmp('searchpatient').show();
         },
     },{
         html: 'Search for a patient in EMR',
