@@ -150,10 +150,13 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     extend: 'Ext.app.Controller',
 
     // Constants
-    SEARCH_LIST_WIDTH: 300,
-    SEARCH_LIST_HEIGHT: 400,
-    SEARCH_LIST_HEIGHT_INNER: 380,
-    SEARCH_LIST_PADDING: 0,
+    SEARCH_LIST: {
+        WIDTH: 300,
+        HEIGHT: 400,
+        HEIGHT_INNER: 380,
+        PADDING: 0,
+        ORIENTATION: "tc-bc?"
+    },
                     
     config: {
         // All the fields are accessed in the controller through the id of the components
@@ -788,17 +791,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.create('Ext.Panel', {
                 id: 'searchedDiagnosisList',
                 items: [{
-                    height: this.SEARCH_LIST_HEIGHT_INNER,
+                    height: this.SEARCH_LIST.HEIGHT_INNER,
                     xtype: 'Diagnosis-List',
                     id: 'diagnosisList',
                     scrollable: true,
                     hidden: false
                 }],
-                width: this.SEARCH_LIST_WIDTH,
-                height: this.SEARCH_LIST_HEIGHT,
-                padding: this.SEARCH_LIST_PADDING
-            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), "tc-bc?");
-
+                width: this.SEARCH_LIST.WIDTH,
+                height: this.SEARCH_LIST.HEIGHT,
+                padding: this.SEARCH_LIST.PADDING
+            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), this.SEARCH_LIST.ORIENTATION);
         } 
         else {
             Ext.getCmp('searchedDiagnosisList').setHidden(false);
@@ -844,15 +846,15 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.create('Ext.Panel', {
                 id: 'searchedDrugList',
                 items: [{
-                    height: this.SEARCH_LIST_HEIGHT_INNER,
+                    height: this.SEARCH_LIST.HEIGHT_INNER,
                     xtype: 'Drug-List',
                     scrollable: true,
                     hidden: false
                 }],
-                width: this.SEARCH_LIST_WIDTH,
-                height: this.SEARCH_LIST_HEIGHT,
-                padding: this.SEARCH_LIST_PADDING
-            }).showBy(Ext.getCmp('drugfilterbysearchfield'), "tc-bc?");
+                width: this.SEARCH_LIST.WIDTH,
+                height: this.SEARCH_LIST.HEIGHT,
+                padding: this.SEARCH_LIST.PADDING
+            }).showBy(Ext.getCmp('drugfilterbysearchfield'), this.SEARCH_LIST.ORIENTATION);
 
         } 
         else {
