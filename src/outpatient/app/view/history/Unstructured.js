@@ -143,18 +143,22 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					});
 					backgroundLayer.add(toolbarBackground);
 					
-					addImageToLayer("resources/images/bg/TODAY_35.png", backgroundLayer, {
+					addImageToLayer("resources/images/bg/today_small.png", backgroundLayer, {
 						x: 0,
 						y: DRAWABLE_Y_MIN,
-						width: 35,
-						height: 835
+						// width: 35,
+						// height: 835
+						width: 41,
+						height: 742
 					});
 					
-					addImageToLayer("resources/images/bg/HISTORY_710.png", backgroundLayer, {
-						x: stage.getWidth()-711,
+					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {
+						x: stage.getWidth()-723,
 						y: DRAWABLE_Y_MIN,
-						width: 710,
-						height: 835
+						// width: 710,
+						width: 722,
+						// height: 835
+						height: 742
 					});
 
 					// Add button for History Dropdown

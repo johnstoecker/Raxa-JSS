@@ -349,18 +349,22 @@ var setupCanvas = function() {
 		});
 		backgroundLayer.add(toolbarBackground);
 
-		addImageToLayer("resources/images/bg/TODAY_710.png", backgroundLayer, {
+		addImageToLayer("resources/images/bg/today_big.png", backgroundLayer, {
 			x: 0,
 			y: DRAWABLE_Y_MIN,
-			width: 710,
-			height: 835,
+			// width: 710,
+			// height: 835,
+			width: 723,
+			height: 742
 		});
 
-		addImageToLayer("resources/images/bg/HISTORY_35.png", backgroundLayer, {
-			x: stage.getWidth() - 36,
+		addImageToLayer("resources/images/bg/history_small.png", backgroundLayer, {
+			x: stage.getWidth() - 42,
 			y: DRAWABLE_Y_MIN,
-			width: 35,
-			height: 835
+			// width: 35,
+			// height: 835
+			width: 41,
+			height: 742
 		});
 
 		var controlItems = [{
