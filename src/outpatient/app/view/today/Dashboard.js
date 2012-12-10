@@ -36,6 +36,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
     extend: 'Ext.Container',
     xtype: 'opdDashboard',
     id: 'patientManagementDashboard',
+    requires: ['RaxaEmr.Outpatient.view.patient.searchpatient'],
     config: {
         listeners: {
             // Toggle arrow on button up/down when showing/hiding the dashboard
@@ -138,6 +139,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
             handler: function() {
                 console.log('search patient patientManagementDashboard button');
                 Ext.getCmp('patientManagementDashboard').hide();
+	            Ext.getCmp('searchpatient').show();
             },
         }, {
             html: 'Search for a patient in EMR',

@@ -40,6 +40,16 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     launch: function () {
     },
 
+    setScreenForPatient: function(patientName, patientAge) {
+        var patientRecord = Ext.create('RaxaEmr.Outpatient.model.Patients', {
+                age: patientAge,
+                display: patientName,
+            });
+        Ext.getCmp('more').setRecord(patientRecord);
+        Ext.getCmp('opdPatientDataEntry').setMasked(false);
+        Ext.getCmp()
+    },
+
     //////// vv COPIED DIRECTLY FROM SCREENER CONTROLLER "Application.js" vv ////////
     // TODO: Refactor to share code across OPD and screener.
     // - Put shared views, models, stores in a "RaxaEmr.Common" namespace
@@ -71,6 +81,9 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         },Util.SAVE_LOAD_MASK_MAX_WAIT_TIME);
 
         var formp = Ext.getCmp('newPatient').saveForm();
+        // Sets Patient Name & Age on Screen while patient is created in the backend
+        this.setScreenForPatient(formp.givenname + ' ' + formp.familyname,formp.patientAge);
+
         if (formp.givenname && formp.familyname && formp.choice && (formp.patientAge || formp.dob  )) {
             var newPatient = {
                 gender : formp.choice,
@@ -98,7 +111,10 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                 disableCaching: false,
                 headers: Util.getBasicAuthHeaders(),
                 success: function (response) {
-                    this.getidentifierstype(JSON.parse(response.responseText).uuid);
+                    var personUuid = JSON.parse(response.responseText).uuid;
+                    this.getidentifierstype(personUuid);
+                    myRecord.data = new Object();
+                    myRecord.data['uuid'] = personUuid;
                 },
                 failure: function (response) {
                     Ext.Msg.alert('Error: unable to write to server. Enter all fields.')
