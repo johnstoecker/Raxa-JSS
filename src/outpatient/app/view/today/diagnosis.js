@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// TODO: This belongs in Viewport setup, or somewhere else, to make it clear that it's being applied globally
 Ext.Viewport.setStyleHtmlContent(true); //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
 Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
     extend: 'Ext.Container',
@@ -23,33 +24,41 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
         layout: {
             type: 'vbox'
         },
-        listeners : {
-            hide: function()
-            {
-                if(Ext.getCmp('searchedDiagnosisList'))
-                    {
-                        Ext.getCmp('searchedDiagnosisList').setHidden(true);
-                    }
+        listeners: {
+            hide: function() {
+                if(Ext.getCmp('searchedDiagnosisList')) {
+                    Ext.getCmp('searchedDiagnosisList').setHidden(true);
+                }
             },
-            show: function()
-            {
+            show: function() {
                 Ext.getCmp('diagnosisfilterbysearchfield').reset();
-                Ext.getCmp('diagnosisfilterbysearchfield').focus(); 
+                Ext.getCmp('diagnosisfilterbysearchfield').focus();
             }
         },
         // centered: true,
         modal: true,
         hidden: true,
         floating: true,
-        left: (768-500) / 2,    // centered, based on screen width and modal width
-        top: 60,    // enough to not overlap with toolbar
+        left: (768 - 500) / 2,
+        // centered, based on screen width and modal width
+        top: 60,
+        // enough to not overlap with toolbar
         width: 500,
         hideOnMaskTap: true,
-        title: 'Diagnosis',
         items: [{
-            xtype: 'titlebar',
-            docked: 'top',
-            title: 'Diagnosis'
+            xtype: 'toolbar',
+            title: 'Diagnosis',
+            items: [{
+                xtype: 'spacer'
+            }, {
+                xtype: 'button',
+                iconCls: 'delete',
+                iconMask: true,
+                handler: function() {
+                    Ext.getCmp('diagnosis-panel').hide();
+                },
+                ui: 'decline',
+            }]
         }, {
             xtype: 'container',
             style: 'background-color: #f7f7f7;',
@@ -111,32 +120,37 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             }, {
                 xtype: 'container',
                 docked: 'bottom',
+                style: 'background-color: #f7f7f7;',
+                height: 80,
                 items: [{
                     xtype: 'container',
-                    margin: '0 0 20 0',
-                    style: 'background-color: #f7f7f7;',
                     layout: {
                         type: 'hbox'
                     },
                     items: [{
-                                xtype: 'button',
-                                text: 'Save',
-                                id: 'addDiagnosisInList',
-                                margin: '30 80 30 80',
-                                ui: 'confirm',
-                                handler: function() {
-                                    stage.fire('paintDiagnosis');
-                                    }
-                            },{
-                                xtype: 'button',
-                                ui: 'confirm',
-                                text: 'Add More Diagnosis',
-                                id: 'addMoreDiagnosis',
-                                margin: '30 80 30 80',
-                                handler: function(){
-                                    Ext.getCmp('diagnosisfilterbysearchfield').reset();                                    
-                                }
-                            }]
+                        xtype: 'spacer',
+                    }, {
+                        xtype: 'button',
+                        text: 'Add Diagnosis',
+                        id: 'addDiagnosisInList',
+                        ui: 'confirm',
+                        handler: function() {
+                            // TODO: Investigate invents this triggers.. sets off a chain and don't think we need all of them
+                            stage.fire('paintDiagnosis');
+                        },
+                    }, {
+                        xtype: 'spacer',
+                    }, {
+                        xtype: 'button',
+                        ui: 'confirm',
+                        text: 'Add Diagnosis and Continue',
+                        id: 'addMoreDiagnosis',
+                        handler: function() {
+                            Ext.getCmp('diagnosisfilterbysearchfield').reset();
+                        },
+                    }, {
+                        xtype: 'spacer',
+                    }]
                 }]
             }]
         }]

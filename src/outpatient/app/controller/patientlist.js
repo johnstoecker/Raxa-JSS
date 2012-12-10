@@ -148,6 +148,13 @@ var opd_observations = new Array(); //contains the observations of different tab
 
 Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     extend: 'Ext.app.Controller',
+
+    // Constants
+    SEARCH_LIST_WIDTH: 300,
+    SEARCH_LIST_HEIGHT: 400,
+    SEARCH_LIST_HEIGHT_INNER: 380,
+    SEARCH_LIST_PADDING: 0,
+                    
     config: {
         // All the fields are accessed in the controller through the id of the components
         refs: { 
@@ -781,15 +788,15 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.create('Ext.Panel', {
                 id: 'searchedDiagnosisList',
                 items: [{
-                    height: 280,
+                    height: this.SEARCH_LIST_HEIGHT_INNER,
                     xtype: 'Diagnosis-List',
                     id: 'diagnosisList',
                     scrollable: true,
                     hidden: false
                 }],
-                width: 200,
-                height: 300,
-                padding: 10
+                width: this.SEARCH_LIST_WIDTH,
+                height: this.SEARCH_LIST_HEIGHT,
+                padding: this.SEARCH_LIST_PADDING
             }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), "tc-bc?");
 
         } 
@@ -837,15 +844,15 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.create('Ext.Panel', {
                 id: 'searchedDrugList',
                 items: [{
-                    height: 475,
+                    height: this.SEARCH_LIST_HEIGHT_INNER,
                     xtype: 'Drug-List',
                     scrollable: true,
                     hidden: false
                 }],
-                width: 200,
-                height: 500,
-                padding: 10
-            }).showBy(Ext.getCmp('drugfilterbysearchfield'), "tl-tr?");
+                width: this.SEARCH_LIST_WIDTH,
+                height: this.SEARCH_LIST_HEIGHT,
+                padding: this.SEARCH_LIST_PADDING
+            }).showBy(Ext.getCmp('drugfilterbysearchfield'), "tc-bc?");
 
         } 
         else {
