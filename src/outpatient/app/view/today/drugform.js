@@ -34,9 +34,9 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
             hide: function()
             {
                 if(Ext.getCmp('searchedDrugList'))
-                    {
-                        Ext.getCmp('searchedDrugList').setHidden(true);
-                    }
+                {
+                    Ext.getCmp('searchedDrugList').setHidden(true);
+                }
             },
             show: function() {
                 Ext.getCmp('drugfilterbysearchfield').reset();
