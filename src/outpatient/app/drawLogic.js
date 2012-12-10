@@ -76,90 +76,6 @@ function addImageToLayer(file, layer, config) {
 	imgObj.src = file;
 }
 
-var k2s = Ext.create('KineticToSencha', {
-	id: 'k2s',
-	listeners: {
-		resetCanvas: function() {
-			console.log('resetCanvas()');
-			this.initCanvasData();
-		},
-		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
-			// By default, "this" will be the object that fired the event.
-			console.log("k2s: clickAddMedication");
-			var displayText = new String();
-			var store = Ext.getStore('drugpanel');
-			var data = store.getData();
-			var itemCount = data.getCount();
-
-			PrintObject.TextGroupProperty.type = 'DrugOrder';
-			PrintObject.TextGroupProperty.storeId = 'drugpanel';
-			PrintObject.TextGroupProperty.gid = this.gidCounter++;
-			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
-
-			for(var i = PrintObject.MedicationPrinted, index = 0; i < itemCount; i++, index++) {
-				var itemData = data.getAt(i).getData();
-
-				displayText = '';
-				// TODO: Consolidate following code into loop
-				if(!itemData.drugname) {
-					// If no drug name, skip to next loop iteration
-					continue;
-				} else {
-					displayText = (itemData.drugname + ' - ');
-				}
-
-				// Print all the details of the drug prescription
-				var detailTypes = ["strength", "frequency", "instruction", "duration"]
-				for (var j=0; j< detailTypes.length; j++) {
-					var details = itemData[detailTypes[j]];
-					if(details) {
-						displayText += (' ' + details);
-						if (detailTypes[j] == "duration") {
-							displayText += ' days';
-						}
-					}
-				}
-
-				PrintObject.MedicationPrinted++;
-				var textForPrintObject = new TextProperty(displayText, itemData.uuid);
-				PrintObject.TextArray.push(textForPrintObject);
-			}
-
-			Ext.getCmp('drugForm').setHidden(false);
-			Ext.getCmp('drugaddform').reset();
-		},
-
-		clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
-			console.log("k2s: clickOnDiagnosis");
-			// Print store. I'll have to pull info from this to print in Canvas
-			var displayText = [];
-			var store = Ext.getStore('diagnosedDisease');
-			var data = store.getData();
-			var itemCount = data.getCount();
-			console.log('itemcount= ' + itemCount);
-			console.log('Diagnosis Printed=' + PrintObject.DiagnosisPrinted);
-			PrintObject.TextGroupProperty.type = 'Diagnosis';
-			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
-			PrintObject.TextGroupProperty.gid = this.gidCounter++;
-
-			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
-
-			for(var i = PrintObject.DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
-				var itemData = data.getAt(i).getData();
-				displayText[index] = (itemData.complain);
-				PrintObject.DiagnosisPrinted++;
-				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
-				PrintObject.TextArray.push(textForPrintObject);
-			}
-
-			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
-			Ext.getCmp('diagnosis-panel').setHidden(false);
-			//      Ext.getCmp('drugaddform').reset();
-			//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
-		}
-	}
-});
-
 var setupCanvas = function() {
 
 	// attach variables and functions that need to be accessed from outside canvas
@@ -568,6 +484,7 @@ var setupCanvas = function() {
 		}
 	}
 
+	// Handle canvas interaction mode
 	function setCanvasInteractionMode(m) {
 		if (m === 'draw') {
 			mode = 'draw';
@@ -582,7 +499,12 @@ var setupCanvas = function() {
 		tempControlsLayer.draw();
 	}
 
-	// Default mode is Draw
+	function getCanvasInteractionMode() {
+		return mode;
+	}
+
+	// Default mode is Draw. Note that the toggling of the pencil icon to default to pressed 
+	// is done elsewhere, in the control button / control group logic
 	setCanvasInteractionMode('draw');
 
 	//
@@ -669,6 +591,8 @@ var setupCanvas = function() {
 		}, this);
 	}
 
+	// Temporary filler function called whenever a user adds a diagnosis
+	// If user chooses "Sinusitus" as their diagnosis, it will cause this alert to appear
 	function fakeDecisionSupport() {
 		Ext.Msg.defaultAllowedConfig.maxHeight = 300;
 		Ext.Msg.defaultAllowedConfig.maxWidth = 400;
@@ -784,6 +708,91 @@ var setupCanvas = function() {
 
 	publicAccessObject['methods'] = {};
 	publicAccessObject['methods']['setCanvasInteractionMode'] = setCanvasInteractionMode;
+	publicAccessObject['methods']['getCanvasInteractionMode'] = getCanvasInteractionMode;
 
 	return publicAccessObject;
 };
+
+var k2s = Ext.create('KineticToSencha', {
+	id: 'k2s',
+	listeners: {
+		resetCanvas: function() {
+			console.log('resetCanvas()');
+			this.initCanvasData();
+		},
+		clickAddMedication: function() { // This function will be called when the 'quit' event is fired
+			// By default, "this" will be the object that fired the event.
+			console.log("k2s: clickAddMedication");
+			var displayText = new String();
+			var store = Ext.getStore('drugpanel');
+			var data = store.getData();
+			var itemCount = data.getCount();
+
+			PrintObject.TextGroupProperty.type = 'DrugOrder';
+			PrintObject.TextGroupProperty.storeId = 'drugpanel';
+			PrintObject.TextGroupProperty.gid = this.gidCounter++;
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
+
+			for(var i = PrintObject.MedicationPrinted, index = 0; i < itemCount; i++, index++) {
+				var itemData = data.getAt(i).getData();
+
+				displayText = '';
+				// TODO: Consolidate following code into loop
+				if(!itemData.drugname) {
+					// If no drug name, skip to next loop iteration
+					continue;
+				} else {
+					displayText = (itemData.drugname + ' - ');
+				}
+
+				// Print all the details of the drug prescription
+				var detailTypes = ["strength", "frequency", "instruction", "duration"]
+				for (var j=0; j< detailTypes.length; j++) {
+					var details = itemData[detailTypes[j]];
+					if(details) {
+						displayText += (' ' + details);
+						if (detailTypes[j] == "duration") {
+							displayText += ' days';
+						}
+					}
+				}
+
+				PrintObject.MedicationPrinted++;
+				var textForPrintObject = new TextProperty(displayText, itemData.uuid);
+				PrintObject.TextArray.push(textForPrintObject);
+			}
+
+			Ext.getCmp('drugForm').setHidden(false);
+			Ext.getCmp('drugaddform').reset();
+		},
+
+		clickOnDiagnosis: function() { // This function will be called when the 'quit' event is fired
+			console.log("k2s: clickOnDiagnosis");
+			// Print store. I'll have to pull info from this to print in Canvas
+			var displayText = [];
+			var store = Ext.getStore('diagnosedDisease');
+			var data = store.getData();
+			var itemCount = data.getCount();
+			console.log('itemcount= ' + itemCount);
+			console.log('Diagnosis Printed=' + PrintObject.DiagnosisPrinted);
+			PrintObject.TextGroupProperty.type = 'Diagnosis';
+			PrintObject.TextGroupProperty.storeId = 'diagnosedDisease';
+			PrintObject.TextGroupProperty.gid = this.gidCounter++;
+
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length)
+
+			for(var i = PrintObject.DiagnosisPrinted, index = 0; i < itemCount; i++, index++) {
+				var itemData = data.getAt(i).getData();
+				displayText[index] = (itemData.complain);
+				PrintObject.DiagnosisPrinted++;
+				var textForPrintObject = new TextProperty(itemData.complain, itemData.id);
+				PrintObject.TextArray.push(textForPrintObject);
+			}
+
+			// TODO: Trigger refresh of Kinetic UI ... drug list should be updated
+			Ext.getCmp('diagnosis-panel').setHidden(false);
+			//      Ext.getCmp('drugaddform').reset();
+			//      Ext.getCmp('treatment-panel').setActiveItem(TREATMENT.ADD);
+		}
+	}
+});

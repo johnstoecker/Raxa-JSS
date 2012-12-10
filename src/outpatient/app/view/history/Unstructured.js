@@ -245,6 +245,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		// 	}
 		// }, {
 			xtype: 'container',
+			flex: 1,
 			disabled: true,
 			id: 'opdHistoryMainContainer',
 			width: STAGE_X,
