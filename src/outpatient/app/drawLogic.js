@@ -669,6 +669,30 @@ var setupCanvas = function() {
 		}, this);
 	}
 
+	function fakeDecisionSupport() {
+		Ext.Msg.defaultAllowedConfig.maxHeight = 300;
+		Ext.Msg.defaultAllowedConfig.maxWidth = 400;
+
+		Ext.Msg.confirm('Raxa Decision Support', 
+			'For <font size="3" color="green"><b>Sinusitis</b></font>, decision support suggests: <br /><br /> ' + '<font size="3" color="red"><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> <br /> <br /> Do you wish to accept this suggestion?', 
+			function(btn) {
+			if(btn == 'yes') {
+				Ext.getStore('drugpanel').add({
+					concept: "80049AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+					drugname: "Mometasone",
+					duration: "15",
+					frequency: "Twice Daily",
+					id: "ext-record-1733",
+					instruction: "With Meals",
+					routeofadministration: "TABLET",
+					strength: "200",
+					uuid: "a427c23f-7b85-4473-afa4-b8867e9733cf"
+				});
+				stage.fire('paintMedication');
+			}
+		}).setSize(400, 300);
+	}
+
 	function drawTextAtLowPoint(PrintObject) {
 		// If nothing to print, skip
 		if(! PrintObject.TextArray.length) {
@@ -754,27 +778,7 @@ var setupCanvas = function() {
 
 		//FOR DEMO UI OF DECISION SUPPORT
 		if(SuggestDrugOrder) {
-			Ext.Msg.defaultAllowedConfig.maxHeight = 300;
-			Ext.Msg.defaultAllowedConfig.maxWidth = 400;
-
-			Ext.Msg.confirm('Raxa Decision Support', 
-				'For <font size="3" color="green"><b>Sinusitis</b></font>, decision support suggests: <br /><br /> ' + '<font size="3" color="red"><b>Mometasone 200 μg twice daily (with meals) for 15 days </b></font> <br /> <br /> Do you wish to accept this suggestion?', 
-				function(btn) {
-				if(btn == 'yes') {
-					Ext.getStore('drugpanel').add({
-						concept: "80049AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-						drugname: "Mometasone",
-						duration: "15",
-						frequency: "Twice Daily",
-						id: "ext-record-1733",
-						instruction: "With Meals",
-						routeofadministration: "TABLET",
-						strength: "200",
-						uuid: "a427c23f-7b85-4473-afa4-b8867e9733cf"
-					});
-					stage.fire('paintMedication');
-				}
-			}).setSize(400, 300);
+			fakeDecisionSupport();
 		}
 	}
 
