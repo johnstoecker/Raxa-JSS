@@ -26,8 +26,16 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
         navigationBar: false,
         items: [{
             xtype: 'toolbar',
+            title: {
+                // Can set title and padding dynamically for logged in doctor
+                id: 'mainviewToolbarTitle',
+                title: 'Login Error!',
+                padding: '0 0 0 30'
+            },
+            layout: {
+                pack: 'left'
+            },
             docked: 'top',
-            title: '',
             items: [{
                 xtype: 'button',
                 id: 'dashboardToggleButton',
@@ -45,28 +53,59 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                     }
 
                     // Hide any other modals, like "patient list", "add new", "search"
-                    Ext.getCmp('contact').hide();   // patient list
-                    
+                    Ext.getCmp('contact').hide(); // patient list
                     var newPatientModal = Ext.getCmp('newPatient');
-                    if (newPatientModal) {
-                        newPatientModal.hide();    
+                    if(newPatientModal) {
+                        newPatientModal.hide();
                     }
-                    
+
                     // search
                 }
+            }, {
+                xtype: 'spacer',
+                width: 10
+            }, {
+                xtype: 'button',
+                iconCls: 'settings',
+                iconMask: true,
+                iconAlign: 'right',
+                text: 'Options', 
+                handler: function(button, e, options) {
+                    // Hide dashboard if it's in the way
+                    var dash = Ext.getCmp('patientManagementDashboard');
+                    dash.hide();
+                    
+                    // Show logout dialog
+                    var logconfirm = button.LogoutButton;
+                    if (!logconfirm) {
+                        logconfirm = button.LogoutButton = Ext.widget('logoutConfirmPanel');
+                    }
+                    logconfirm.showBy(button);
+                }
+            }, {
+                xtype: 'spacer',
+                width: 340
             }]
         }, {
             // Individual Patient record
             xtype: 'patientlist-show'
-        },{
+        }, {
             // OPD Dashboard to add, select, search patients. (Hidden by default)
             xtype: 'opdDashboard'
-        },{
+        }, {
             // Patient List. (Hidden by default)
-            xtype: 'patientlist' 
+            xtype: 'patientlist'
         },{
             // Search Patient List. (Hidden by default)
-            xtype: 'searchpatient' 
+            xtype: 'searchpatient'
         }]
-    }
+    },
+
+    // Sets name of logged in doctor on titlebar, in top right of screen
+    setDoctorName: function(name) {
+        var doctorName = Ext.getCmp('mainviewToolbarTitle');
+        // Max doctor name length is < 20 characters before it will scroll off the screen of ipad2 resolution
+        doctorName.setTitle("Dr. " + name);
+        doctorName.setPadding('0 0 0 0')
+    } 
 });

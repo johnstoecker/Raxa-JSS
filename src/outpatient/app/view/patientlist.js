@@ -20,7 +20,8 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
     id: 'contact',
     
     config: {
-
+        
+        // TODO: Add nice looking empty text
         emptyText: 'No patients found',
 
         // Floating by default
@@ -60,7 +61,18 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
         items: [{
             xtype: 'toolbar',
             docked: 'top',
-            title: 'Patient List'
+            title: 'Patient List',
+            items: [{
+                xtype: 'spacer'
+            },{
+                xtype: 'button',
+                iconCls: 'delete',
+                iconMask: true,
+                handler: function() {
+                    Ext.getCmp('contact').hide();
+                },
+                ui: 'decline',
+            }]
         }],
         // itemTpl: '{display}',
 		itemTpl: new Ext.XTemplate(

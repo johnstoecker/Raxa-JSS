@@ -64,17 +64,19 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 				docked: 'top',
 				xtype: 'toolbar',
 				title: 'History',
+				id: 'historyListCloseButton',
 				// styleHtmlContent: true,
 				items: [{
+					xtype: 'spacer'
+				},{
 					xtype: 'button',
-					text: 'Close',
+					iconCls: 'delete',
+					iconMask: true,
 					handler: function() {
-						console.log('cliked');
 						Ext.getCmp('visitHistory').hide();
 					},
 					ui: 'decline',
-					// badgeText: '2' // TODO: put this on buttons(?!), so we can see recent updates, etc
-				}]
+				}],
 			}, {
 				xtype: 'list',
 				id: 'visitHistoryList',
