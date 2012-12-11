@@ -63,6 +63,12 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
             docked: 'top',
             title: 'Patient List',
             items: [{
+                xtype: 'button',
+                id: 'refresh',
+                iconCls: 'refresh',
+                iconMask: true,
+                ui: 'confirm',
+            },{
                 xtype: 'spacer'
             },{
                 xtype: 'button',
