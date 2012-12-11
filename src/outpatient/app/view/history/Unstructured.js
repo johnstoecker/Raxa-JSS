@@ -143,42 +143,36 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					});
 					backgroundLayer.add(toolbarBackground);
 					
-					addImageToLayer("resources/images/bg/TODAY_35.png", backgroundLayer, {
+					addImageToLayer("resources/images/bg/today_small.png", backgroundLayer, {
 						x: 0,
 						y: DRAWABLE_Y_MIN,
-						width: 35,
-						height: 835
+						// width: 35,
+						// height: 835
+						width: 41,
+						height: 742
 					});
 					
-					addImageToLayer("resources/images/bg/HISTORY_710.png", backgroundLayer, {
-						x: stage.getWidth()-711,
+					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {
+						x: stage.getWidth()-723,
 						y: DRAWABLE_Y_MIN,
-						width: 710,
-						height: 835
+						// width: 710,
+						width: 722,
+						// height: 835
+						height: 742
 					});
 
 					// Add button for History Dropdown
-					var historyButtonText = new Kinetic.Text({
-						x: 600,
-						y: 5,
-						width: 120,
-						height: 40,
-						text: 'History',
-						fontSize: 15,
-						padding: 10,
-						fontFamily: 'Helvetica',
-						align: 'center',
-						stroke: '#555',
-				        strokeWidth: 2,
-				        fill: '#0070C0',
-				        textFill: '#FFF',
-				        cornerRadius: 10
+					addImageToLayer("resources/images/button_History_off.png", controlsLayer, {
+						x: 660,
+						y: 0,
+						width: 80,
+						height: 44,
+						events: 'click touchstart',
+						handler: function() {
+							// Show visit history
+							Ext.getCmp('visitHistory').show();
+						}
 					});
-
-					var historyHandler = function() {Ext.getCmp('visitHistory').show();};
-					historyButtonText.on('click touchstart', historyHandler);
-
-					backgroundLayer.add(historyButtonText);
 
 					var visitHistoryStore = Ext.getStore('visitHistoryStore');
 					var tempMonth = 10;
@@ -251,6 +245,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		// 	}
 		// }, {
 			xtype: 'container',
+			flex: 1,
 			disabled: true,
 			id: 'opdHistoryMainContainer',
 			width: STAGE_X,

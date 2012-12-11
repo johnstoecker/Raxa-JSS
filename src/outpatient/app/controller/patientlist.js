@@ -1056,8 +1056,13 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
 
     getVisitHistory: function(encounterStore) {
+        // TODO: For now, prevent loading actually historical encounters
+        //  - need to: persist an image (at high quality) and reload
+        //  - (or) better: persist a json and reload into history view
+        //      ... more confusing b/c requires multiple stages and reloading of stage. 
+        //      ... but smaller objects to send via rest and more flexible
         return [];
-        
+
         console.log("getVisitHistory");
         var visitHistoryStore = Ext.getStore('visitHistoryStore');
         visitHistoryStore.clearData();
@@ -1109,6 +1114,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
 
     getPatientEncounters: function(patientUuid) {
+        return [];
+        
         var store = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
         var myUrl = HOST + '/ws/rest/v1/encounter' + '?patient=' + patientUuid + '&v=full';    
         store.getProxy().setUrl(myUrl);

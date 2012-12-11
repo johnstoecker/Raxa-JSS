@@ -11,6 +11,7 @@ Ext.define('KineticToSencha', {
 	gidCounter: 0,
 	DoctorOrderStore: null,
 	DoctorOrderModel: null,	
+	canvas: null,
 
 	constructor: function(config) {
 		this.initConfig(config); // We need to initialize the config options when the class is instantiated
@@ -41,6 +42,11 @@ Ext.define('KineticToSencha', {
 	// Saves just "drawable" portion of canvas
 	saveDrawableCanvas: function() {
 		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
+		
+		// Disable interaction. E.g. this hides delete icons, if in erase mode. Interaction is restored below.
+		var interactionMode = k2s.canvas.methods.getCanvasInteractionMode();
+		k2s.canvas.methods.setCanvasInteractionMode('');
+
 		stage.toImage({
 			callback: function(i) {
 				i.id = "PatientRecord";
@@ -104,7 +110,10 @@ Ext.define('KineticToSencha', {
    					type: 'slide',
 					direction: 'right'
 				});
-				
+
+				// Restore prior interaction mode (e.g. adding back 'x' icons for delete)
+				k2s.canvas.methods.setCanvasInteractionMode(interactionMode);
+
 				// Save via REST
 				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
 				// from onSaveCanvas... saveDrawableCanvas... etc
