@@ -148,6 +148,16 @@ var opd_observations = new Array(); //contains the observations of different tab
 
 Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     extend: 'Ext.app.Controller',
+
+    // Constants
+    SEARCH_LIST: {
+        WIDTH: 300,
+        HEIGHT: 400,
+        HEIGHT_INNER: 380,
+        PADDING: 0,
+        ORIENTATION: "tc-bc?"
+    },
+                    
     config: {
         // All the fields are accessed in the controller through the id of the components
         refs: { 
@@ -344,6 +354,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     // TODO: Must enforce that you cannot draw on canvas or press any buttons until
     //  an actual patient record is loaded, as this will throw errors.
     launch: function () {
+        var doctorName = Util.getSession().display;
+        Ext.getCmp('mainview').setDoctorName(doctorName);
+
         Ext.getCmp('patientManagementDashboard').show();
 
         // Set store for patient list in UI
@@ -781,17 +794,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.create('Ext.Panel', {
                 id: 'searchedDiagnosisList',
                 items: [{
-                    height: 280,
+                    height: this.SEARCH_LIST.HEIGHT_INNER,
                     xtype: 'Diagnosis-List',
                     id: 'diagnosisList',
                     scrollable: true,
                     hidden: false
                 }],
-                width: 200,
-                height: 300,
-                padding: 10
-            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), "tc-bc?");
-
+                width: this.SEARCH_LIST.WIDTH,
+                height: this.SEARCH_LIST.HEIGHT,
+                padding: this.SEARCH_LIST.PADDING
+            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), this.SEARCH_LIST.ORIENTATION);
         } 
         else {
             Ext.getCmp('searchedDiagnosisList').setHidden(false);
@@ -806,9 +818,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     //This function calls on selection of Diagnosis list and adds to Diagnosed List
     onDiagnosisListSelect: function (list, index, node, record) {
-
-
-        console.log(arguments);
         Ext.getCmp('diagnosisfilterbysearchfield').setValue(record.data.sign);
         Ext.getCmp('searchedDiagnosisList').setHidden(true);
         var diagnosis = record.data;
@@ -837,15 +846,15 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             Ext.create('Ext.Panel', {
                 id: 'searchedDrugList',
                 items: [{
-                    height: 475,
+                    height: this.SEARCH_LIST.HEIGHT_INNER,
                     xtype: 'Drug-List',
                     scrollable: true,
                     hidden: false
                 }],
-                width: 200,
-                height: 500,
-                padding: 10
-            }).showBy(Ext.getCmp('drugfilterbysearchfield'), "tl-tr?");
+                width: this.SEARCH_LIST.WIDTH,
+                height: this.SEARCH_LIST.HEIGHT,
+                padding: this.SEARCH_LIST.PADDING
+            }).showBy(Ext.getCmp('drugfilterbysearchfield'), this.SEARCH_LIST.ORIENTATION);
 
         } 
         else {
@@ -921,14 +930,16 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 // duration: 'fake dur',
                 // routeofadministration: 'fake route'
             });
-	 
-	    //Drug Form is reset after drug data is pushed into code
+	   
+            // Drug Form is reset after drug data is pushed into code
             Ext.getCmp('drugaddform').reset();
 
-            if (obj.id != 'addMoreDrug') {
-                Ext.getCmp('drugForm').setHidden(true);
-                        //Print prescription of drug order
-                        stage.fire('paintMedication');
+            Ext.getCmp('drugForm').hide();
+            stage.fire('paintMedication');
+                
+            // If 'add more', then reopen the form
+            if (obj.id == 'addMoreDrug') {
+                Ext.getCmp('drugForm').show();
             };   
         } 
         else {

@@ -1,7 +1,5 @@
 Ext.Loader.setPath({
     'Ext.ux.touch.grid': '../lib/touch/Ext.ux.touch.grid',
-    //Path to grid code so that grid fuctionalities and view can be accessed
-    // 'Screener': '/Raxa-JSS/src/screener/app'//Path to screener module so that store and models of screener can be accessed 
     'Screener': '../screener/app' //Path to screener module so that store and models of screener can be accessed 
 });
 
@@ -16,7 +14,6 @@ Ext.application({
     views: ['Viewport'],
     controllers: ['patientlist', 'AddPatient'],
 
-    // views: ['Main'],
     icon: {
         '57': 'resources/icons/Icon.png',
         '72': 'resources/icons/Icon~ipad.png',
@@ -36,11 +33,15 @@ Ext.application({
     },
 
     launch: function() {
-        // Destroy the #appLoadingIndicator element
-        Ext.fly('appLoadingIndicator').destroy();
+        // Verify user is logged in
+        if(Util.checkModulePrivilege('outpatient') && Util.uuidLoadedSuccessfully()){
+            // Destroy the #appLoadingIndicator element
+            Ext.fly('appLoadingIndicator').destroy();
 
-        // Initialize the main view
-        Ext.Viewport.add(Ext.create('RaxaEmr.Outpatient.view.Viewport'));
+            // Initialize the main view
+            Ext.Viewport.add(Ext.create('RaxaEmr.Outpatient.view.Viewport'));
+        }
+
     },
 
     onUpdated: function() {

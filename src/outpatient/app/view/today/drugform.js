@@ -34,15 +34,29 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
             hide: function()
             {
                 if(Ext.getCmp('searchedDrugList'))
-                    {
-                        Ext.getCmp('searchedDrugList').setHidden(true);
-                    }
+                {
+                    Ext.getCmp('searchedDrugList').setHidden(true);
+                }
+            },
+            show: function() {
+                Ext.getCmp('drugfilterbysearchfield').reset();
+                Ext.getCmp('drugfilterbysearchfield').focus();
             }
         },
         items: [{
-            xtype: 'titlebar',
-            docked: 'top',
-            title: 'Drug Order'
+                xtype: 'toolbar',
+                title: 'Drug Order',
+                items: [{
+                    xtype: 'spacer'
+                },{
+                    xtype: 'button',
+                    iconCls: 'delete',
+                    iconMask: true,
+                    handler: function() {
+                        Ext.getCmp('drugForm').hide();
+                    },
+                    ui: 'decline',
+                }]
             },{
             xtype: 'container',
             width: 500,
@@ -54,7 +68,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                 flex: 1,
                 items: [{
                     xtype: 'container',
-                    style: 'border:solid #DADADA;',
                     height: 280,
                     layout: {
                         type: 'fit'
@@ -165,9 +178,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                     }]
                                 }
                             }, {
-                                xtype: 'textfield',
+                                // TODO: Cause "days" to have a numeric input, like in Screener
+                                xtype: 'numberfield',
                                 id: 'drug-duration',
-                                label: 'Duration (days)',
+                                label: 'Duration (days)'
                             }]
                         }, {
                             xtype: 'container',
@@ -178,7 +192,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                             }, {
                                 xtype: 'button',
                                 ui: 'confirm',
-                                text: 'Done',
+                                text: 'Add Drug',
                                 id: 'addDrugInList',
                                 flex: 1,
                                 width: '40%',
@@ -188,7 +202,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                             }, {
                                 xtype: 'button',
                                 ui: 'confirm',
-                                text: 'Add More Drugs',
+                                text: 'Add Drug and Continue',
                                 id: 'addMoreDrug',
                                 flex: 2,
                                 width: '40%',
