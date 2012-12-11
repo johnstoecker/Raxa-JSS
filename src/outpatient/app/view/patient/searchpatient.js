@@ -36,8 +36,10 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
                 Ext.getCmp('patientManagementDashboard').hide();
                 Ext.getCmp('searchpatient').hide();
 
+            },
+            show: function () {
+               Ext.getCmp('searchpatientfield').focus();
             }
-
         },
         store: 'PatientSearch',
 
@@ -81,12 +83,17 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
             title: 'Search Patient'
         }, {
             xtype: 'searchfield',
+            id: 'searchpatientfield',
             docked: 'top',
             margin: '20 50 20 50',
             label: 'Search Patient',
+            defer: false,
             listeners: {
                 keyup: function (field) {
+                    var MAX_TIME_BETWEEN_SEARCH = 1500;
 
+                    if(Ext.getCmp('searchpatientfield').config.defer==false)
+                    {
                     Ext.getStore('PatientSearch').getProxy().setUrl(HOST + '/ws/rest/v1/patient?v=full&q=' + field.getValue());
 
                     Ext.getStore('PatientSearch').load({
@@ -99,11 +106,16 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
                             }
                         }
                     });
+                Ext.getCmp('searchpatientfield').config.defer =true;
+                //defer is set to false after MAX_TIME_BETWEEN_SEARCH
+                    setTimeout(function () {
+                        Ext.getCmp('searchpatientfield').config.defer =false;
+                        console.log('search can be called now');
+                     }, MAX_TIME_BETWEEN_SEARCH);
+                    }
                 }
-
             }
         }],
-
         itemTpl: new Ext.XTemplate(
             '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>',
             '<div style="float:left;width:60%">', '{person.display}', '</div>',
