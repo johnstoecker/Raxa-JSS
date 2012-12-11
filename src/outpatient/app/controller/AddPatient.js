@@ -47,7 +47,8 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             });
         Ext.getCmp('more').setRecord(patientRecord);
         Ext.getCmp('opdPatientDataEntry').setMasked(false);
-        Ext.getCmp()
+        //Saving in global variable myRecord initiated in controller
+        myRecord = patientRecord;
     },
 
     //////// vv COPIED DIRECTLY FROM SCREENER CONTROLLER "Application.js" vv ////////
@@ -111,13 +112,12 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                 disableCaching: false,
                 headers: Util.getBasicAuthHeaders(),
                 success: function (response) {
-                    var personUuid = JSON.parse(response.responseText).uuid;
-                    this.getidentifierstype(personUuid);
-                    myRecord.data = new Object();
-                    myRecord.data['uuid'] = personUuid;
+                    var personJSON = JSON.parse(response.responseText);
+                    myRecord = personJSON;
+                    this.getidentifierstype(personJSON.uuid);
                 },
                 failure: function (response) {
-                    Ext.Msg.alert('Error: unable to write to server. Enter all fields.')
+                    Ext.Msg.alert('Error','Unable to write to server. Please re-create the patient');
                 }
             });
             Ext.getCmp('newPatient').hide();
