@@ -91,7 +91,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						addrecords: function() {
 							var visitHistoryStore = Ext.getStore('visitHistoryStore');
 							if (visitHistoryStore.getCount()) {
-								// Always shows newest record, arranged by "date" (see sorter, above)
+								// Always auto-opens newest by "date" (see sorter, above)
 								var record = visitHistoryStore.getAt(0);
 								var me = Ext.getCmp('history-unstructured-panel');
 								me.showVisitInView(record);

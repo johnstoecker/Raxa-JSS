@@ -144,7 +144,6 @@
 
 // TODO: Remove these from the global namespace
 var myRecord = new Object(); // for the record of current patient
-var opd_observations = new Array(); //contains the observations of different tabs
 
 Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     extend: 'Ext.app.Controller',
