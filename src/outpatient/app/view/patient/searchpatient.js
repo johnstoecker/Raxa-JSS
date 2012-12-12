@@ -19,24 +19,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
     id: 'searchpatient',
 
     config: {
-
         listeners: {
-            itemtap: function (list, index, node, record) {
-                console.log(record);
-
-                var patientRecord = Ext.create('RaxaEmr.Outpatient.model.Patients', {
-                    display: record.data.person.display,
-                    age: record.data.person.age,
-                    uuid: record.data.person.uuid
-                });
-                Ext.getCmp('more').setRecord(patientRecord);
-
-                myRecord = patientRecord;
-
-                Ext.getCmp('patientManagementDashboard').hide();
-                Ext.getCmp('searchpatient').hide();
-
-            },
             show: function () {
                Ext.getCmp('searchpatientfield').focus();
             }
@@ -87,30 +70,26 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
             docked: 'top',
             margin: '20 50 20 50',
             label: 'Search Patient',
-            searchTimeout: new Object(),
             listeners: {
                 keyup: function (field) {
-                    var MAX_TIME_BETWEEN_SEARCH = 1500;
-                     if(Ext.getCmp('searchpatientfield').config.searchTimeout)
-                     {
-                         clearTimeout(Ext.getCmp('searchpatientfield').config.searchTimeout);
-                     }
-                    Ext.getCmp('searchpatientfield').config.searchTimeout = setTimeout(function () {
-                        Ext.getStore('PatientSearch').getProxy().setUrl(HOST + '/ws/rest/v1/patient?v=full&q=' + field.getValue());
-                        Ext.getStore('PatientSearch').load({
-                            scope: this,
-                            callback: function (records, operation, success) {
-                                if (success) {
-                                    console.log('search returned ' + records.length + ' patients');
-                                } else {
-                                    Ext.Msg.alert("Error", Util.getMessageLoadError());
-                                }
+
+                    Ext.getStore('PatientSearch').getProxy().setUrl(HOST + '/ws/rest/v1/patient?v=full&q=' + field.getValue());
+
+                    Ext.getStore('PatientSearch').load({
+                        scope: this,
+                        callback: function (records, operation, success) {
+                            if (success) {
+                                console.log('search returned ' + records.length + 'patients')
+                            } else {
+                                Ext.Msg.alert("Error", Util.getMessageLoadError());
                             }
-                        });
-                    }, MAX_TIME_BETWEEN_SEARCH);
+                        }
+                    });
                 }
+
             }
         }],
+
         itemTpl: new Ext.XTemplate(
             '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>',
             '<div style="float:left;width:60%">', '{person.display}', '</div>',
