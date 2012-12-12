@@ -19,26 +19,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
     id: 'searchpatient',
 
     config: {
-
-        listeners: {
-            itemtap: function (list, index, node, record) {
-                console.log(record);
-
-                var patientRecord = Ext.create('RaxaEmr.Outpatient.model.Patients', {
-                    display: record.data.person.display,
-                    age: record.data.person.age,
-                    uuid: record.data.person.uuid
-                });
-                Ext.getCmp('more').setRecord(patientRecord);
-
-                myRecord = patientRecord;
-
-                Ext.getCmp('patientManagementDashboard').hide();
-                Ext.getCmp('searchpatient').hide();
-
-            }
-
-        },
         store: 'PatientSearch',
 
         // Floating by default

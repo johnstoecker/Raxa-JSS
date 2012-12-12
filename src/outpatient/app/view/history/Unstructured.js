@@ -174,51 +174,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						}
 					});
 
-					var visitHistoryStore = Ext.getStore('visitHistoryStore');
-					var tempMonth = 10;
-					var tempDay = 24;
-					var tempHour = 9;
-					var tempMinute = 11;
-					function addImageToHistoryStore(url) {	// TODO: add meta data
-						// Request to fetch DataURL from a file
-						// http://www.html5canvastutorials.com/advanced/html5-canvas-load-image-data-url/
-						var request = new XMLHttpRequest();
-						request.open('GET', url, true);
-						request.onreadystatechange = function() {
-						// Makes sure the document is ready to parse.
-						if(request.readyState == 4) {
-						  // Makes sure it's found the file.
-						  if(request.status == 200) {
-						  	// Add to history store
-						  	var visitHistoryItem = {
-			                    'title': "Fake Title",
-			                    'date' : '2012.'+ tempMonth +'.'+ tempDay + ' - ' + tempHour + ':' + tempMinute + 'am',
-			                    'uuid' : 'FAKE',
-			                    'diagnosisCount': 'd#',
-			                    'treatmentCount': 't#',
-			                    'imgSrc' : request.responseText,
-			                    'json' : ''
-			                };
-
-			                // tempMonth -= 2;
-			                tempDay -= 7;
-			                tempHour +=1;
-			                tempMinute += 14;
-
-			                visitHistoryStore.add(visitHistoryItem);
-						  }
-						}
-						};
-						request.send(null);
-					}
-					
-					var images = [
-						'resources/images/dataUrl/DataURL1', 
-					];
-					for (var k=0; k < images.length; k++) {
-						addImageToHistoryStore(images[k]);
-					}
-
 					stage.draw();
 				}
 			},

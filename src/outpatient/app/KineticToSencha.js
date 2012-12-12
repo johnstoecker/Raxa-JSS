@@ -46,7 +46,7 @@ Ext.define('KineticToSencha', {
 		// Disable interaction. E.g. this hides delete icons, if in erase mode. Interaction is restored below.
 		var interactionMode = k2s.canvas.methods.getCanvasInteractionMode();
 		k2s.canvas.methods.setCanvasInteractionMode('');
-
+		var k2sContext = this;
 		stage.toImage({
 			callback: function(i) {
 				i.id = "PatientRecord";
@@ -73,7 +73,7 @@ Ext.define('KineticToSencha', {
 						console.log('callback for dataUrl');
 					},
 					mimeType: 'image/jpeg',
-					quality: .1,
+					quality: .4,
 					// height: 32,
 					// width: 32
 				});
@@ -82,19 +82,13 @@ Ext.define('KineticToSencha', {
 				temp_layer.remove();
 
 				// Adds it to history store (list is visible in history view)
-				var now = Ext.util.Format.date(Date(), 'Y.m.j - g:ia');
-				var visitHistoryStore = Ext.getStore('visitHistoryStore');
-				visitHistoryStore.add({
-					title: 'Visit <x>',
-					date: now,
-					uuid: 'FAKE-UUID-PUSHED',
-					diagnosisCount: 0,
-					treatmentCount: 0,
-					imgSrc: dataUrl,
-					// id: 'PatientRecord'
+				k2sContext.addToVisitHistory({
+					date: Date(),
+					imgSrc: dataUrl
 				});
 
 				// Show most recently added item, from store
+				var visitHistoryStore = Ext.getStore('visitHistoryStore');
 				var record = visitHistoryStore.getAt(visitHistoryStore.getCount()-1)
 				var me = Ext.getCmp('history-unstructured-panel');
 				me.showVisitInView(record);
@@ -119,6 +113,23 @@ Ext.define('KineticToSencha', {
 				// from onSaveCanvas... saveDrawableCanvas... etc
 				k2s.sendDoctorOrderEncounter(dataUrl);
 			}
+		});
+	},
+
+	// Adds a visit to the history view
+	// config should pass: date, imgSrc 
+	// TODO: json, doctorname... (other metadata?)
+	addToVisitHistory: function(config) {
+		var visitHistoryStore = Ext.getStore('visitHistoryStore');
+		visitHistoryStore.add({
+			// title: 'Visit <x>',
+			date: Ext.util.Format.date(config.date, 'Y.m.j - g:ia'),
+			// doctorName: '',
+			// uuid: 'FAKE-UUID-PUSHED',
+			// diagnosisCount: 0,
+			// treatmentCount: 0,
+			imgSrc: config.imgSrc,
+			// json: config.json
 		});
 	},
 
@@ -207,8 +218,10 @@ Ext.define('KineticToSencha', {
 	// Send Outpatient encounter - causes the visit to "finalize" given current workflow
 	sendDoctorOrderEncounter: function(dataUrl) {
 		this.addObs();
+		// TODO: these are currently two special cases of Obs. can streamline to just the addObs fn
 		this.addDoctorRecordImage(dataUrl);
-		this.addDoctorRecordVectorImage();
+		// this.addDoctorRecordVectorImage();
+
 		this.addOrder();
 
 		this.DoctorOrderModel.data.patient = myRecord.data.uuid;
@@ -217,6 +230,7 @@ Ext.define('KineticToSencha', {
 		//makes the post call for creating the patient
 		var that = this;
 		this.DoctorOrderStore.on('write', function() {
+			// Reset the "today" canvas after saving the visit
 			that.initCanvasData();
 		});
 		this.DoctorOrderStore.sync();

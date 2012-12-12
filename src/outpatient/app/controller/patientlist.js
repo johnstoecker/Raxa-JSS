@@ -162,6 +162,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         // All the fields are accessed in the controller through the id of the components
         refs: { 
             main: '#mainview',
+            searchpatient: 'searchpatient',
             contacts: 'patientlist',
             contact: '#contact',
             name: '#name',
@@ -209,6 +210,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
         // To perform action on specific component accessed through it's id above 
         control: { 
+            searchpatient: {
+                itemtap: 'onSearchContactSelect'
+            },
             contacts: {
                 itemtap: 'onContactSelect'
             },
@@ -438,27 +442,41 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         return (HOST + '/ws/rest/v1/raxacore/patientlist' + '?inList=' + scr_UUID + '&notInList=' + out_UUID + '&encounterType=' + encountertype);
     },
 
+    onSearchContactSelect: function(list, index, node, record) {
+        console.log(record);
+
+        var patientRecord = Ext.create('RaxaEmr.Outpatient.model.Patients', {
+            display: record.data.person.display,
+            age: record.data.person.age,
+            uuid: record.data.person.uuid
+        });
+        Ext.getCmp('more').setRecord(patientRecord);
+
+        myRecord = patientRecord;
+
+        console.log('on contact select');
+
+        Ext.getCmp('patientManagementDashboard').hide();
+        Ext.getCmp('searchpatient').hide();
+
+        this._loadPatientDetails();
+    },
+
     //called after clicking on a patient in the patient list
     onContactSelect: function (list, index, node, record) {
-
-        if (!this.showContact) {
-            console.log('creating show Contact screen')
-
-            // this.showContact = Ext.create('RaxaEmr.Outpatient.view.today.more');
-            this.showContact = Ext.getCmp('more');
-        }
-
-        this.showContact.setRecord(record);
+        // Set record in view
+        Ext.getCmp('more').setRecord(record);
         
         // Hide patients list
         Ext.getCmp('contact').hide();
 
-        // Show contact
-        this.getMain().setActiveItem(this.showContact);
-
         // Persist current patient's details
         myRecord = record;
-       
+
+        this._loadPatientDetails();
+    },
+
+    _loadPatientDetails: function() {
         // Get patient's visit history
         var patientEncounterStore = this.getPatientEncounters(myRecord.data.uuid);
         patientEncounterStore.on('load', function () {
@@ -467,8 +485,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             // Add all visits to the view
             var visitHistoryStore = this.getVisitHistory(patientEncounterStore);
             for (var i =0; i < visitHistoryStore.getCount(); i++) {
-                // var stageJSON = visitHistoryStore.getAt(i).getData().json;
-                
+                // TODO: Re-create from JSON instead of images
+                // var stageJSON = visitHistoryStore.getAt(i).getData().json;                
                 // Add to stage
                 // Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
             }
@@ -564,7 +582,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 }
             }
         });
-    },
+    }, 
 
     addChiefComplain: function () {
         var combo = Ext.getCmp('cheifComplain');
@@ -1056,12 +1074,11 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
 
     getVisitHistory: function(encounterStore) {
-        // TODO: For now, prevent loading actually historical encounters
+        // TODO: To load historic encounters...
         //  - need to: persist an image (at high quality) and reload
         //  - (or) better: persist a json and reload into history view
         //      ... more confusing b/c requires multiple stages and reloading of stage. 
         //      ... but smaller objects to send via rest and more flexible
-        return [];
 
         console.log("getVisitHistory");
         var visitHistoryStore = Ext.getStore('visitHistoryStore');
@@ -1069,7 +1086,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
         // Get each Outpatient encounter, put relevant items into visitHistoryStore
         for (var i=0; i < encounterStore.getCount(); i++) {
-            console.log(encounterData)
             var encounterData = encounterStore.getAt(i).getData();
             var display = encounterData.display;
             var obs = encounterData.obs;
@@ -1094,19 +1110,14 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                         json = o.value;
                     }
                 }   
-                
-                console.log('adding to visitHistoryStore');
-                var visitHistoryItem = {
-                    'title': encounterData.display,
-                    'date' : Ext.util.Format.date(encounterData.encounterDatetime),
-                    'uuid' : encounterData.uuid,
-                    'diagnosisCount': 'd#',
-                    'treatmentCount': 't#',
+
+                k2s.addToVisitHistory({
+                    // 'title': encounterData.display,
+                    'date' : encounterData.encounterDatetime,
+                    // 'uuid' : encounterData.uuid,
                     'imgSrc' : imgSrc,
-                    'json' : json
-                };
-                console.log(visitHistoryItem);
-                visitHistoryStore.add(visitHistoryItem);            
+                    // 'json' : json
+                });
             }
         }
 
@@ -1114,8 +1125,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     },
 
     getPatientEncounters: function(patientUuid) {
-        return [];
-        
         var store = Ext.create('RaxaEmr.Outpatient.store.opdEncounterPost');
         var myUrl = HOST + '/ws/rest/v1/encounter' + '?patient=' + patientUuid + '&v=full';    
         store.getProxy().setUrl(myUrl);

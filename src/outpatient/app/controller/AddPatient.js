@@ -47,7 +47,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             });
         Ext.getCmp('more').setRecord(patientRecord);
         Ext.getCmp('opdPatientDataEntry').setMasked(false);
-        Ext.getCmp()
     },
 
     //////// vv COPIED DIRECTLY FROM SCREENER CONTROLLER "Application.js" vv ////////
@@ -212,10 +211,16 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             if (encountertype === localStorage.screenerUuidencountertype) {
                 console.log('was screenerUuidencountertype')
                 pStore.on('load', function() {
+                    // TODO: Route this through same assign/create patient logic
+                    //  that happens in the controller.. makes sure store is reset, view, etc
                     console.log('was screenerUuidencountertype.. load event')
                     var record = pStore.getAt(pStore.getCount()-1)
                     var contactScreen = Ext.getCmp('more');
                     contactScreen.setRecord(record);
+                    
+                    // TODO: Reset history canvas and store
+                    // Ext.getStore('visitHistoryStore').clearData();
+
                     Ext.getCmp('opdPatientDataEntry').setMasked(false);
                 }, this);
             }
