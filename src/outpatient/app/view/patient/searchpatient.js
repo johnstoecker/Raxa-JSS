@@ -87,32 +87,27 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
             docked: 'top',
             margin: '20 50 20 50',
             label: 'Search Patient',
-            defer: false,
+            searchTimeout: new Object(),
             listeners: {
                 keyup: function (field) {
                     var MAX_TIME_BETWEEN_SEARCH = 1500;
-
-                    if(Ext.getCmp('searchpatientfield').config.defer==false)
-                    {
-                    Ext.getStore('PatientSearch').getProxy().setUrl(HOST + '/ws/rest/v1/patient?v=full&q=' + field.getValue());
-
-                    Ext.getStore('PatientSearch').load({
-                        scope: this,
-                        callback: function (records, operation, success) {
-                            if (success) {
-                                console.log('search returned ' + records.length + 'patients')
-                            } else {
-                                Ext.Msg.alert("Error", Util.getMessageLoadError());
+                     if(Ext.getCmp('searchpatientfield').config.searchTimeout)
+                     {
+                         clearTimeout(Ext.getCmp('searchpatientfield').config.searchTimeout);
+                     }
+                    Ext.getCmp('searchpatientfield').config.searchTimeout = setTimeout(function () {
+                        Ext.getStore('PatientSearch').getProxy().setUrl(HOST + '/ws/rest/v1/patient?v=full&q=' + field.getValue());
+                        Ext.getStore('PatientSearch').load({
+                            scope: this,
+                            callback: function (records, operation, success) {
+                                if (success) {
+                                    console.log('search returned ' + records.length + ' patients');
+                                } else {
+                                    Ext.Msg.alert("Error", Util.getMessageLoadError());
+                                }
                             }
-                        }
-                    });
-                Ext.getCmp('searchpatientfield').config.defer =true;
-                //defer is set to false after MAX_TIME_BETWEEN_SEARCH
-                    setTimeout(function () {
-                        Ext.getCmp('searchpatientfield').config.defer =false;
-                        console.log('search can be called now');
-                     }, MAX_TIME_BETWEEN_SEARCH);
-                    }
+                        });
+                    }, MAX_TIME_BETWEEN_SEARCH);
                 }
             }
         }],
