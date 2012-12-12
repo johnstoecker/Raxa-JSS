@@ -112,12 +112,13 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                 disableCaching: false,
                 headers: Util.getBasicAuthHeaders(),
                 success: function (response) {
-                    var personJSON = JSON.parse(response.responseText);
-                    myRecord = personJSON;
-                    this.getidentifierstype(personJSON.uuid);
+                    var personUuid = JSON.parse(response.responseText).uuid;
+                    this.getidentifierstype(personUuid);
+                    myRecord.data = new Object();
+                    myRecord.data['uuid'] = personUuid;
                 },
                 failure: function (response) {
-                    Ext.Msg.alert('Error','Unable to write to server. Please re-create the patient');
+                    Ext.Msg.alert('Error: unable to write to server. Enter all fields.')
                 }
             });
             Ext.getCmp('newPatient').hide();

@@ -2,15 +2,15 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	extend: 'Ext.Container',
 	xtype: 'history-unstructured-panel',
 	id: 'history-unstructured-panel',
-	
+
 	// Connection with KineticJS stage
 	isCanvasSetup: false,
 	stage: null,
-	showVisitInView: function(record) {		
+	showVisitInView: function(record) {
 		var me = Ext.getCmp('history-unstructured-panel');
 		var imgSrc = record.get('imgSrc');
-	  	addImageToLayer(imgSrc, me.loadedImageLayer, {
-			x: DRAWABLE_X_MIN+35,
+		addImageToLayer(imgSrc, me.loadedImageLayer, {
+			x: DRAWABLE_X_MIN + 35,
 			y: DRAWABLE_Y_MIN,
 			width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
 			height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
@@ -19,7 +19,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		// var img = Ext.getCmp('singleVisitHistoryImage');
 		// var imgSrc = record.get('imgSrc');
 		// img.setSrc('imgSrc');
-
 		// Close visit history list window, if open
 		Ext.getCmp('visitHistory').hide();
 
@@ -55,7 +54,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 			// Here we specify the #id of the element we created in `index.html`
 			// contentEl: 'content',
 			// Style the content and make it scrollable
-			
 			// scrollable: true,
 			layout: 'hbox',
 
@@ -68,7 +66,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 				// styleHtmlContent: true,
 				items: [{
 					xtype: 'spacer'
-				},{
+				}, {
 					xtype: 'button',
 					iconCls: 'delete',
 					iconMask: true,
@@ -84,12 +82,33 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 				store: new Ext.data.ArrayStore({
 					id: 'visitHistoryStore',
 					fields: ['title', 'date', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc', 'json'],
-					data: []
+					data: [],
+					sorters: [{
+						property: 'date',
+						direction: 'DESC'
+					}],
+					listeners: {
+						addrecords: function() {
+							var visitHistoryStore = Ext.getStore('visitHistoryStore');
+							if (visitHistoryStore.getCount()) {
+								// Always auto-opens newest by "date" (see sorter, above)
+								var record = visitHistoryStore.getAt(0);
+								var me = Ext.getCmp('history-unstructured-panel');
+								me.showVisitInView(record);
+							}
+						}
+					}
 				}),
 
 				flex: 1,
 				disableSelection: true,
 				listeners: {
+					// load: function() {
+						// on first load after selecting any patient...
+						// if >=1 visit
+						// show most recent visit in view / 
+						// automatically open the visit history menu
+					// },
 					itemtap: function(view, index, target, record, e, eOpts) {
 						var me = Ext.getCmp('history-unstructured-panel');
 						me.showVisitInView(record);
@@ -112,9 +131,15 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					this.isCanvasSetup = true;
 
 					// Layers
-					var backgroundLayer = new Kinetic.Layer({id:'backgroundLayer'});
-					var loadedImageLayer = new Kinetic.Layer({id:'loadedImageLayer'});
-					var controlsLayer = new Kinetic.Layer({id:'controlsLayer'});
+					var backgroundLayer = new Kinetic.Layer({
+						id: 'backgroundLayer'
+					});
+					var loadedImageLayer = new Kinetic.Layer({
+						id: 'loadedImageLayer'
+					});
+					var controlsLayer = new Kinetic.Layer({
+						id: 'controlsLayer'
+					});
 
 					this.loadedImageLayer = loadedImageLayer;
 
@@ -139,10 +164,10 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						y: 0,
 						width: stage.getWidth(),
 						height: TOOLBAR_HEIGHT,
-						fill: "#82b0e1"	// Light Blue.
+						fill: "#82b0e1" // Light Blue.
 					});
 					backgroundLayer.add(toolbarBackground);
-					
+
 					addImageToLayer("resources/images/bg/today_small.png", backgroundLayer, {
 						x: 0,
 						y: DRAWABLE_Y_MIN,
@@ -151,9 +176,9 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						width: 41,
 						height: 742
 					});
-					
+
 					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {
-						x: stage.getWidth()-723,
+						x: stage.getWidth() - 723,
 						y: DRAWABLE_Y_MIN,
 						// width: 710,
 						width: 722,
@@ -174,51 +199,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						}
 					});
 
-					var visitHistoryStore = Ext.getStore('visitHistoryStore');
-					var tempMonth = 10;
-					var tempDay = 24;
-					var tempHour = 9;
-					var tempMinute = 11;
-					function addImageToHistoryStore(url) {	// TODO: add meta data
-						// Request to fetch DataURL from a file
-						// http://www.html5canvastutorials.com/advanced/html5-canvas-load-image-data-url/
-						var request = new XMLHttpRequest();
-						request.open('GET', url, true);
-						request.onreadystatechange = function() {
-						// Makes sure the document is ready to parse.
-						if(request.readyState == 4) {
-						  // Makes sure it's found the file.
-						  if(request.status == 200) {
-						  	// Add to history store
-						  	var visitHistoryItem = {
-			                    'title': "Fake Title",
-			                    'date' : '2012.'+ tempMonth +'.'+ tempDay + ' - ' + tempHour + ':' + tempMinute + 'am',
-			                    'uuid' : 'FAKE',
-			                    'diagnosisCount': 'd#',
-			                    'treatmentCount': 't#',
-			                    'imgSrc' : request.responseText,
-			                    'json' : ''
-			                };
-
-			                // tempMonth -= 2;
-			                tempDay -= 7;
-			                tempHour +=1;
-			                tempMinute += 14;
-
-			                visitHistoryStore.add(visitHistoryItem);
-						  }
-						}
-						};
-						request.send(null);
-					}
-					
-					var images = [
-						'resources/images/dataUrl/DataURL1', 
-					];
-					for (var k=0; k < images.length; k++) {
-						addImageToHistoryStore(images[k]);
-					}
-
 					stage.draw();
 				}
 			},
@@ -228,22 +208,20 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 		},
 		fullscreen: true,
 		items: [{
-		// 	// Button to view all history items
-		// 	xtype: 'button',
-		// 	id: 'unstructuredHistoryChooseDateButton',
-
-		// 	left: 600,
-		// 	top: 10,
-
-		// 	height: 20,
-		// 	// width: 60,
-		// 	text: 'Which Visit?',
-		// 	//today's date
-		// 	handler: function() {
-		// 		Ext.getCmp('visitHistory').showBy(this);
-		// 		console.log('open history view');
-		// 	}
-		// }, {
+			// 	// Button to view all history items
+			// 	xtype: 'button',
+			// 	id: 'unstructuredHistoryChooseDateButton',
+			// 	left: 600,
+			// 	top: 10,
+			// 	height: 20,
+			// 	// width: 60,
+			// 	text: 'Which Visit?',
+			// 	//today's date
+			// 	handler: function() {
+			// 		Ext.getCmp('visitHistory').showBy(this);
+			// 		console.log('open history view');
+			// 	}
+			// }, {
 			xtype: 'container',
 			flex: 1,
 			disabled: true,

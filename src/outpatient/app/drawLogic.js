@@ -737,7 +737,6 @@ var k2s = Ext.create('KineticToSencha', {
 				var itemData = data.getAt(i).getData();
 
 				displayText = '';
-				// TODO: Consolidate following code into loop
 				if(!itemData.drugname) {
 					// If no drug name, skip to next loop iteration
 					continue;
