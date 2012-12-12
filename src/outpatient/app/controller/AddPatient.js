@@ -47,7 +47,8 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             });
         Ext.getCmp('more').setRecord(patientRecord);
         Ext.getCmp('opdPatientDataEntry').setMasked(false);
-        Ext.getCmp()
+        //Saving in global variable myRecord initiated in controller
+        myRecord = patientRecord;
     },
 
     //////// vv COPIED DIRECTLY FROM SCREENER CONTROLLER "Application.js" vv ////////
