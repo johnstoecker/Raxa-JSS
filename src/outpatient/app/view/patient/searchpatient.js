@@ -66,6 +66,7 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
             title: 'Search Patient'
         }, {
             xtype: 'searchfield',
+            id: 'searchpatientfield',
             docked: 'top',
             margin: '20 50 20 50',
             label: 'Search Patient',
