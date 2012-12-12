@@ -73,11 +73,11 @@ Ext.define('KineticToSencha', {
 						console.log('callback for dataUrl');
 					},
 					mimeType: 'image/jpeg',
-					quality: 1,
+					quality: .1,
 					// height: 32,
 					// width: 32
 				});
-				// k2s.addDoctorRecordImage_TEMP_FOR_DEMO(dataUrl);
+				
 				// Delete temp layer
 				temp_layer.remove();
 
@@ -117,7 +117,7 @@ Ext.define('KineticToSencha', {
 				// Save via REST
 				// TODO: fix callback spaghetti code ... this callback is hidden in another callback
 				// from onSaveCanvas... saveDrawableCanvas... etc
-				k2s.sendDoctorOrderEncounter();
+				k2s.sendDoctorOrderEncounter(dataUrl);
 			}
 		});
 	},
@@ -176,44 +176,11 @@ Ext.define('KineticToSencha', {
 		console.log(this.DoctorOrderModel);
 	},
 
-	// <TODO: Add Comment describing>
-	addDoctorRecordImage: function() {
-		var PatientRecordHistory = Ext.getStore('visitHistoryStore').getData();
-		for(var j = 0; j < Ext.getStore('visitHistoryStore').getData().all.length; j++) //j is always 4, but not now.
-		{
-			if(PatientRecordHistory.all[j].data.id == "PatientRecord") {
-				//    if( PatientRecordHistory.all[j].imgSrc.length < 65000){   
-				var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-					obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-					person: myRecord.data.uuid,
-					//need to set selected patient uuid in localStorage
-					concept: localStorage.patientRecordImageUuidconcept,
-					value: PatientRecordHistory.all[j].data.imgSrc
-				});
-				this.DoctorOrderModel.data.obs.push(ObsModel.raw);
-				//  }
-				//    else {
-				//    Ext.Msg.alert('Error','Can\'t save data on server');
-				//    }
-			}
-		}
-		console.log(Ext.getStore('DoctorOrder'));
-	},
-	//Sending Stage JSON so that high quality doctor records can be generated again
-	addDoctorRecordVectorImage: function() {
-
-		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
-			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
-			person: myRecord.data.uuid,
-			//need to set selected patient uuid in localStorage
-			concept: localStorage.patientRecordVectorImageUuidconcept,
-			value: stage.toJSON()
-		});
-		this.DoctorOrderModel.data.obs.push(ObsModel.raw);
-	},
-	//Small icons to show as thumbnails
-	addDoctorRecordImage_TEMP_FOR_DEMO: function(dataUrl) {
-
+	// Saves the dataURL for the image (actual jpg graphic)
+	// Currently, saves data in full size, but someday may only create a thumbnail
+	// Note: OpenMRS REST calls are restricted to max size < ~70kb, by default, so 
+	// can't attach a large image
+	addDoctorRecordImage: function(dataUrl) {
 		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
 			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
 			person: myRecord.data.uuid,
@@ -224,10 +191,23 @@ Ext.define('KineticToSencha', {
 		this.DoctorOrderModel.data.obs.push(ObsModel.raw);
 	},
 
+	// Sending Stage JSON so that high quality doctor records can be generated again
+	// Idea: also allow stage to flexibly update (e.g. to show current status/results for a lab test)
+	addDoctorRecordVectorImage: function() {
+		var ObsModel = Ext.create('RaxaEmr.Outpatient.model.DoctorOrderObservation', {
+			obsDatetime: Util.Datetime(new Date(), Util.getUTCGMTdiff()),
+			person: myRecord.data.uuid,
+			//need to set selected patient uuid in localStorage
+			concept: localStorage.patientRecordVectorImageUuidconcept,
+			value: stage.toJSON()
+		});
+		this.DoctorOrderModel.data.obs.push(ObsModel.raw);
+	},
+
 	// Send Outpatient encounter - causes the visit to "finalize" given current workflow
-	sendDoctorOrderEncounter: function() {
+	sendDoctorOrderEncounter: function(dataUrl) {
 		this.addObs();
-		this.addDoctorRecordImage();
+		this.addDoctorRecordImage(dataUrl);
 		this.addDoctorRecordVectorImage();
 		this.addOrder();
 
