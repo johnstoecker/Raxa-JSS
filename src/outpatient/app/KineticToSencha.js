@@ -88,13 +88,9 @@ Ext.define('KineticToSencha', {
 				});
 
 				// Show most recently added item, from store
-				var visitHistoryStore = Ext.getStore('visitHistoryStore');
-				var record = visitHistoryStore.getAt(visitHistoryStore.getCount()-1)
-				var me = Ext.getCmp('history-unstructured-panel');
-				me.showVisitInView(record);
+				// this automatically happens in the store, now
 
 				// Scroll to history view
-				
 				var UNSTRUCTURED_HISTORY_VIEW = 0;
 				Ext.getCmp('history-panel').setActiveItem(UNSTRUCTURED_HISTORY_VIEW);
 
