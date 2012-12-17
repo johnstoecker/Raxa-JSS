@@ -16,6 +16,10 @@
 
 //info about the patient when we click on a patient like weight, height etc. is shown by this grid
  
+// TODO: Move to CSS file and access here via "cls" tag in Sencha
+var VITALS_VIEW_TITLE_STYLE = 'color:#2e7ab8;font-weight:bold';
+var VITALS_VIEW_VALUE_STYLE = 'color:#000000;font-weight:bold';
+
 Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
     extend: 'Ext.Container',
     xtype: 'vitalsGrid',
@@ -29,35 +33,35 @@ Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
             '<tbody>'+
                 '<tr>'+
                     '<td>'+
-                        '<span style=";"><strong>Systolic Blood Pressure</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Temperature</strong></span></td>'+
                     '<td>'+
-                        '<span><strong>Diastolic Blood Pressure</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">SaO2</span></td>'+
                     '<td>'+
-                        '<span><strong>Temperature</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Pulse Rate</span></td>'+
                 '</tr>'+
                 '<tr>'+
                     '<td>'+
-                        '&nbsp;<b id="SBP"></b></td>'+
+                        '<span style="' + VITALS_VIEW_VALUE_STYLE + '" id="Temp"></td>'+
                     '<td>'+
-                        '&nbsp;<b id="DBP"></b></td>'+
+                        '<span style="' + VITALS_VIEW_VALUE_STYLE + '" id="O2Sat"></td>'+
                     '<td>'+
-                        '&nbsp;<b id="Temp"></b></td>'+
+                        '<span style="' + VITALS_VIEW_VALUE_STYLE + '" id="PR"></td>'+
                 '</tr>'+
                 '<tr>'+
                     '<td>'+
-                        '<span><strong>Respiratory Rate</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">BP</strong></span></td>'+
                     '<td>'+
-                        '<span><strong>Pulse Rate</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Respiratory Rate</strong></span></td>'+
                     '<td>'+
-                        '<span><strong>Oxygen Saturation</strong></span></td>'+
+                        // "+Vitals" button
                 '</tr>'+
                 '<tr>'+
                     '<td>'+
-                        '&nbsp;<b id="RR"></b></td>'+
+                        '<span style="' + VITALS_VIEW_VALUE_STYLE + '" id="SBP"></span> / <span style="' + VITALS_VIEW_VALUE_STYLE + '" id="DBP"></span></td>'+
                     '<td>'+
-                        '&nbsp;<b id="PR"></b></td>'+
+                        '<span style="' + VITALS_VIEW_VALUE_STYLE + '" id="RR"></td>'+
                     '<td>'+
-                        '&nbsp;<b id="O2Sat"></b></td>'+
+                        // "+Vitals" button
                 '</tr>'+
             '</tbody>'+
         '</table>'
