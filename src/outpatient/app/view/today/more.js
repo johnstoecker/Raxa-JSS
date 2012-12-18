@@ -45,9 +45,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
                         '</div>', 
                         '<div style="float:left;width:30%;">', 
                             '<div class="name_small" style="float:left;">', 
-                                '<span>ID : --</span>', 
-                                '<span>Age : {age} </span>', 
-                                '<span>From : -- </span>', 
+                                '<span>{age} / {gender}</span>', 
                             '</div>', 
                         '</div>', 
                     '</div>'
