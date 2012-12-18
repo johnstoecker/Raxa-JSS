@@ -39,7 +39,8 @@ Ext.define("RaxaEmr.Outpatient.view.today.VitalsForm", {
                             height: '50px',
                             flex : 3,
                             minValue: 0,
-                            maxValue: 250
+                            maxValue: 250,
+                            name: 'systolicBloodPressureField',
                         },
                         {
                             xtype: 'label',

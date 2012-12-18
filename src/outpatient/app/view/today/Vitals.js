@@ -24,6 +24,64 @@ Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
     extend: 'Ext.Container',
     xtype: 'vitalsGrid',
     id: 'vitalsGrid',
+
+    // Pass in values in the following format
+    // { key : value}
+    // key in ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE'];
+    setVitals: function(newValues) {
+        console.log('update vitals from view.. pass in values');
+        console.log(newValues);
+        
+        // default values
+        item = {};
+        item.pulse = '-';
+        item.temp = '-';
+        item.oxysat = '-';
+        item.sbp = '-';
+        item.dbp = '-';
+        item.resrate = '-';
+
+        // new values        
+        for (var i=0; i < newValues.length; i++) {
+            console.log(newValues[i]);
+            var key = newValues[i].key;
+            var val = newValues[i].value;
+            
+            switch (key){
+                case 'PULSE':
+                    document.getElementById('PR').innerHTML =val;
+                    item.pulse = val;
+                    break;
+                case 'TEMPERATURE (C)':
+                    document.getElementById('Temp').innerHTML =val;;
+                    item.temp = val;
+                    break;
+                case 'BLOOD OXYGEN SATURATION':
+                    document.getElementById('O2Sat').innerHTML =val;
+                    item.oxysat = val;
+                    break;
+                case 'DIASTOLIC BLOOD PRESSURE': 
+                    document.getElementById('DBP').innerHTML = val;
+                    item.dbp = val;
+                    break;
+                case 'SYSTOLIC BLOOD PRESSURE':
+                    item.sbp = val;
+                    document.getElementById('SBP').innerHTML = val;
+                    break;
+                case 'RESPIRATORY RATE':
+                    item.resrate = val;
+                    document.getElementById('RR').innerHTML = val;
+                    break;
+                default:
+                   break;
+            }
+        }
+        item.bp = Ext.String.format('{0} / {1}', item.sbp, item.dbp);
+
+        var vitalsGridStore = Ext.getStore("Grid"); // TODO: rename to something easier/useful
+        vitalsGridStore.clearData();
+        vitalsGridStore.add(item);
+    },
     config: {
         title: 'Grid',
         store: 'Grid',

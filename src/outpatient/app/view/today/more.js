@@ -26,6 +26,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
         layout: 'vbox',
         items: [{
             xtype: 'button',
+            id: 'addVitalsButton',
             text: '+ Vitals',
             left: 656,
             top: 52,

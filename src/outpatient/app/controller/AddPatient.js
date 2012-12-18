@@ -15,12 +15,13 @@
  */
 Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     extend: 'Ext.app.Controller',
-    requires: ['Screener.view.NewPatient', 'Screener.model.encounterpost','Screener.store.Location','Screener.model.NewPatient', 'Screener.store.NewPatients', 'Screener.store.IdentifierType', 'Screener.store.encounterpost'],
+    requires: ['Screener.view.NewPatient', 'Screener.model.encounterpost','Screener.store.Location','Screener.model.NewPatient', 'Screener.store.NewPatients', 'Screener.store.IdentifierType', 'Screener.store.encounterpost', 'Screener.model.observation'],
     config: {
         // All the fields are accessed in the controller through the id of the components
         refs: { 
             addPatientButton: '#addPatientButton',
-            savePatientButton: '#savePatientButton'
+            savePatientButton: '#savePatientButton',
+            submitVitalsButton: '#submitVitalsButton',
         },
 
         // To perform action on specific component, which are referenced through their ids above 
@@ -30,6 +31,9 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             },
             savePatientButton: {
                 tap: 'savePerson'
+            },
+            submitVitalsButton: {
+                tap: 'savePatientVitals'
             },
         }
     },
@@ -161,6 +165,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     },
 
     sendEncounterData: function (personUuid, encountertype, location, provider) {
+        console.log("sendEncounterData('" + personUuid + "', '" + encountertype + "', '" + location + "', '" + provider + "')");
         //funciton to get the date in required format of the openMRS, since the default extjs4 format is not accepted
         var t = Util.Datetime(new Date(), Util.getUTCGMTdiff());
         
@@ -174,6 +179,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             provider: provider
         });
        
+        gloJson = jsonencounter;
         // Handle "Screener Vitals" encounters specially
         // Create observations linked to the encounter
         if (encountertype === localStorage.screenervitalsUuidencountertype)
@@ -189,16 +195,19 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                     concept: c,
                     value: v
                 });
+                console.log('concept: ', c, ', value: ', v);
+
+                // For OPD, show obs immediately in the UI
             };
 
             console.log("Creating Obs for uuid types...");
             v = Ext.getCmp("vitalsForm").getValues();
-            createObs(localStorage.bloodoxygensaturationUuidconcept, v.bloodOxygenSaturationField[0]);
-            createObs(localStorage.diastolicbloodpressureUuidconcept, v.diastolicBloodPressureField[0]);
-            createObs(localStorage.respiratoryRateUuidconcept, v.respiratoryRateField[0]);
-            createObs(localStorage.systolicbloodpressureUuidconcept, v.systolicBloodPressureField[0]);
-            createObs(localStorage.temperatureUuidconcept, v.temperatureField[0]); 
-            createObs(localStorage.pulseUuidconcept, v.pulseField[0]);
+            createObs(localStorage.bloodoxygensaturationUuidconcept, v.bloodOxygenSaturationField);
+            createObs(localStorage.diastolicbloodpressureUuidconcept, v.diastolicBloodPressureField);
+            createObs(localStorage.respiratoryRateUuidconcept, v.respiratoryRateField);
+            createObs(localStorage.systolicbloodpressureUuidconcept, v.systolicBloodPressureField);
+            createObs(localStorage.temperatureUuidconcept, v.temperatureField); 
+            createObs(localStorage.pulseUuidconcept, v.pulseField);
             observations.sync();
             console.log("... Complete! Created Obs for new uuid types");
         }
@@ -278,9 +287,18 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     // Assigns patient, pops-open the patient-list so you can select that patient
     assignPatient: function (patient, provider) {
         var encounterSent = this.sendEncounterData(patient, localStorage.screenerUuidencountertype, localStorage.waitingUuidlocation, provider);
-        
-        // Show patient list, so user gets feedback that their patient was added successfully
-        // TODO: Move this logic into view modification.. shouldn't be involved in the controller
-        // Ext.getCmp('contact').show();
     },    
+
+    // Create a SCREENER_VITALS encounter and attach vitals observations
+    savePatientVitals: function () {
+        if (! myRecord) {
+            console.log("error, must have a patient selected before can add vitals");
+        }
+        console.log('savePatientVitals');
+
+        var patientUuid = myRecord.data['uuid'];
+        var providerPersonUuid = localStorage.loggedInUser;
+        this.sendEncounterData(patientUuid, localStorage.screenervitalsUuidencountertype, "", providerPersonUuid);
+        Ext.Msg.alert("Submitted patient vitals");
+    },
 });
