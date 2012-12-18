@@ -87,13 +87,14 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
             flex: DASHBOARD_CONSTANTS.BUTTON_FLEX,
             style: DASHBOARD_CONSTANTS.BUTTON_STYLE,
             html: '<img src="resources/images/icons/dashboard_patient_queue.png" width="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '" height="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '"/>',
-            handler: function() {
-                console.log('patientList patient patientManagementDashboard button');
-                Ext.getCmp('patientManagementDashboard').hide();
-                Ext.getCmp('contact').show();
-            },
+            listeners: {
+                tap: function() {
+                    Ext.getCmp('patientManagementDashboard').hide();
+                    Ext.getCmp('contact').show();
+                }
+            }
         }, {
-            html: 'Select a patient from the queue',
+            html: '<div ontouchstart="Ext.getCmp(\'dashboardPatientListButton\').fireEvent(\'tap\');"> Select a patient from the queue</div',
             style: DASHBOARD_CONSTANTS.FONT_STYLE,
             width: DASHBOARD_CONSTANTS.TEXT_WIDTH,
             flex: DASHBOARD_CONSTANTS.TEXT_FLEX,
@@ -108,12 +109,14 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
             flex: DASHBOARD_CONSTANTS.BUTTON_FLEX,
             style: DASHBOARD_CONSTANTS.BUTTON_STYLE,
             html: '<img src="resources/images/icons/dashboard_add_patient.png" width="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '" height="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '"/>',
-            handler: function() {
-                console.log('add patient patientManagementDashboard button');
-                Ext.getCmp('patientManagementDashboard').hide();
-            },
+            listeners: {
+                tap: function() {
+                    Ext.getCmp('newPatient').show();
+                    Ext.getCmp('patientManagementDashboard').hide();
+                }
+            }
         }, {
-            html: 'Add a new patient to EMR',
+            html: '<div ontouchstart="Ext.getCmp(\'addPatientButton\').fireEvent(\'tap\');"> Add a new patient to EMR</div>',
             style: DASHBOARD_CONSTANTS.FONT_STYLE,
             width: DASHBOARD_CONSTANTS.TEXT_WIDTH,
             flex: DASHBOARD_CONSTANTS.TEXT_FLEX,
@@ -122,21 +125,22 @@ Ext.define('RaxaEmr.Outpatient.view.today.Dashboard', {
         }, {
             xtype: 'button',
             text: 'Search',
+            id: 'searchPatientButtonOnDashboard',
             height: DASHBOARD_CONSTANTS.BUTTON_DIM,
             width: DASHBOARD_CONSTANTS.BUTTON_DIM,
             margin: DASHBOARD_CONSTANTS.BUTTON_MARGIN,
             flex: DASHBOARD_CONSTANTS.BUTTON_FLEX,
             style: DASHBOARD_CONSTANTS.BUTTON_STYLE,
             html: '<img src="resources/images/icons/dashboard_search_patient.png" width="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '" height="' + DASHBOARD_CONSTANTS.BUTTON_IMG_DIM + '"/>',
-            //TODO Make this diabled after Demo as image is faded in view if button is diabled
             disabled: false,
-            handler: function() {
-                console.log('search patient patientManagementDashboard button');
-                Ext.getCmp('patientManagementDashboard').hide();
-	            Ext.getCmp('searchpatient').show();
+            listeners: {
+                tap: function() {
+                    Ext.getCmp('patientManagementDashboard').hide();
+    	            Ext.getCmp('searchpatient').show();
+                }
             },
         }, {
-            html: 'Search for a patient in EMR',
+            html: '<div ontouchstart="Ext.getCmp(\'searchPatientButtonOnDashboard\').fireEvent(\'tap\');">Search for a patient in EMR',
             style: DASHBOARD_CONSTANTS.FONT_STYLE,
             width: DASHBOARD_CONSTANTS.TEXT_WIDTH,
             flex: DASHBOARD_CONSTANTS.TEXT_FLEX,
