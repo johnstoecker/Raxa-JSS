@@ -329,7 +329,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         var doctorName = Util.getSession().display;
         Ext.getCmp('mainview').setDoctorName(doctorName);
 
-        Ext.getCmp('patientManagementDashboard').show();
+        // TODO: for testing! restore dash as default
+        // Ext.getCmp('patientManagementDashboard').show();
+        Ext.getCmp('vitalsModal').show();
 
         // Set store for patient list in UI
         var store_patientList = Ext.getStore('patientStore');

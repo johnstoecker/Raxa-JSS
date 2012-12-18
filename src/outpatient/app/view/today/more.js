@@ -28,11 +28,12 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
             xtype: 'button',
             text: '+ Vitals',
             left: 656,
-            top: 42,
+            top: 52,
             width: 80,
-            height: 30,
+            height: 30, // layout of vitals "table" changes when real values are added to it
             handler: function() {
                 console.log('popup for vitals, allowing input');
+                Ext.getCmp('vitalsModal').show();
             }
         },{
             xtype: 'container',
@@ -46,7 +47,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
                         '<div style="float:left;width:30%;">', 
                             '<span id ="patientProfile" class="headshot" style="float:left;background-image:url(resources/images/headshots/pic.gif);">', 
                             '</span>', 
-
                         '</div>', 
                         '<div style="float:left;width:40%;">', 
                             '<span class="name" style="float:left;">', 
