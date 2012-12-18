@@ -357,12 +357,19 @@ var setupCanvas = function() {
 			Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
 				if(btn == 'yes') {
 					// TODO: Saved image is wrong resolution
-					
+					// TODO: Using Global Variable myRecord set in controller
+					// after selecting patient from patientlist and after every search/add patient 
+					if(!myRecord.data)
+					{
+						Ext.Msg.alert("Error","Please select/create a patient");
+					}
+					else{
 					// Saves image to localStore
 					// Scrolls directly to see the history item in history view
 					// Also saves via REST using k2s.sendDoctorOrderEncounter();
 					// Clear "today" canvas, after saving via REST
 					onSaveCanvas();
+					}
 				}
 			});
 		},
