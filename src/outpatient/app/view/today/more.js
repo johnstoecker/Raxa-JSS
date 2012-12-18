@@ -25,6 +25,16 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
         id: 'more',
         layout: 'vbox',
         items: [{
+            xtype: 'button',
+            text: '+ Vitals',
+            left: 656,
+            top: 42,
+            width: 80,
+            height: 30,
+            handler: function() {
+                console.log('popup for vitals, allowing input');
+            }
+        },{
             xtype: 'container',
             height: 96,
             layout: 'hbox',
