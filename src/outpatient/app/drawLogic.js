@@ -170,7 +170,12 @@ var setupCanvas = function() {
 			newLinePoints.push(prevPos);
 			newLine = new Kinetic.Line({
 				points: newLinePoints,
-				stroke: "black"
+				stroke: "black",
+				strokeWidth: 1,
+				//lineJoin can be miter, round, or bevel
+				lineJoin: "round",
+				//Other configs including lineCap, swadow, cornerRadius make the curves better
+				//but response time is not adequate.
 			});
 			linesLayer.add(newLine);
 			moving = true;
