@@ -40,7 +40,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
             },
             show: function() {
                 Ext.getCmp('drugfilterbysearchfield').reset();
-                Ext.getCmp('drugfilterbysearchfield').focus();
             }
         },
         items: [{
@@ -192,7 +191,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                             }, {
                                 xtype: 'button',
                                 ui: 'confirm',
-                                text: 'Add Drug',
+                                text: 'Add Drug and Continue',
                                 id: 'addDrugInList',
                                 flex: 1,
                                 width: '40%',
@@ -202,7 +201,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                             }, {
                                 xtype: 'button',
                                 ui: 'confirm',
-                                text: 'Add Drug and Continue',
+                                text: 'Add More Drugs',
                                 id: 'addMoreDrug',
                                 flex: 2,
                                 width: '40%',
