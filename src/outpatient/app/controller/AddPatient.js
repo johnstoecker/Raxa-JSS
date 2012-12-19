@@ -40,10 +40,11 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     launch: function () {
     },
 
-    setScreenForPatient: function(patientName, patientAge) {
+    setScreenForPatient: function(patientName, patientAge, patientGender) {
         var patientRecord = Ext.create('RaxaEmr.Outpatient.model.Patients', {
                 age: patientAge,
                 display: patientName,
+                gender: patientGender
             });
         Ext.getCmp('more').setRecord(patientRecord);
         Ext.getCmp('opdPatientDataEntry').setMasked(false);
@@ -83,7 +84,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
         var formp = Ext.getCmp('newPatient').saveForm();
         // Sets Patient Name & Age on Screen while patient is created in the backend
-        this.setScreenForPatient(formp.givenname + ' ' + formp.familyname,formp.patientAge);
+        this.setScreenForPatient(formp.givenname + ' ' + formp.familyname,formp.patientAge,formp.choice);
 
         if (formp.givenname && formp.familyname && formp.choice && (formp.patientAge || formp.dob  )) {
             var newPatient = {
@@ -91,7 +92,8 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                 names: [{
                     givenName: formp.givenname,
                     familyName: formp.familyname
-                }] 
+                }] ,
+                age: formp.patientAge
             };
             if ( formp.patientAge !== "" && formp.patientAge.length > 0  ) {
                 newPatient.age = formp.patientAge ;   

@@ -32,7 +32,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             },
             show: function() {
                 Ext.getCmp('diagnosisfilterbysearchfield').reset();
-                Ext.getCmp('diagnosisfilterbysearchfield').focus();
             }
         },
         // centered: true,
@@ -131,7 +130,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                         xtype: 'spacer',
                     }, {
                         xtype: 'button',
-                        text: 'Add Diagnosis',
+                        text: 'Add Diagnosis and Continue',
                         id: 'addDiagnosisInList',
                         ui: 'confirm',
                         handler: function() {
@@ -143,7 +142,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     }, {
                         xtype: 'button',
                         ui: 'confirm',
-                        text: 'Add Diagnosis and Continue',
+                        text: 'Add More Diagnoses',
                         id: 'addMoreDiagnosis',
                         handler: function() {
                             // TODO: fire event. move handling to controller

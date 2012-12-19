@@ -416,7 +416,8 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         var patientRecord = Ext.create('RaxaEmr.Outpatient.model.Patients', {
             display: record.data.person.display,
             age: record.data.person.age,
-            uuid: record.data.person.uuid
+            uuid: record.data.person.uuid,
+            gender: record.data.person.gender
         });
         Ext.getCmp('more').setRecord(patientRecord);
 
