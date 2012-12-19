@@ -128,10 +128,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                             value: 'Once Daily',
                                             title: 'Once Daily'
                                         }, {
-                                            value: 'Once Daily',
+                                            value: 'Twice Daily',
                                             title: 'Twice Daily'
                                         }, {
-                                            value: 'Once Daily',
+                                            value: 'Thrice Daily',
                                             title: 'Thrice Daily'
                                         }]
                                     }
