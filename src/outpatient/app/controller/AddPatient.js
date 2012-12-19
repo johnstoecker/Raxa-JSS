@@ -305,8 +305,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         var v = Ext.getCmp("vitalsForm").getValues();
         var vitals = [];
 
-        // TODO: remove global
-        gloVitals = vitals;
         vitals.push({key:localStorage.bloodoxygensaturationUuidconcept, value:v.bloodOxygenSaturationField});
         vitals.push({key:localStorage.diastolicbloodpressureUuidconcept, value:v.diastolicBloodPressureField});
         vitals.push({key:localStorage.respiratoryRateUuidconcept, value:v.respiratoryRateField});
