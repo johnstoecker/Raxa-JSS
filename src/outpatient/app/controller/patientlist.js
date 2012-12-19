@@ -464,7 +464,11 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         }, this);
 
         // TODO: Get patient's diagnoses
+        
+        this._loadPatientRecentObs(myRecord.data.uuid);
+    }, 
 
+    _loadPatientRecentObs: function(patientUuid) {
         // Helper Function for getting most recent value of an observation type
         //
         // Input: display name of Observation and store of Observations
@@ -484,58 +488,38 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             }
             return "-";
         };
-        
+
         // Load observations for current patient
         var obsStore = Ext.create('RaxaEmr.Outpatient.store.obs');
             
-        obsStore.getProxy().setUrl(HOST + '/ws/rest/v1/obs?patient=' + myRecord.data.uuid);
+        obsStore.getProxy().setUrl(HOST + '/ws/rest/v1/obs?patient=' + patientUuid);
         var that = this;
+        var vitalsGridView = Ext.getCmp('vitalsGrid');
+
         obsStore.load({
             callback: function(records, operation, success){
                 if(success){
                         // wait for store to load
                         console.log(obsStore); 
                         var obsTypes = ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE','PATIENT IMAGE'];
-                        item = {};
-                        item.pulse = '-';
-                        item.temp = '-';
-                        item.oxysat = '-';
-                        item.sbp = '-';
-                        item.dbp = '-';
-                        item.resrate = '-';
                         for (var i=0; i < obsTypes.length; i++) {
                             var val = getMostRecentObsValue(obsTypes[i], obsStore)
                             // TODO: Will show undefined if no value is found
                             switch (obsTypes[i]){
+                                // TODO: Change from display name to concept UUID instead
                                 case 'PULSE':
-                                    document.getElementById('PR').innerHTML =val;
-                                    item.pulse = val;
-                                    break;
                                 case 'TEMPERATURE (C)':
-                                    document.getElementById('Temp').innerHTML =val;;
-                                    item.temp = val;
-                                    break;
                                 case 'BLOOD OXYGEN SATURATION':
-                                    document.getElementById('O2Sat').innerHTML =val;
-                                    item.oxysat = val;
-                                    break;
                                 case 'DIASTOLIC BLOOD PRESSURE': 
-                                    document.getElementById('DBP').innerHTML = val;
-                                    item.dbp = val;
-                                    break;
                                 case 'SYSTOLIC BLOOD PRESSURE':
-                                    item.sbp = val;
-                                    document.getElementById('SBP').innerHTML = val;
-                                    break;
                                 case 'RESPIRATORY RATE':
-                                    item.resrate = val;
-                                    document.getElementById('RR').innerHTML = val;
+                                    vitalsGridView.setVitals([{key:obsTypes[i], value: val}]);
                                     break;
                                 case 'PATIENT IMAGE' :
                                     if (val!=='-')
-                                        {
-                                            document.getElementById('patientProfile').style['background-image'] = "url("+val+")";
-                                        }
+                                    {
+                                        document.getElementById('patientProfile').style['background-image'] = "url("+val+")";
+                                    }
                                     break;
                                  default:
                                     break;
@@ -553,7 +537,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 }
             }
         });
-    }, 
+    },
 
     //to perform actions on toolbar buttion of navigation view
     buttonAction: function (obj, obj2) {
