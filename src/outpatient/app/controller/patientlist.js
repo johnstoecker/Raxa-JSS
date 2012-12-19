@@ -503,13 +503,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                         // wait for store to load
                         console.log(obsStore); 
                         var obsTypes = ['PULSE','TEMPERATURE (C)', 'BLOOD OXYGEN SATURATION', 'DIASTOLIC BLOOD PRESSURE', 'SYSTOLIC BLOOD PRESSURE', 'RESPIRATORY RATE','PATIENT IMAGE'];
-                        // item = {};
-                        // item.pulse = '-';
-                        // item.temp = '-';
-                        // item.oxysat = '-';
-                        // item.sbp = '-';
-                        // item.dbp = '-';
-                        // item.resrate = '-';
                         for (var i=0; i < obsTypes.length; i++) {
                             var val = getMostRecentObsValue(obsTypes[i], obsStore)
                             // TODO: Will show undefined if no value is found
