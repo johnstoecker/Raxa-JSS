@@ -813,13 +813,15 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             // Drug Form is reset after drug data is pushed into code
             Ext.getCmp('drugaddform').reset();
 
-            Ext.getCmp('drugForm').hide();
-            stage.fire('paintMedication');
-                
+            stage.fire('paintMedication');            
+
             // If 'add more', then reopen the form
             if (obj.id == 'addMoreDrug') {
                 Ext.getCmp('drugForm').show();
-            };   
+            } else {
+                // Hide modal (prevents extra pop up bug on iPad?)
+                Ext.getCmp('drugForm').hide();
+            } 
         } 
         else {
             Ext.Msg.alert('Invalid Form', 'Please complete the Drug Form');
