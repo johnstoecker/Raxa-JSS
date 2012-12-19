@@ -44,6 +44,8 @@ var TOOLBAR_HEIGHT = 46;
 
 var HIGH_Y_OFFSET = 10; // a little extra space
 
+// TODO: Remove from global scope
+//	This is only being used in drawLogic.js (this file) so should be simple
 function isInDrawableArea(myX, myY) {
 	up = {
 		x: myX,
