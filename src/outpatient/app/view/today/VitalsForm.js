@@ -88,28 +88,32 @@ Ext.define("RaxaEmr.Outpatient.view.today.VitalsForm", {
                         flex: '3'
                     },
                     {
-                        layout : {
-                            type  : 'hbox',
-                            align : 'strech'
-                        },
+                        html : 'Celcius',
                         flex:2,
                         border: '0 0 0 1',
-                        style:'border-style : solid; border-color: #ddd',
-                        items  : [
-                        {
-                            xtype : 'radiofield',
-                            label : 'C',
-                            value: 'C',
-                            name  : 'choice',
-                            style: 'bgcolor:white;border-color:white'
-                        },
-                        {
-                            xtype : 'radiofield',
-                            label : 'F',
-                            value: 'F',
-                            name  : 'choice'
-                        }
-                        ]
+                        style:'border-style : solid; border-color: #ddd'
+                        // layout : {
+                        //     type  : 'hbox',
+                        //     align : 'strech'
+                        // },
+                        // flex:2,
+                        // border: '0 0 0 1',
+                        // style:'border-style : solid; border-color: #ddd',
+                        // items  : [
+                        // {
+                        //     xtype : 'radiofield',
+                        //     label : 'C',
+                        //     value: 'C',
+                        //     name  : 'choice',
+                        //     style: 'bgcolor:white;border-color:white'
+                        // },
+                        // {
+                        //     xtype : 'radiofield',
+                        //     label : 'F',
+                        //     value: 'F',
+                        //     name  : 'choice'
+                        // }
+                        // ]
                     }
                     ]
                 },

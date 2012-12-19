@@ -46,29 +46,36 @@ Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
             console.log(newValues[i]);
             var key = newValues[i].key;
             var val = newValues[i].value;
-            
+
+            // TODO: Accepts display name or concept UUID. refactor cleanly will only concept uuids
             switch (key){
                 case 'PULSE':
+                case localStorage.pulseUuidconcept:
                     document.getElementById('PR').innerHTML =val;
                     item.pulse = val;
                     break;
                 case 'TEMPERATURE (C)':
+                case localStorage.temperatureUuidconcept:
                     document.getElementById('Temp').innerHTML =val;;
                     item.temp = val;
                     break;
                 case 'BLOOD OXYGEN SATURATION':
+                case localStorage.bloodoxygensaturationUuidconcept:
                     document.getElementById('O2Sat').innerHTML =val;
                     item.oxysat = val;
                     break;
                 case 'DIASTOLIC BLOOD PRESSURE': 
+                case localStorage.diastolicbloodpressureUuidconcept:
                     document.getElementById('DBP').innerHTML = val;
                     item.dbp = val;
                     break;
                 case 'SYSTOLIC BLOOD PRESSURE':
+                case localStorage.systolicbloodpressureUuidconcept:
                     item.sbp = val;
                     document.getElementById('SBP').innerHTML = val;
                     break;
                 case 'RESPIRATORY RATE':
+                case localStorage.respiratoryRateUuidconcept:
                     item.resrate = val;
                     document.getElementById('RR').innerHTML = val;
                     break;

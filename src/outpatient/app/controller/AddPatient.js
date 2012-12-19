@@ -179,7 +179,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             provider: provider
         });
        
-        gloJson = jsonencounter;
         // Handle "Screener Vitals" encounters specially
         // Create observations linked to the encounter
         if (encountertype === localStorage.screenervitalsUuidencountertype)
@@ -201,7 +200,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             };
 
             console.log("Creating Obs for uuid types...");
-            v = Ext.getCmp("vitalsForm").getValues();
+            var v = Ext.getCmp("vitalsForm").getValues();
             createObs(localStorage.bloodoxygensaturationUuidconcept, v.bloodOxygenSaturationField);
             createObs(localStorage.diastolicbloodpressureUuidconcept, v.diastolicBloodPressureField);
             createObs(localStorage.respiratoryRateUuidconcept, v.respiratoryRateField);
@@ -291,14 +290,34 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
     // Create a SCREENER_VITALS encounter and attach vitals observations
     savePatientVitals: function () {
-        if (! myRecord) {
+        if (! myRecord.data) {
             console.log("error, must have a patient selected before can add vitals");
+            return;
         }
         console.log('savePatientVitals');
 
         var patientUuid = myRecord.data['uuid'];
         var providerPersonUuid = localStorage.loggedInUser;
         this.sendEncounterData(patientUuid, localStorage.screenervitalsUuidencountertype, "", providerPersonUuid);
-        Ext.Msg.alert("Submitted patient vitals");
+
+        // update UI immediately
+            
+        var v = Ext.getCmp("vitalsForm").getValues();
+        var vitals = [];
+
+        // TODO: remove global
+        gloVitals = vitals;
+        vitals.push({key:localStorage.bloodoxygensaturationUuidconcept, value:v.bloodOxygenSaturationField});
+        vitals.push({key:localStorage.diastolicbloodpressureUuidconcept, value:v.diastolicBloodPressureField});
+        vitals.push({key:localStorage.respiratoryRateUuidconcept, value:v.respiratoryRateField});
+        vitals.push({key:localStorage.systolicbloodpressureUuidconcept, value:v.systolicBloodPressureField});
+        vitals.push({key:localStorage.temperatureUuidconcept, value:v.temperatureField}); 
+        vitals.push({key:localStorage.pulseUuidconcept, value:v.pulseField});
+
+        var vitalsGridView = Ext.getCmp('vitalsGrid');
+        vitalsGridView.setVitals(vitals);
+
+        // Close vitals window
+        Ext.getCmp('vitalsModal').hide();
     },
 });

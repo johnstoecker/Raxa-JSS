@@ -12,7 +12,7 @@ Ext.define("RaxaEmr.Outpatient.view.today.VitalsModal", {
         top: 60,
         // enough to not overlap with toolbar
         width: 500,
-        height: 400,
+        height: 440,
         hideOnMaskTap: true,
         layout: 'vbox',
         // style: 'background:#96d2f7',

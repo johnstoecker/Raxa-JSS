@@ -329,9 +329,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         var doctorName = Util.getSession().display;
         Ext.getCmp('mainview').setDoctorName(doctorName);
 
-        // TODO: for testing! restore dash as default
-        // Ext.getCmp('patientManagementDashboard').show();
-        Ext.getCmp('vitalsModal').show();
+        Ext.getCmp('patientManagementDashboard').show();
 
         // Set store for patient list in UI
         var store_patientList = Ext.getStore('patientStore');
@@ -507,6 +505,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                             var val = getMostRecentObsValue(obsTypes[i], obsStore)
                             // TODO: Will show undefined if no value is found
                             switch (obsTypes[i]){
+                                // TODO: Change from display name to concept UUID instead
                                 case 'PULSE':
                                 case 'TEMPERATURE (C)':
                                 case 'BLOOD OXYGEN SATURATION':
