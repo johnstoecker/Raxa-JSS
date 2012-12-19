@@ -157,7 +157,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                         ui: 'confirm',
                         handler: function() {
                             // TODO: Investigate events this triggers.. sets off a chain and don't think we need all of them
-                            stage.fire('paintDiagnosis');                        
+                            stage.fire('paintDiagnosis');        
+
+                            // Hide modal (prevents extra pop up bug on iPad?)
+                            Ext.getCmp('diagnosis-panel').hide();                                           
                         },
                         flex: 1
                     }, {
