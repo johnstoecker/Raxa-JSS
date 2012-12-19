@@ -19,11 +19,6 @@ Ext.define('RaxaEmr.Outpatient.view.patient.searchpatient', {
     id: 'searchpatient',
 
     config: {
-        listeners: {
-            show: function () {
-               Ext.getCmp('searchpatientfield').focus();
-            }
-        },
         store: 'PatientSearch',
 
         // Floating by default
