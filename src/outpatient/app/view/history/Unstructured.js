@@ -112,6 +112,9 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					itemtap: function(view, index, target, record, e, eOpts) {
 						var me = Ext.getCmp('history-unstructured-panel');
 						me.showVisitInView(record);
+
+						// Hide modal window
+						Ext.getCmp('visitHistory').hide();
 					}
 				},
 			}]
