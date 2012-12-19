@@ -44,6 +44,8 @@ var TOOLBAR_HEIGHT = 46;
 
 var HIGH_Y_OFFSET = 10; // a little extra space
 
+// TODO: Remove from global scope
+//	This is only being used in drawLogic.js (this file) so should be simple
 function isInDrawableArea(myX, myY) {
 	up = {
 		x: myX,
@@ -316,19 +318,19 @@ var setupCanvas = function() {
 			console.log('mode = erase');
 			setCanvasInteractionMode('erase');
 		}
-	}, {
-		// Keyboard (typed text input)
-		image: 'resources/images/icons/text_off.png',
-		imageWhenToggledOn: 'resources/images/icons/text_on.png',
-		x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
-		y: TOOLBAR_ITEM_BASE_Y,
-		width: TOOLBAR_ITEM_DIM,
-		height: TOOLBAR_ITEM_DIM,
-		controlGroup : 'drawingInput',
-		handler: function() {
-			console.log('KEYBOARD: TODO');
-			// mode = "keyboard";
-		}
+	// }, {
+	// 	// Keyboard (typed text input)
+	// 	image: 'resources/images/icons/text_off.png',
+	// 	imageWhenToggledOn: 'resources/images/icons/text_on.png',
+	// 	x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
+	// 	y: TOOLBAR_ITEM_BASE_Y,
+	// 	width: TOOLBAR_ITEM_DIM,
+	// 	height: TOOLBAR_ITEM_DIM,
+	// 	controlGroup : 'drawingInput',
+	// 	handler: function() {
+	// 		console.log('KEYBOARD: TODO');
+	// 		// mode = "keyboard";
+	// 	}
 	}, {
 		// New
 		image: 'resources/images/button_New_off.png',
