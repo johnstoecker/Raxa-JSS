@@ -225,11 +225,27 @@ Ext.define('KineticToSencha', {
 
 		//makes the post call for creating the patient
 		var that = this;
-		this.DoctorOrderStore.on('write', function() {
-			// Reset the "today" canvas after saving the visit
-			that.initCanvasData();
-		});
+
+		// this.DoctorOrderStore.on('write', function() {
+		// 	// Reset the "today" canvas after saving the visit
+		// 	that.initCanvasData();
+		// });
 		this.DoctorOrderStore.sync();
+
+		// TODO: Moving this outside of the 'write' callback. It will now happen immediately after the REST call
+		// 	Danger-- if the REST call fails, we've lost all the data we need to construct it!
+		//	We'll need a better scheme for caching this data in the future and doing repeated sync attempts...
+		//
+		// Another option -- could add a mask to the main "input" UI before REST call, and remove mask after REST call. however,
+		// 	this doesn't fix the fundamental problem that the rest call might fail
+		// The other issue is that you cannot really clear the view (and allow user input) without clearing the stores too
+		//	because the stores' data is tied to the view (e.g. diagnoses shown in the UI are being submitted in the backend).
+		//	So if we just clear the canvas and allow the user to start drawing again, they may be confused when the stores
+		// 	behave unexpectedly. 
+		// 	...
+		//	Design discussion needed. let's solve this in a robust way that accounts for possibility of validation
+		//  or syncing/network errors.
+		that.initCanvasData();
 	},
 
 	// This function clears the canvas (UI) and resets all the models/stores which are tied ot the UI
