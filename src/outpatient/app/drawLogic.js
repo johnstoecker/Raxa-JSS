@@ -371,6 +371,8 @@ var setupCanvas = function() {
 					// Also saves via REST using k2s.sendDoctorOrderEncounter();
 					// Clear "today" canvas, after saving via REST
 					onSaveCanvas();
+					//Also prints on confirming "Finalize" (TODO- add print option in history as well).
+					window.open("app/view/print/patientRecordPrint.html", "Patient Record");
 					}
 				}
 			});
