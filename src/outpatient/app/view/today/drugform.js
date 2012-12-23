@@ -192,12 +192,14 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                 xtype: 'button',
                                 ui: 'confirm',
                                 text: 'Add More',
+                                hidden: true,
                                 id: 'addMoreDrug',
                                 flex: 1
-                            }, {
-                                xtype: 'spacer',
-                                flex: 1
-                            }, {
+                            },// {
+                              //  xtype: 'spacer',
+                              //  flex: 1
+                            //  }, 
+                            {
                                 xtype: 'button',
                                 ui: 'confirm',
                                 text: 'Done',
