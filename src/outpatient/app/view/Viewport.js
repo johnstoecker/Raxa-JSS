@@ -41,7 +41,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
                 id: 'dashboardToggleButton',
                 iconCls: 'arrow_down',
                 iconAlign: 'right',
-                text: 'Dashboard',
+                text: 'Select Patient',
                 iconMask: true,
                 handler: function() {
                     var dash = Ext.getCmp('patientManagementDashboard');
