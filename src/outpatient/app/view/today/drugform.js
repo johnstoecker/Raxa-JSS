@@ -81,7 +81,8 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                             items: [{
                                 xtype: 'searchfield',
                                 id: 'drugfilterbysearchfield',
-                                label: 'Drug Name'
+                                label: 'Drug Name',
+                                placeHolder: 'Use Keyboard to start typing....'
                             }, {
                                 xtype: 'selectfield',
                                 label: 'Strength',

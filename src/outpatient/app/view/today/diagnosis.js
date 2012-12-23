@@ -94,6 +94,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     }, {
                         xtype: 'searchfield',
                         id: 'diagnosisfilterbysearchfield',
+                        placeHolder: 'Use Keyboard to start typing....'
                     }]
                 }, {
                     xtype: 'Diagnosis-List',
