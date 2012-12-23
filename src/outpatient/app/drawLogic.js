@@ -150,6 +150,17 @@ var setupCanvas = function() {
 		Ext.getCmp('drugForm').hide();
 		drawTextAtLowPoint(PrintObject);
 	});
+	stage.on("paintDate", function() {
+		//Should be called at reset stage / clear stage
+		if(PrintObject)
+		{
+			PrintObject.TextGroupProperty.type = 'Date';
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length);
+			textForPrintObject = new TextProperty(new Date().toDateString(),'date');
+			PrintObject.TextArray.push(textForPrintObject);
+			drawTextAtLowPoint(PrintObject);
+		}
+	});
 
 	////////////////////////
 	// Event Handlers
@@ -610,6 +621,7 @@ var setupCanvas = function() {
 	// Temporary filler function called whenever a user adds a diagnosis
 	// If user chooses "Sinusitus" as their diagnosis, it will cause this alert to appear
 	function fakeDecisionSupport() {
+		//TODO: These settings changes default setting. should not change global setting. 
 		Ext.Msg.defaultAllowedConfig.maxHeight = 300;
 		Ext.Msg.defaultAllowedConfig.maxWidth = 400;
 
@@ -721,6 +733,7 @@ var setupCanvas = function() {
 			fakeDecisionSupport();
 		}
 	}
+	stage.fire("paintDate");
 
 	publicAccessObject['methods'] = {};
 	publicAccessObject['methods']['setCanvasInteractionMode'] = setCanvasInteractionMode;

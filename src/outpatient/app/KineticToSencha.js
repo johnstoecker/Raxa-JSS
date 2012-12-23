@@ -308,5 +308,7 @@ Ext.define('KineticToSencha', {
 		}
 
 		eraseDrawableLayers();
+		//Prints Date on Page
+		stage.fire("paintDate");
 	}
 });
