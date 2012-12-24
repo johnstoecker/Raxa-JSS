@@ -1,8 +1,18 @@
 <html>
 	<body>
 	<center>	
-		<h1> MADAN FAMILY CARE CENTRE </h1>
-	 </center>
+		<div id="LetterHead">
+			<h1> MADAN FAMILY CARE CENTRE </h1>
+		</div>	
+		</center>
+		<div id="patient Details">
+			<table width="100%">
+				<tr>
+					<td id="PatientDetails" width="50%"> </td>
+					<td id="DoctorDetails" width="50%"> </td>
+				</tr>
+			</table>
+		</div>
 <img id="patientRecord">
 </img>
 </body>
@@ -10,8 +20,9 @@
 	if(localStorage.printablePatientRecord)
 	{
 		var printablePatientRecord = JSON.parse(localStorage.printablePatientRecord);
-		console.log(printablePatientRecord);
 		document.getElementById('patientRecord').src = printablePatientRecord.DataUrl;
+		document.getElementById('PatientDetails').innerHTML= 'Patient: <b>' + printablePatientRecord.patient.display + '</b>  ' + printablePatientRecord.patient.age + '/' + printablePatientRecord.patient.gender;
+		document.getElementById('DoctorDetails').innerHTML= 'Doctor:<b> Dr.' + JSON.parse(localStorage.session).display  + '</b>';
 	}
     function Print() { 
         window.print();

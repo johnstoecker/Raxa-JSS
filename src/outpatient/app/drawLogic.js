@@ -251,9 +251,9 @@ var setupCanvas = function() {
 	// SAVING 
 	// Save - event handler
 
-	function onSaveCanvas() {
+	function onSaveCanvas(print) {
 		// Callback, since the stage toDataURL() method is asynchronous
-		k2s.saveDrawableCanvas();
+		k2s.saveDrawableCanvas(print);
 		// k2s.saveLoadMask();
 	}
 
@@ -367,26 +367,53 @@ var setupCanvas = function() {
 		// height: 44
 		handler: function() {
 			console.log('sending Doctor Encounter');
-			Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
-				if(btn == 'yes') {
-					// TODO: Saved image is wrong resolution
-					// TODO: Using Global Variable myRecord set in controller
-					// after selecting patient from patientlist and after every search/add patient 
-					if(!myRecord.data)
-					{
-						Ext.Msg.alert("Error","Please select/create a patient");
-					}
-					else{
-					// Saves image to localStore
-					// Scrolls directly to see the history item in history view
-					// Also saves via REST using k2s.sendDoctorOrderEncounter();
-					// Clear "today" canvas, after saving via REST
-					onSaveCanvas();
-					//Also prints on confirming "Finalize" (TODO- add print option in history as well).
-					window.open("app/view/print/patientRecordPrint.html", "Patient Record");
-					}
+			var messageBox = Ext.create('Ext.MessageBox');
+			messageBox.show({
+				title: "Finalize?",
+				buttons:  [{ 
+				itemId : 'no',  
+				text   : 'No',   
+				handler : function() {
+					//TODO: UI Response to make sure user know data is not saved.
+					this.hide();
+					} 
+				},{   
+					itemId : 'yes',   
+					text   : 'Yes',  
+					handler : function() {
+						this.hide();
+						savePatientRecord({print:false});
+					}    
+				},{   
+					itemId : 'yesAndPrint',   
+					text   : 'Yes & Print',
+					handler : function() {
+					this.hide();
+					var print=true;
+					savePatientRecord(print);	
+		          }   
+		      }], 
+		    });
+
+	function savePatientRecord(print) {
+				// TODO: Saved image is wrong resolution
+				// TODO: Using Global Variable myRecord set in controller
+				// after selecting patient from patientlist and after every search/add patient 
+				if(!myRecord.data)
+				{
+					Ext.Msg.alert("Error","Please select/create a patient");
+					Ext.getCmp('patientManagementDashboard').show();
 				}
-			});
+				else{
+				// Saves image to localStore
+				// Scrolls directly to see the history item in history view
+				// Also saves via REST using k2s.sendDoctorOrderEncounter();
+				// Clear "today" canvas, after saving via REST
+				onSaveCanvas(print);					
+				//TODO Record that print command has been given and alert should come if \
+				//new patient is selected without saving prev one
+				}
+		}
 		},
 	}, {
 		// Add diagnosis

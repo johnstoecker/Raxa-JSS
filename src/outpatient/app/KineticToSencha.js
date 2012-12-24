@@ -40,7 +40,7 @@ Ext.define('KineticToSencha', {
 	},
 
 	// Saves just "drawable" portion of canvas
-	saveDrawableCanvas: function() {
+	saveDrawableCanvas: function(print) {
 		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
 		
 		// Disable interaction. E.g. this hides delete icons, if in erase mode. Interaction is restored below.
@@ -78,21 +78,23 @@ Ext.define('KineticToSencha', {
 					// width: 32
 				});
 				
-				//TODO: Rather than storing in localStorage, event should be published (pubsub)
-				var printablePatientRecord = { 
-					DataUrl : kineticImage.toDataURL({
-							callback: function(dataUrl) {
-								console.log('callback for dataUrl');
-							},
-							mimeType: 'image/jpeg',
-							quality: 1,
-							// height: 32,
-							// width: 32
-						}),
-					patient: myRecord.raw
-				};
-				localStorage.setItem('printablePatientRecord',JSON.stringify(printablePatientRecord));
-				console.log(JSON.stringify(printablePatientRecord));
+				if(print==true)
+					{
+						//TODO: Rather than storing in localStorage, event should be published (pubsub)
+						var printablePatientRecord = { 
+							DataUrl : kineticImage.toDataURL({
+									callback: function(dataUrl) {
+										console.log('callback for dataUrl');
+									},
+									mimeType: 'image/jpeg',
+									quality: 1
+								}),
+							patient: myRecord.raw
+						};
+						localStorage.setItem('printablePatientRecord',JSON.stringify(printablePatientRecord));
+						//TODO add print option in history as well. 
+						window.open("app/view/print/patientRecordPrint.html", "Patient Record");
+					}
 				// Delete temp layer
 				temp_layer.remove();
 
