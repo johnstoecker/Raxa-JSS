@@ -203,12 +203,24 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
             console.log("Creating Obs for uuid types...");
             var v = Ext.getCmp("vitalsForm").getValues();
+            if(v.bloodOxygenSaturationField !== null) {
             createObs(localStorage.bloodoxygensaturationUuidconcept, v.bloodOxygenSaturationField);
+            }
+            if(v.diastolicBloodPressureField !== null) {
             createObs(localStorage.diastolicbloodpressureUuidconcept, v.diastolicBloodPressureField);
+            }
+            if(v.respiratoryRateField !== null) {
             createObs(localStorage.respiratoryRateUuidconcept, v.respiratoryRateField);
+            }
+            if(v.systolicBloodPressureField !== null) {
             createObs(localStorage.systolicbloodpressureUuidconcept, v.systolicBloodPressureField);
-            createObs(localStorage.temperatureUuidconcept, v.temperatureField); 
+            }
+            if(v.temperatureField !== null) {
+            createObs(localStorage.temperatureUuidconcept, v.temperatureField);
+            }
+            if(v.pulseField !== null) {
             createObs(localStorage.pulseUuidconcept, v.pulseField);
+            }
             observations.sync();
             console.log("... Complete! Created Obs for new uuid types");
         }
