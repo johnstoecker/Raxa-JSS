@@ -44,6 +44,8 @@ var TOOLBAR_HEIGHT = 46;
 
 var HIGH_Y_OFFSET = 10; // a little extra space
 
+// TODO: Remove from global scope
+//	This is only being used in drawLogic.js (this file) so should be simple
 function isInDrawableArea(myX, myY) {
 	up = {
 		x: myX,
@@ -170,7 +172,12 @@ var setupCanvas = function() {
 			newLinePoints.push(prevPos);
 			newLine = new Kinetic.Line({
 				points: newLinePoints,
-				stroke: "black"
+				stroke: "black",
+				strokeWidth: 1,
+				//lineJoin can be miter, round, or bevel
+				lineJoin: "round",
+				//Other configs including lineCap, swadow, cornerRadius make the curves better
+				//but response time is not adequate.
 			});
 			linesLayer.add(newLine);
 			moving = true;
@@ -311,19 +318,19 @@ var setupCanvas = function() {
 			console.log('mode = erase');
 			setCanvasInteractionMode('erase');
 		}
-	}, {
-		// Keyboard (typed text input)
-		image: 'resources/images/icons/text_off.png',
-		imageWhenToggledOn: 'resources/images/icons/text_on.png',
-		x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
-		y: TOOLBAR_ITEM_BASE_Y,
-		width: TOOLBAR_ITEM_DIM,
-		height: TOOLBAR_ITEM_DIM,
-		controlGroup : 'drawingInput',
-		handler: function() {
-			console.log('KEYBOARD: TODO');
-			// mode = "keyboard";
-		}
+	// }, {
+	// 	// Keyboard (typed text input)
+	// 	image: 'resources/images/icons/text_off.png',
+	// 	imageWhenToggledOn: 'resources/images/icons/text_on.png',
+	// 	x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
+	// 	y: TOOLBAR_ITEM_BASE_Y,
+	// 	width: TOOLBAR_ITEM_DIM,
+	// 	height: TOOLBAR_ITEM_DIM,
+	// 	controlGroup : 'drawingInput',
+	// 	handler: function() {
+	// 		console.log('KEYBOARD: TODO');
+	// 		// mode = "keyboard";
+	// 	}
 	}, {
 		// New
 		image: 'resources/images/button_New_off.png',
@@ -352,12 +359,19 @@ var setupCanvas = function() {
 			Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
 				if(btn == 'yes') {
 					// TODO: Saved image is wrong resolution
-					
+					// TODO: Using Global Variable myRecord set in controller
+					// after selecting patient from patientlist and after every search/add patient 
+					if(!myRecord.data)
+					{
+						Ext.Msg.alert("Error","Please select/create a patient");
+					}
+					else{
 					// Saves image to localStore
 					// Scrolls directly to see the history item in history view
 					// Also saves via REST using k2s.sendDoctorOrderEncounter();
 					// Clear "today" canvas, after saving via REST
 					onSaveCanvas();
+					}
 				}
 			});
 		},

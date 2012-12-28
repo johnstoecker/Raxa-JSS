@@ -32,7 +32,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             },
             show: function() {
                 Ext.getCmp('diagnosisfilterbysearchfield').reset();
-                Ext.getCmp('diagnosisfilterbysearchfield').focus();
             }
         },
         // centered: true,
@@ -129,21 +128,11 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     },
                     items: [{
                         xtype: 'spacer',
-                    }, {
-                        xtype: 'button',
-                        text: 'Add Diagnosis',
-                        id: 'addDiagnosisInList',
-                        ui: 'confirm',
-                        handler: function() {
-                            // TODO: Investigate invents this triggers.. sets off a chain and don't think we need all of them
-                            stage.fire('paintDiagnosis');
-                        },
-                    }, {
-                        xtype: 'spacer',
+                        flex: 1
                     }, {
                         xtype: 'button',
                         ui: 'confirm',
-                        text: 'Add Diagnosis and Continue',
+                        text: 'Add More',
                         id: 'addMoreDiagnosis',
                         handler: function() {
                             // TODO: fire event. move handling to controller
@@ -157,8 +146,26 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                             // Show modal again
                             Ext.getCmp('diagnosis-panel').show();                           
                         },
+                        flex: 1
                     }, {
                         xtype: 'spacer',
+                        flex: 1
+                    }, {
+                        xtype: 'button',
+                        text: 'Done',
+                        id: 'addDiagnosisInList',
+                        ui: 'confirm',
+                        handler: function() {
+                            // TODO: Investigate events this triggers.. sets off a chain and don't think we need all of them
+                            stage.fire('paintDiagnosis');        
+
+                            // Hide modal (prevents extra pop up bug on iPad?)
+                            Ext.getCmp('diagnosis-panel').hide();                                           
+                        },
+                        flex: 1
+                    }, {
+                        xtype: 'spacer',
+                        flex: 1
                     }]
                 }]
             }]

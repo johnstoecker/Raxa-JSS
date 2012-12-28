@@ -40,7 +40,6 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
             },
             show: function() {
                 Ext.getCmp('drugfilterbysearchfield').reset();
-                Ext.getCmp('drugfilterbysearchfield').focus();
             }
         },
         items: [{
@@ -129,10 +128,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                             value: 'Once Daily',
                                             title: 'Once Daily'
                                         }, {
-                                            value: 'Once Daily',
+                                            value: 'Twice Daily',
                                             title: 'Twice Daily'
                                         }, {
-                                            value: 'Once Daily',
+                                            value: 'Thrice Daily',
                                             title: 'Thrice Daily'
                                         }]
                                     }
@@ -188,27 +187,25 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                             layout: 'hbox',
                             items: [{
                                 xtype: 'spacer',
-                                width: '8%'
+                                flex: 1
                             }, {
                                 xtype: 'button',
                                 ui: 'confirm',
-                                text: 'Add Drug',
-                                id: 'addDrugInList',
-                                flex: 1,
-                                width: '40%',
-                            }, {
-                                xtype: 'spacer',
-                                width: '4%'
-                            }, {
-                                xtype: 'button',
-                                ui: 'confirm',
-                                text: 'Add Drug and Continue',
+                                text: 'Add More',
                                 id: 'addMoreDrug',
-                                flex: 2,
-                                width: '40%',
+                                flex: 1
                             }, {
                                 xtype: 'spacer',
-                                width: '8%'
+                                flex: 1
+                            }, {
+                                xtype: 'button',
+                                ui: 'confirm',
+                                text: 'Done',
+                                id: 'addDrugInList',
+                                flex: 1
+                            }, {
+                                xtype: 'spacer',
+                                flex: 1
                             }]
                         }]
                     }]
