@@ -21,6 +21,7 @@ Ext.define('RaxaEmr.Outpatient.store.diagnosis', {
         proxy: {
             type: 'ajax',
             url: 'resources/data/diagnosis.json',
-        }
+        },
+        autoLoad: true
     }
 });

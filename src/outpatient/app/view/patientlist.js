@@ -20,20 +20,22 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
     id: 'contact',
     
     config: {
-
+        
+        // TODO: Add nice looking empty text
         emptyText: 'No patients found',
 
         // Floating by default
-        left: 0,
-        top: 0,
+        left: (768 - 700) / 2,
+        top: 60,
         
         // Modal
         modal: true,
+        floating: true,
         hideOnMaskTap: true,
         hidden: true,
 
         // Size and layout
-        width: 768,
+        width: 700,
         height: 400,
 
         // Show / Hide Animations
@@ -56,6 +58,28 @@ Ext.define('RaxaEmr.Outpatient.view.patientlist', {
         pressedCls:'testPress',
 
 		// List item template
+        items: [{
+            xtype: 'toolbar',
+            docked: 'top',
+            title: 'Patient List',
+            items: [{
+                xtype: 'button',
+                id: 'refresh',
+                iconCls: 'refresh',
+                iconMask: true,
+                ui: 'confirm',
+            },{
+                xtype: 'spacer'
+            },{
+                xtype: 'button',
+                iconCls: 'delete',
+                iconMask: true,
+                handler: function() {
+                    Ext.getCmp('contact').hide();
+                },
+                ui: 'decline',
+            }]
+        }],
         // itemTpl: '{display}',
 		itemTpl: new Ext.XTemplate(
             '<div class="headshot" style="background-image:url(resources/images/headshots/pic.gif);"></div>', 

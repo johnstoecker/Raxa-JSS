@@ -26,20 +26,36 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
         hidden: true,
         floating: true,
         hideOnMaskTap: true,
+        left: (768-500) / 2,    // centered, based on screen width and modal width
+        top: 60,
+        width: 500,
         title: 'Treatment',
         listeners : {
             hide: function()
             {
                 if(Ext.getCmp('searchedDrugList'))
-                    {
-                        Ext.getCmp('searchedDrugList').setHidden(true);
-                    }
+                {
+                    Ext.getCmp('searchedDrugList').setHidden(true);
+                }
+            },
+            show: function() {
+                Ext.getCmp('drugfilterbysearchfield').reset();
             }
         },
         items: [{
-            xtype: 'titlebar',
-            docked: 'top',
-            title: 'Drug Order'
+                xtype: 'toolbar',
+                title: 'Drug Order',
+                items: [{
+                    xtype: 'spacer'
+                },{
+                    xtype: 'button',
+                    iconCls: 'delete',
+                    iconMask: true,
+                    handler: function() {
+                        Ext.getCmp('drugForm').hide();
+                    },
+                    ui: 'decline',
+                }]
             },{
             xtype: 'container',
             width: 500,
@@ -51,9 +67,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                 flex: 1,
                 items: [{
                     xtype: 'container',
-                    style: 'border:solid #DADADA;',
-                    height: 500,
-                    width: 500,
+                    height: 280,
                     layout: {
                         type: 'fit'
                     },
@@ -114,10 +128,10 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                             value: 'Once Daily',
                                             title: 'Once Daily'
                                         }, {
-                                            value: 'Once Daily',
+                                            value: 'Twice Daily',
                                             title: 'Twice Daily'
                                         }, {
-                                            value: 'Once Daily',
+                                            value: 'Thrice Daily',
                                             title: 'Thrice Daily'
                                         }]
                                     }
@@ -163,36 +177,35 @@ Ext.define('RaxaEmr.Outpatient.view.today.drugform', {
                                     }]
                                 }
                             }, {
-                                xtype: 'textfield',
+                                // TODO: Cause "days" to have a numeric input, like in Screener
+                                xtype: 'numberfield',
                                 id: 'drug-duration',
-                                label: 'Duration (days)',
+                                label: 'Duration (days)'
                             }]
                         }, {
                             xtype: 'container',
                             layout: 'hbox',
                             items: [{
                                 xtype: 'spacer',
-                                width: '8%'
+                                flex: 1
+                            }, {
+                                xtype: 'button',
+                                ui: 'confirm',
+                                text: 'Add More',
+                                id: 'addMoreDrug',
+                                flex: 1
+                            }, {
+                                xtype: 'spacer',
+                                flex: 1
                             }, {
                                 xtype: 'button',
                                 ui: 'confirm',
                                 text: 'Done',
                                 id: 'addDrugInList',
-                                flex: 1,
-                                width: '40%',
+                                flex: 1
                             }, {
                                 xtype: 'spacer',
-                                width: '4%'
-                            }, {
-                                xtype: 'button',
-                                ui: 'confirm',
-                                text: 'Add More Drugs',
-                                id: 'addMoreDrug',
-                                flex: 2,
-                                width: '40%',
-                            }, {
-                                xtype: 'spacer',
-                                width: '8%'
+                                flex: 1
                             }]
                         }]
                     }]

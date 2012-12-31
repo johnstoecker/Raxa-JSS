@@ -13,7 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-Ext.Viewport.setStyleHtmlContent(true);  //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
+// TODO: This belongs in Viewport setup, or somewhere else, to make it clear that it's being applied globally
+Ext.Viewport.setStyleHtmlContent(true); //This is to fit title of top bars & Component title bars (and not show them ending with ... (dots)
 Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
     extend: 'Ext.Container',
     xtype: 'diagnosis-panel',
@@ -23,25 +24,50 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
         layout: {
             type: 'vbox'
         },
-        centered: true,
+        listeners: {
+            hide: function() {
+                if(Ext.getCmp('searchedDiagnosisList')) {
+                    Ext.getCmp('searchedDiagnosisList').setHidden(true);
+                }
+            },
+            show: function() {
+                Ext.getCmp('diagnosisfilterbysearchfield').reset();
+            }
+        },
+        // centered: true,
         modal: true,
         hidden: true,
         floating: true,
+        left: (768 - 500) / 2,
+        // centered, based on screen width and modal width
+        top: 60,
+        // enough to not overlap with toolbar
+        width: 500,
         hideOnMaskTap: true,
-        title: 'Diagnosis',
         items: [{
-            xtype: 'titlebar',
-            docked: 'top',
-            title: 'Diagnosis'
-          },{
+            xtype: 'toolbar',
+            title: 'Diagnosis',
+            items: [{
+                xtype: 'spacer'
+            }, {
+                xtype: 'button',
+                iconCls: 'delete',
+                iconMask: true,
+                handler: function() {
+                    Ext.getCmp('diagnosis-panel').hide();
+                },
+                ui: 'decline',
+            }]
+        }, {
             xtype: 'container',
-            width: 500,
+            style: 'background-color: #f7f7f7;',
             layout: {
                 type: 'hbox'
             },
             items: [{
                 xtype: 'container',
                 flex: 1,
+                margin: '20 40 20 40',
                 layout: {
                     type: 'vbox'
                 },
@@ -76,12 +102,13 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             }, {
                 xtype: 'container',
                 flex: 1,
+                hidden: true,
                 items: [{
                     xtype: 'container',
                     margin: '0 0 20 0',
                     border: '0 0 0 3',
                     //style: 'border:solid #DADADA;',
-                    height: 400,
+                    height: 200,
                     layout: {
                         type: 'fit'
                     },
@@ -92,30 +119,53 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
             }, {
                 xtype: 'container',
                 docked: 'bottom',
+                style: 'background-color: #f7f7f7;',
+                height: 80,
                 items: [{
                     xtype: 'container',
-                    margin: '0 0 20 0',
-                    style: 'background-color: #f7f7f7;',
-                    height: 50,
                     layout: {
                         type: 'hbox'
                     },
                     items: [{
                         xtype: 'spacer',
-                        width: '60%'
-                    },{
-                xtype: 'button',
-                text: 'Save',
-                flex: 1,
-                margin: '0 0 20 0',
-                width: '30%',
-                ui: 'confirm',
-                handler: function() {
-                    stage.fire('paintDiagnosis');
-                }
-            },{
+                        flex: 1
+                    }, {
+                        xtype: 'button',
+                        ui: 'confirm',
+                        text: 'Add More',
+                        id: 'addMoreDiagnosis',
+                        handler: function() {
+                            // TODO: fire event. move handling to controller
+                            // TODO: Ideally, it should still group them together and only draw
+                            //  the line underneath once all diagnoses have been selected.
+                            stage.fire('paintDiagnosis');
+
+                            // Reset what's in the modal
+                            Ext.getCmp('diagnosisfilterbysearchfield').reset();
+
+                            // Show modal again
+                            Ext.getCmp('diagnosis-panel').show();                           
+                        },
+                        flex: 1
+                    }, {
                         xtype: 'spacer',
-                        width: '10%'
+                        flex: 1
+                    }, {
+                        xtype: 'button',
+                        text: 'Done',
+                        id: 'addDiagnosisInList',
+                        ui: 'confirm',
+                        handler: function() {
+                            // TODO: Investigate events this triggers.. sets off a chain and don't think we need all of them
+                            stage.fire('paintDiagnosis');        
+
+                            // Hide modal (prevents extra pop up bug on iPad?)
+                            Ext.getCmp('diagnosis-panel').hide();                                           
+                        },
+                        flex: 1
+                    }, {
+                        xtype: 'spacer',
+                        flex: 1
                     }]
                 }]
             }]

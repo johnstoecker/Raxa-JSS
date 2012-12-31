@@ -27,7 +27,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosedlist', {
         items: [{
             xtype: 'toolbar',
             docked: 'top',
-            title: 'Diagosed Diseases',
+            title: 'Diagnosed Diseases',
             items: [{
                 xtype: 'spacer'
             },  {

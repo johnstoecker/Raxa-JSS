@@ -6,7 +6,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Overview', {
     title: 'History',
     initialize: function() {
         // Save the scope
-        console.log('initHistoryComponent');
         var that = this;
         this.callParent(arguments);
     },
@@ -15,26 +14,6 @@ Ext.define('RaxaEmr.Outpatient.view.history.Overview', {
             type: 'hbox'
         },
         items: [{
-        //     xtype: 'container',
-        //     layout: {
-        //         type: 'vbox'
-        //     }, 
-        //     items: [{
-        //         // Left bar
-        //         // "Today" view vs History View
-        //         xtype: 'container',
-        //         width: 58,
-        //         height: 52
-        //     }, {
-        //         // Left bar
-        //         // "Today" view vs History View
-        //         xtype: 'image',
-        //         src: 'resources/images/bg/TODAY_35.png',
-        //         width: 35,
-        //         height: 835
-        //     }]
-        // },
-        // {
             // Right side
             flex: 1,
             xtype: 'container',
@@ -78,8 +57,8 @@ Ext.define('RaxaEmr.Outpatient.view.history.Overview', {
             // Main view
             {
                 id: 'historyPanelMainView',
-                flex: 95,
                 xtype: 'container',
+                flex: 1,
                 layout: {
                     type: 'card'
                 },
