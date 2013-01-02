@@ -339,52 +339,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
     //fetches patient list who are screened but not not have an OPD encounter
     getpatientlist: function () {
         var d = new Date();
-        //fetching screener patient list
-        var list_scrEncounter = Ext.create('RaxaEmr.Outpatient.model.PostList', {
-            name: "Screener Encounter",
-            description: "Patients encountered Screener on " + "startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d),
-            searchQuery: "?encounterType=" + localStorage.screenerUuidencountertype + "&startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d)
-
-        });
-        //fetching opd patient list
-        var list_outEncounter = Ext.create('RaxaEmr.Outpatient.model.PostList', {
-            name: "Outpatient Encounter",
-            description: "Patients encountered Outpatient on " + "startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d),
-            searchQuery: "?encounterType=" + localStorage.outUuidencountertype + "&startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d)
-
-        });
-        var k = 0;
-        this.createList(list_scrEncounter, list_outEncounter, k);
-
-    },
-    //creating postlists for screener and opd lists
-    createList: function (list_scr, list_out, k) {
-        var that = this;
-
-        var store_scr = Ext.create('RaxaEmr.Outpatient.store.PostLists');
-        store_scr.on('write', function () {
-            // Sync opd list
-            var store_out = Ext.create('RaxaEmr.Outpatient.store.PostLists');
-            store_out.on('write', function () {
-                that.finalPatientList(store_scr, store_out);
-            }, that);
-            store_out.add(list_out);
-            store_out.sync();
-        }, that);
-        
-        store_scr.add(list_scr);
-        store_scr.sync();
-    },
-
-    //this is where the actual list is fetched
-    finalPatientList: function (store_scrEncounter, store_outEncounter) {
         var store_patientList = Ext.getStore('patientStore');
-        
-        console.log('store_scrEncounter');
-        console.log(store_scrEncounter.getData().getAt(0).getData().uuid);
-        console.log(store_scrEncounter);
-
-        store_patientList.getProxy().setUrl(this.getPatientListUrl(store_scrEncounter.getData().getAt(0).getData().uuid, store_outEncounter.getData().getAt(0).getData().uuid, localStorage.screenerUuidencountertype));
+        //fetching screener patient list
+        store_patientList.getProxy().setUrl(HOST + '/ws/rest/v1/raxacore/patientlist/optimized' + '?startDate=' + Util.Datetime(d, 24) + '&endDate=' + Util.Datetime(d) + '&encounterType=' + localStorage.screenerUuidencountertype + '&excludeEncounterType=' + localStorage.outUuidencountertype);
         store_patientList.load({
             scope: this,
             callback: function(records, operation, success){
@@ -402,12 +359,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 }
             }
         });
-        return store_patientList;
-    },
 
-    //for setting the url of the store
-    getPatientListUrl: function (scr_UUID, out_UUID, encountertype) {
-        return (HOST + '/ws/rest/v1/raxacore/patientlist' + '?inList=' + scr_UUID + '&notInList=' + out_UUID + '&encounterType=' + encountertype);
     },
 
     onSearchContactSelect: function(list, index, node, record) {
