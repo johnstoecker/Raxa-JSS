@@ -13,25 +13,26 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <p>	<span id="letterHead" style="font-size:28px;width:100%;"></span>
+                                        <p> <span id="letterHead" style="font-size:28px;width:100%;"></span>
 
                                         </p>
-                                        <p>	<span id="headerAddress" style="font-size:16px;"></span>
+                                        <p> <span id="headerAddress" style="font-size:16px;"></span>
 
                                         </p>
                                     </td>
                                     <td id="timings" style="text-align: right;"></td>
                                 </tr>
                                 <tr>
-                                    <td>	<strong><span id="PatientDetails" 	style="font-size:16px;"></span></strong>
+                                    <td>    <strong><span id="PatientDetails"   style="font-size:16px;"></span></strong>
 
                                     </td>
                                     <td style="text-align: right;">
                                         <p>
-                                            <br>	<strong><span style="font-size:16px;" id="DoctorDetails"></span></strong>
+                                            <br>
+                                            <br><strong><span style="font-size:16px;" id="DoctorDetails"></span></strong>
 
                                         </p>
-                                        <p>	<span style="font-size: 14px;" id="providerDetails"></span>
+                                        <p> <span style="font-size: 14px;" id="providerDetails"></span>
 
                                         </p>
                                     </td>
@@ -43,31 +44,32 @@
                 <tr>
                     <td>
                         <center>
-                            <img id="patientRecord"></img>
+                            <div id="patientRecordJSON" style: "height:190mm; width:220mm"></div>
                         </center>
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        <table border="0" style="width: 100%;">
-                            <tbody>
-                                <tr>
-                                    <td id="FooterLeft"></td>
-                                    <td id="FooterRight">
-                                        <p style="text-align:right;"></p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
+        <footer>
+            <table border="0" style="width: 100%;">
+                <tbody>
+                    <tr>
+                        <td id="FooterLeft"></td>
+                        <td id="FooterRight">
+                            <p style="text-align:right;"></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </footer>
     </body>
+    <script src="../../../../lib/kinetic-v4.0.5.min.js"></script>
     <script>
         if (localStorage.printablePatientRecord) {
             var printablePatientRecord = JSON.parse(localStorage.printablePatientRecord);
-            document.getElementById('patientRecord').src = printablePatientRecord.DataUrl;
             document.getElementById('PatientDetails').innerHTML = 'Patient: <b>' + printablePatientRecord.patient.display + '</b>  ' + printablePatientRecord.patient.gender + ' / ' + printablePatientRecord.patient.age;
             document.getElementById('DoctorDetails').innerHTML = 'Doctor:<b> Dr.' + JSON.parse(localStorage.session).display + '</b>';
             document.getElementById('letterHead').innerHTML = localStorage.headerPrescription || 'PATIENT OPD RECORD';
@@ -76,6 +78,53 @@
             document.getElementById('FooterLeft').innerHTML = 'This prescription is not valid for Medico-legal cases';
             document.getElementById('FooterRight').innerHTML = 'Powered by Raxa EMR| www.raxa.io';
             document.getElementById('timings').innerHTML = localStorage.providertimings || "";
+
+            var stage = Kinetic.Node.create(printablePatientRecord.canvasJSON, 'patientRecordJSON');
+        
+            //Link Images and then draw the stage
+            makeImageWork(drawAfterImagesLinked);
+
+            function makeImageWork(callback) {
+
+                for (var i = 0; i < stage.get('#textLayer')[0].getChildren().length; i++) {
+
+                    if (stage.get('#textLayer')[0].getChildren()[i].shapeType === "Image" && stage.get('#textLayer')[0].getChildren()[i].getName()) {
+
+                        printImage = new Image();
+
+                        switch (stage.get('#textLayer')[0].getChildren()[i].getName()) {
+                            case 'LineSeparator':
+                                printImage.src = "../../resources/images/icons/line.png";
+                                stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+                                break;
+                            case 'DrugOrder':
+                                printImage.src = "../../resources/images/icons/bullet_drug.png";
+                                stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+                                break;
+                            case 'Diagnosis':
+                                printImage.src = "../../resources/images/icons/bullet_diagnosis.png";
+                                stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+                                break;
+                            case 'LabOrder':
+                                printImage.src = "../../resources/images/icons/bullet_investigation.png";
+                                stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+                                break;
+                        }
+                    }
+                }
+                //Draws stage and then send Print command
+                callback(Print);
+            }
+
+            function drawAfterImagesLinked(callback) {
+
+                //Doctor sees the prescription and print (callback) options comes quickly 
+                setTimeout(function () {
+                    stage.get('#textLayer')[0].draw();
+                    callback();
+                }, 500);
+
+            }
         }
 
         function Print() {

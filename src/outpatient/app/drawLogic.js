@@ -64,10 +64,12 @@ function isInDrawableArea(myX, myY) {
 // 	This is being used in Unstructured.js view
 function addImageToLayer(file, layer, config) {
 	var imgObj = new Image();
+	imgObj.src = file;
 	imgObj.onload = function() {
 		config.image = imgObj;
-		var kineticImage = new Kinetic.Image(config);
 
+		var kineticImage = new Kinetic.Image(config);
+		kineticImage.setName(config.name);
 		if (config.handler && config.events) {
 			kineticImage.on(config.events, config.handler);
 		}
@@ -75,7 +77,6 @@ function addImageToLayer(file, layer, config) {
 		layer.add(kineticImage);
 		layer.draw();
 	}
-	imgObj.src = file;
 }
 
 var setupCanvas = function() {
@@ -186,7 +187,7 @@ var setupCanvas = function() {
 				stroke: "black",
 				strokeWidth: 1,
 				//lineJoin can be miter, round, or bevel
-				lineJoin: "round",
+//				lineJoin: "round",
 				//Other configs including lineCap, swadow, cornerRadius make the curves better
 				//but response time is not adequate.
 			});
@@ -279,7 +280,7 @@ var setupCanvas = function() {
 		width: stage.getWidth(),
 		// height: DRAWABLE_Y_MIN - 4,
 		height: TOOLBAR_HEIGHT,
-		fill: "#82b0e1" // Light Blue.
+		fill: "white"
 	});
 	backgroundLayer.add(toolbarBackground);
 
@@ -704,7 +705,8 @@ var setupCanvas = function() {
 			x: DRAWABLE_X_MIN + 20,
 			y: myHighY,
 			width: 14,
-			height: 14
+			height: 14,
+			name: type
 		});
 		for(var i = 0; i < TextArray.length; i++) {
 			var complexText = new Kinetic.Text({
@@ -747,7 +749,8 @@ var setupCanvas = function() {
 			x: DRAWABLE_X_MIN + 20,
 			y: handDrawnLineY,
 			width: 529,
-			height: 9
+			height: 9,
+			name: 'LineSeparator'
 		});
 
 		// += the height of the "hand drawn line" + "additional spacing"

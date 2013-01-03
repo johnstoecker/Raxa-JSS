@@ -9,16 +9,9 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	showVisitInView: function(record) {
 		var me = Ext.getCmp('history-unstructured-panel');
 		var imgSrc = record.get('imgSrc');
-		addImageToLayer(imgSrc, me.loadedImageLayer, {
-			x: DRAWABLE_X_MIN + 35,
-			y: DRAWABLE_Y_MIN,
-			width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
-			height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
-		});
+		var json =  record.get('json') ;
+		Ext.getCmp('history-unstructured-panel').fireEvent('repaint',json);
 
-		// var img = Ext.getCmp('singleVisitHistoryImage');
-		// var imgSrc = record.get('imgSrc');
-		// img.setSrc('imgSrc');
 		// Close visit history list window, if open
 		Ext.getCmp('visitHistory').hide();
 
@@ -122,41 +115,88 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	},
 	config: {
 		listeners: {
+			repaint: function(stageJSONParam) {
+				//converts JSON to Kinetic Stage object
+				var RetrivedStage = Kinetic.Node.create(stageJSONParam, 'historyContainer');
+				
+				//Add children to textLayer is not present, otherwise pushes new Layer in stage
+				if(this.stage.get('#textLayer').length){
+					this.stage.get('#textLayer')[0].removeChildren();
+					this.stage.get('#textLayer')[0].children = RetrivedStage.get('#textLayer')[0].getChildren();
+				}
+				else{
+					this.stage.add(RetrivedStage.get('#textLayer')[0]);
+				}
+
+				//Add children to linesLayer is not present, otherwise pushes new Layer in stage
+				if(this.stage.get('#linesLayer').length){
+					this.stage.get('#linesLayer')[0].removeChildren();
+					this.stage.get('#linesLayer')[0].children = RetrivedStage.get('#linesLayer')[0].getChildren();
+				}
+				else{
+					this.stage.add(RetrivedStage.get('#linesLayer')[0]);
+				}
+
+				//Aligns to Page Margin
+				this.stage.get('#textLayer')[0].setX(60);
+				this.stage.get('#linesLayer')[0].setX(60);
+
+                for (var i = 0; i < stage.get('#textLayer')[0].getChildren().length; i++) {
+	                if (stage.get('#textLayer')[0].getChildren()[i].shapeType === "Image" && stage.get('#textLayer')[0].getChildren()[i].getName()) {
+
+	                    printImage = new Image();
+
+	                    switch (stage.get('#textLayer')[0].getChildren()[i].getName()) {
+	                        case 'LineSeparator': console.log('LineSapartor in switch case');
+	                            printImage.src = "resources/images/icons/line.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                        case 'DrugOrder':
+	                            printImage.src = "resources/images/icons/bullet_drug.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                        case 'Diagnosis':
+	                            printImage.src = "resources/images/icons/bullet_diagnosis.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                        case 'LabOrder':
+	                            printImage.src = "resources/images/icons/bullet_investigation.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                    }
+	                }
+			}	
+				this.stage.get('#textLayer')[0].draw(); 		
+			},
 			painted: function() {
 				if(!this.isCanvasSetup) {
-					var stage = new Kinetic.Stage({
+					stage = new Kinetic.Stage({
 						id: "unstructuredHistoryStage",
 						container: "historyContainer",
 						width: STAGE_X,
 						height: STAGE_Y
-					});
+					}); 
 					this.stage = stage;
 					this.isCanvasSetup = true;
 
 					// Layers
-					var backgroundLayer = new Kinetic.Layer({
+					var backgroundLayer =  new Kinetic.Layer({
 						id: 'backgroundLayer'
-					});
-					var loadedImageLayer = new Kinetic.Layer({
-						id: 'loadedImageLayer'
-					});
+					}); 
 					var controlsLayer = new Kinetic.Layer({
 						id: 'controlsLayer'
 					});
 
-					this.loadedImageLayer = loadedImageLayer;
-
-					stage.add(backgroundLayer);
-					stage.add(loadedImageLayer);
-					stage.add(controlsLayer);
+					this.stage.add(backgroundLayer);
+					this.stage.add(controlsLayer);
 
 					// Draw background.
 					// Background - blank white canvas
 					var background = new Kinetic.Rect({
 						x: 0,
 						y: 0,
-						width: stage.getWidth(),
-						height: stage.getHeight(),
+						width: this.stage.getWidth(),
+						height: this.stage.getHeight(),
 						fill: "white"
 					});
 					backgroundLayer.add(background);
@@ -165,9 +205,9 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					var toolbarBackground = new Kinetic.Rect({
 						x: 0,
 						y: 0,
-						width: stage.getWidth(),
+						width: this.stage.getWidth(),
 						height: TOOLBAR_HEIGHT,
-						fill: "#82b0e1" // Light Blue.
+						fill: "white"
 					});
 					backgroundLayer.add(toolbarBackground);
 
@@ -181,7 +221,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					});
 
 					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {
-						x: stage.getWidth() - 723,
+						x: this.stage.getWidth() - 723,
 						y: DRAWABLE_Y_MIN,
 						// width: 710,
 						width: 722,
@@ -202,9 +242,34 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						}
 					});
 
+					// Add Printer button
+					addImageToLayer("resources/images/icons/printer.png", controlsLayer, {
+						x: 680,
+						y: 60,
+						width: 44,
+						height: 44,
+						events: 'click touchstart',
+						handler: function() {
+
+						//TODO: Rather than storing in localStorage, event should be published (pubsub)
+						var printablePatientRecord = { 
+							patient: myRecord.raw,
+							canvasJSON: this.parent.parent.toJSON({
+								x: DRAWABLE_X_MIN,
+								y: DRAWABLE_Y_MIN,
+								width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+								height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+							})
+						};	
+						
+						localStorage.setItem('printablePatientRecord',JSON.stringify(printablePatientRecord));
+						//open print window
+						window.open("app/view/print/patientRecordPrint.html", "Patient Record");
+						}
+					});
 					stage.draw();
 				}
-			},
+ 			}, 
 		},
 		layout: {
 			type: 'vbox'

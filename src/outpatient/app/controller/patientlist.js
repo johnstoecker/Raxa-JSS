@@ -358,7 +358,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     },
     //creating postlists for screener and opd lists
-    createList: function (list_scr, list_out, k) {
+    createList:function (list_scr, list_out, k) {
         var that = this;
 
         var store_scr = Ext.create('RaxaEmr.Outpatient.store.PostLists');
@@ -457,9 +457,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             var visitHistoryStore = this.getVisitHistory(patientEncounterStore);
             for (var i =0; i < visitHistoryStore.getCount(); i++) {
                 // TODO: Re-create from JSON instead of images
-                // var stageJSON = visitHistoryStore.getAt(i).getData().json;                
+                 var stageJSON = visitHistoryStore.getAt(i).getData().json;                
                 // Add to stage
-                // Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
+                 Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
             }
         }, this);
 
@@ -884,7 +884,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                         imgSrc = o.value;
                     } else if (conceptUuid == localStorage.patientRecordVectorImageUuidconcept) {
                         console.log('found vector image!');
-                        console.log(o);
                         json = o.value;
                     }
                 }   

@@ -89,8 +89,15 @@ Ext.define('KineticToSencha', {
 									mimeType: 'image/jpeg',
 									quality: 1
 								}),
-							patient: myRecord.raw
-						};
+							patient: myRecord.raw,
+							canvasJSON: stage.toJSON({
+								x: DRAWABLE_X_MIN,
+								y: DRAWABLE_Y_MIN,
+								width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+								height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+							})
+						};	
+						
 						localStorage.setItem('printablePatientRecord',JSON.stringify(printablePatientRecord));
 						//TODO add print option in history as well. 
 						window.open("app/view/print/patientRecordPrint.html", "Patient Record");
@@ -101,7 +108,8 @@ Ext.define('KineticToSencha', {
 				// Adds it to history store (list is visible in history view)
 				k2sContext.addToVisitHistory({
 					date: Date(),
-					imgSrc: dataUrl
+					imgSrc: dataUrl,
+					json: stage.toJSON()
 				});
 
 				// Show most recently added item, from store
@@ -142,7 +150,7 @@ Ext.define('KineticToSencha', {
 			// diagnosisCount: 0,
 			// treatmentCount: 0,
 			imgSrc: config.imgSrc,
-			// json: config.json
+			json: config.json
 		});
 	},
 
@@ -232,8 +240,8 @@ Ext.define('KineticToSencha', {
 	sendDoctorOrderEncounter: function(dataUrl) {
 		this.addObs();
 		// TODO: these are currently two special cases of Obs. can streamline to just the addObs fn
-		this.addDoctorRecordImage(dataUrl);
-		// this.addDoctorRecordVectorImage();
+//		this.addDoctorRecordImage(dataUrl);
+		this.addDoctorRecordVectorImage();
 
 		this.addOrder();
 

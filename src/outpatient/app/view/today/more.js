@@ -23,6 +23,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
         cls: 'x-show-contact',
         ui: 'round',
         id: 'more',
+        style: 'background-color: #FFFFFF;',        
         layout: 'vbox',
         items: [{
             xtype: 'button',
@@ -35,6 +36,17 @@ Ext.define('RaxaEmr.Outpatient.view.today.more', {
             handler: function() {
                 console.log('popup for vitals, allowing input');
                 Ext.getCmp('vitalsModal').show();
+            }
+        },{
+            xtype: 'button',
+            id: 'addReferButton',
+            text: 'Refer',
+            left: 290,
+            top: 52,
+            width: 80,
+            height: 30, // layout of vitals "table" changes when real values are added to it
+            handler: function() {
+                    //Make Referable Modal work
             }
         },{
             xtype: 'container',

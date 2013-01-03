@@ -294,6 +294,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     savePatientVitals: function () {
         if (! myRecord.data) {
             console.log("error, must have a patient selected before can add vitals");
+            alert('Please select patient before adding vitals');
             return;
         }
         console.log('savePatientVitals');
