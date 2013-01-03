@@ -15,7 +15,7 @@
  */
 Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     extend: 'Ext.app.Controller',
-    requires: ['Screener.view.NewPatient', 'Screener.model.encounterpost','Screener.store.Location','Screener.model.NewPatient', 'Screener.store.NewPatients', 'Screener.store.IdentifierType', 'Screener.store.encounterpost', 'Screener.model.observation'],
+    requires: ['Screener.view.NewPatient', 'Screener.model.encounterpost','Screener.model.NewPatient', 'Screener.store.NewPatients', 'Screener.store.encounterpost', 'Screener.model.observation'],
     config: {
         // All the fields are accessed in the controller through the id of the components
         refs: { 
@@ -88,7 +88,7 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
         var formp = Ext.getCmp('newPatient').saveForm();
         // Sets Patient Name & Age on Screen while patient is created in the backend
-        this.setScreenForPatient(formp.givenname + ' ' + formp.familyname,formp.patientAge,formp.choice);
+        this.setScreenForPatient(formp.givenname + ' ' + formp.familyname,formp.patientAge);
 
         if (formp.givenname && formp.familyname && formp.choice && (formp.patientAge || formp.dob  )) {
             var newPatient = {
@@ -96,15 +96,9 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
                 names: [{
                     givenName: formp.givenname,
                     familyName: formp.familyname
-                }] ,
+                }],
                 age: formp.patientAge
             };
-            if ( formp.patientAge !== "" && formp.patientAge.length > 0  ) {
-                newPatient.age = formp.patientAge ;   
-            }
-            if( formp.dob !== "" && formp.dob.length > 0 ) {
-                newPatient.birthdate =  formp.dob;
-            }
             var newPatientParam = Ext.encode(newPatient);
             console.log('newPatient');
             console.log(newPatient);
@@ -112,16 +106,22 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
             console.log(newPatientParam);
             Ext.Ajax.request({
                 scope:this,
-                url: HOST + '/ws/rest/v1/person',
+                url: HOST + '/ws/rest/v1/raxacore/patient',
                 method: 'POST',
                 params: newPatientParam,
                 disableCaching: false,
                 headers: Util.getBasicAuthHeaders(),
                 success: function (response) {
+                    console.log(response);
                     var personUuid = JSON.parse(response.responseText).uuid;
-                    this.getidentifierstype(personUuid);
                     myRecord.data = new Object();
                     myRecord.data['uuid'] = personUuid;
+                    // TODO: https://raxaemr.atlassian.net/browse/TODO-67
+                    // Need to add location to OpenMRS for screenerUuidlocation
+                    this.sendEncounterData(personUuid, localStorage.regUuidencountertype, localStorage.screenerUuidlocation, localStorage.loggedInUser);
+                    // NOTE.. This next line is the only change from Screener to OPD
+                    // In OPD, we want to automatically assign this patient to the current doctor's list
+                    this.assignPatient(personUuid, localStorage.loggedInUser);
                 },
                 failure: function (response) {
                     Ext.Msg.alert('Error: unable to write to server. Enter all fields.')
@@ -133,37 +133,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         else {
             Ext.Msg.alert ("Error","Please Enter all the mandatory fields");
         }
-    },
-
-        // Get IdentifierType using IdentifierType store 
-    getidentifierstype: function (personUuid) {
-        var identifiers = Ext.create('Screener.store.IdentifierType')
-        identifiers.load({
-            scope: this,
-            callback: function(records, operation, success){
-                if(success){
-                    this.getlocation(personUuid,identifiers.getAt(0).getData().uuid)
-                }
-                else{
-                    Ext.Msg.alert("Error", Util.getMessageLoadError());
-                }
-            }
-        });
-    },
-    // Get Location using Location store
-    getlocation: function (personUuid, identifierType) {
-        var locations = Ext.create('Screener.store.Location')
-        locations.load({
-            scope: this,
-            callback: function(records, operation, success){
-                if(success){
-                    this.makePatient(personUuid,identifierType,locations.getAt(0).getData().uuid)
-                }
-                else{
-                    Ext.Msg.alert("Error", Util.getMessageLoadError());
-                }
-            }
-        });
     },
 
     sendEncounterData: function (personUuid, encountertype, location, provider) {
@@ -203,12 +172,24 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
 
             console.log("Creating Obs for uuid types...");
             var v = Ext.getCmp("vitalsForm").getValues();
+            if(v.bloodOxygenSaturationField !== null) {
             createObs(localStorage.bloodoxygensaturationUuidconcept, v.bloodOxygenSaturationField);
+            }
+            if(v.diastolicBloodPressureField !== null) {
             createObs(localStorage.diastolicbloodpressureUuidconcept, v.diastolicBloodPressureField);
+            }
+            if(v.respiratoryRateField !== null) {
             createObs(localStorage.respiratoryRateUuidconcept, v.respiratoryRateField);
+            }
+            if(v.systolicBloodPressureField !== null) {
             createObs(localStorage.systolicbloodpressureUuidconcept, v.systolicBloodPressureField);
-            createObs(localStorage.temperatureUuidconcept, v.temperatureField); 
+            }
+            if(v.temperatureField !== null) {
+            createObs(localStorage.temperatureUuidconcept, v.temperatureField);
+            }
+            if(v.pulseField !== null) {
             createObs(localStorage.pulseUuidconcept, v.pulseField);
+            }
             observations.sync();
             console.log("... Complete! Created Obs for new uuid types");
         }
@@ -261,30 +242,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
         this.newPatient.show();
     },
 
-    // Creates a new patient using NewPatients store 
-    makePatient: function (personUuid, identifierType, location) {
-        var patient = Ext.create('Screener.model.NewPatient', {
-            person: personUuid,
-            identifiers: [{
-                identifier: Util.getPatientIdentifier().toString(),
-                identifierType: identifierType,
-                location: location,
-                preferred: true
-            }]
-        });
-        var PatientStore = Ext.create('Screener.store.NewPatients')
-        PatientStore.add(patient);
-        PatientStore.sync();
-        PatientStore.on('write', function () {
-            // TODO: https://raxaemr.atlassian.net/browse/TODO-67
-            // Need to add location to OpenMRS for screenerUuidlocation
-            this.sendEncounterData(personUuid, localStorage.regUuidencountertype, localStorage.screenerUuidlocation, localStorage.loggedInUser);
-            // NOTE.. This next line is the only change from Screener to OPD
-            // In OPD, we want to automatically assign this patient to the current doctor's list
-            this.assignPatient(personUuid, localStorage.loggedInUser);
-        }, this)
-    },
-
     // Assigns patient, pops-open the patient-list so you can select that patient
     assignPatient: function (patient, provider) {
         var encounterSent = this.sendEncounterData(patient, localStorage.screenerUuidencountertype, localStorage.waitingUuidlocation, provider);
@@ -294,7 +251,6 @@ Ext.define('RaxaEmr.Outpatient.controller.AddPatient', {
     savePatientVitals: function () {
         if (! myRecord.data) {
             console.log("error, must have a patient selected before can add vitals");
-            alert('Please select patient before adding vitals');
             return;
         }
         console.log('savePatientVitals');
