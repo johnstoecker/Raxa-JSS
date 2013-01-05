@@ -721,7 +721,6 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 width: this.SEARCH_LIST.WIDTH,
                 height: this.SEARCH_LIST.HEIGHT,
                 padding: this.SEARCH_LIST.PADDING
-            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), this.SEARCH_LIST.ORIENTATION);
         } 
         else {
             Ext.getCmp('searchedDiagnosisList').setHidden(false);
@@ -871,6 +870,10 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             console.log('Encounter #', (i+1), display);        
             if(encounterData.encounterType.uuid == localStorage.outUuidencountertype) {
                 gloObs = obs;
+                var structuredDataArray =  { 
+                                                Diagnosis: new Array(),
+                                                DrugOrder: new Array()
+                                         }
                 // find vectorImage (json) and thumbnail Image (dataUrl)
                 // TODO: Handle multiple images or jsons per encounter.
                 var json = '';
@@ -885,15 +888,21 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                     } else if (conceptUuid == localStorage.patientRecordVectorImageUuidconcept) {
                         console.log('found vector image!');
                         json = o.value;
+                    } else {
+                            structuredDataArray.Diagnosis.push({
+                                    name: o.concept.display
+                                })
                     }
                 }   
+                structuredData = new Object(structuredDataArray);
 
                 k2s.addToVisitHistory({
                     // 'title': encounterData.display,
                     'date' : encounterData.encounterDatetime,
                     // 'uuid' : encounterData.uuid,
                     'imgSrc' : imgSrc,
-                    // 'json' : json
+                    'json' : json,
+                    'structuredData' : JSON.stringify(structuredData),
                 });
             }
         }

@@ -240,7 +240,7 @@ Ext.define('KineticToSencha', {
 	sendDoctorOrderEncounter: function(dataUrl) {
 		this.addObs();
 		// TODO: these are currently two special cases of Obs. can streamline to just the addObs fn
-//		this.addDoctorRecordImage(dataUrl);
+		this.addDoctorRecordImage(dataUrl);
 		this.addDoctorRecordVectorImage();
 
 		this.addOrder();
