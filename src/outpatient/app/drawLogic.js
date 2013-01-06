@@ -353,6 +353,20 @@ var setupCanvas = function() {
 	// 		// mode = "keyboard";
 	// 	}
 	}, {
+		// Keyboard (typed text input)
+		image: 'resources/images/icons/text_off.png',
+		imageWhenToggledOn: 'resources/images/icons/text_on.png',
+		x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
+		y: TOOLBAR_ITEM_BASE_Y,
+		width: TOOLBAR_ITEM_DIM,
+		height: TOOLBAR_ITEM_DIM,
+		controlGroup : 'drawingInput',
+		handler: function() {
+			console.log('KEYBOARD: TODO');
+			// mode = "keyboard";
+			Ext.getCmp('freetext-panel').show();
+		}
+	}, {
 		// New
 		image: 'resources/images/button_New_off.png',
 		x: stage.getWidth() - 120 - 58 - 80,

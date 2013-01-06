@@ -21,7 +21,7 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
     xtype: 'mainview',
     id: 'mainview',
 
-    requires: ['RaxaEmr.Outpatient.view.patientlist', 'RaxaEmr.Outpatient.view.today.more', 'RaxaEmr.Outpatient.view.today.diagnosis', 'RaxaEmr.Outpatient.view.today.Dashboard', 'RaxaEmr.Outpatient.view.today.VitalsModal'],
+    requires: ['RaxaEmr.Outpatient.view.patientlist', 'RaxaEmr.Outpatient.view.today.more', 'RaxaEmr.Outpatient.view.today.diagnosis', 'RaxaEmr.Outpatient.view.today.Dashboard', 'RaxaEmr.Outpatient.view.today.VitalsModal','RaxaEmr.Outpatient.view.today.freetext'],
     config: {
         navigationBar: false,
         items: [{
@@ -101,6 +101,8 @@ Ext.define('RaxaEmr.Outpatient.view.Viewport', {
         },{
             // Add vitals. (Hidden by default)
             xtype: 'vitalsmodal'
+        },{
+            xtype: 'freetext-panel'
         }]
     },
 
