@@ -721,6 +721,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                 width: this.SEARCH_LIST.WIDTH,
                 height: this.SEARCH_LIST.HEIGHT,
                 padding: this.SEARCH_LIST.PADDING
+            }).showBy(Ext.getCmp('diagnosisfilterbysearchfield'), this.SEARCH_LIST.ORIENTATION);
         } 
         else {
             Ext.getCmp('searchedDiagnosisList').setHidden(false);
