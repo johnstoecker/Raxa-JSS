@@ -903,7 +903,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                     // 'uuid' : encounterData.uuid,
                     'imgSrc' : imgSrc,
                     'json' : json,
-                    'structuredData' : JSON.stringify(structuredData),
+                    'structuredData' : JSON.stringify(structuredDataArray),
                 });
             }
         }

@@ -8,8 +8,8 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	stage: null,
 	showVisitInView: function(record) {
 		var me = Ext.getCmp('history-unstructured-panel');
-		var imgSrc = record.get('imgSrc');
-		var json =  record.get('json') ;
+		var imgSrc = record.get('imgSrc') || "";
+		var json =  record.get('json') || "" ;
 		Ext.getCmp('history-unstructured-panel').fireEvent('repaint',json);
 
 		// Close visit history list window, if open
@@ -29,7 +29,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 			id: 'visitHistory',
 
 			// We give it a left and top property to make it floating by default
-			left: 364,
+			left: 100,
 			top: 60,
 
 			// Make it modal so you can click the mask to hide the overlay
@@ -74,7 +74,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 				itemTpl: '<img src="{imgSrc}" height="48" width="32" /> <span style="font-size:26px"> {date} </span>',
 				store: new Ext.data.ArrayStore({
 					id: 'visitHistoryStore',
-					fields: ['title', 'date', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc', 'json'],
+					fields: ['title', 'date', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc', 'json','structuredData'],
 					data: [],
 					sorters: [{
 						property: 'date',
@@ -137,18 +137,26 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					this.stage.add(RetrivedStage.get('#linesLayer')[0]);
 				}
 
-				//Aligns to Page Margin
-				this.stage.get('#textLayer')[0].setX(60);
-				this.stage.get('#linesLayer')[0].setX(60);
+				//TODO: Show this on repaint.
+				if(!this.stage.get('#textLayer').length){
+					this.stage.get('#textLayer')[0].show();
+				}
+				if(!this.stage.get('#linesLayer').length){
+					this.stage.get('#linesLayer')[0].show();
+				}
+				if(this.stage.get('#structuredDataLayer').length){
+					this.stage.get('#structuredDataLayer')[0].hide();
+				}
 
-                for (var i = 0; i < stage.get('#textLayer')[0].getChildren().length; i++) {
-	                if (stage.get('#textLayer')[0].getChildren()[i].shapeType === "Image" && stage.get('#textLayer')[0].getChildren()[i].getName()) {
+                for (var i = 0; i < this.stage.get('#textLayer')[0].getChildren().length; i++) {
+	                if (this.stage.get('#textLayer')[0].getChildren()[i].shapeType === "Image" && this.stage.get('#textLayer')[0].getChildren()[i].getName()) {
 
-	                    printImage = new Image();
-
-	                    switch (stage.get('#textLayer')[0].getChildren()[i].getName()) {
-	                        case 'LineSeparator': console.log('LineSapartor in switch case');
+	                    var printImage = new Image();
+	                    
+	                    switch (this.stage.get('#textLayer')[0].getChildren()[i].getName()) {
+	                        case 'LineSeparator':
 	                            printImage.src = "resources/images/icons/line.png";
+	                            
 	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
 	                            break;
 	                        case 'DrugOrder':
@@ -165,8 +173,18 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	                            break;
 	                    }
 	                }
+	             if(i===(stage.get('#textLayer')[0].getChildren().length-1))
+				 {
+				 	this.stage.get('#textLayer')[0].draw(); 
+				 	this.stage.get('#linesLayer')[0].draw();
+				 }
 			}	
-				this.stage.get('#textLayer')[0].draw(); 		
+				//Testing
+				setTimeout(function(){
+					Ext.getCmp('history-unstructured-panel').stage.draw();
+				 	//this.stage.get('#textLayer')[0].draw(); 
+				 	//this.stage.get('#linesLayer')[0].draw();
+				}, 500)
 			},
 			painted: function() {
 				if(!this.isCanvasSetup) {
@@ -201,7 +219,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					});
 					backgroundLayer.add(background);
 
-					// Background - toolbar background
+/*					// Background - toolbar background
 					var toolbarBackground = new Kinetic.Rect({
 						x: 0,
 						y: 0,
@@ -210,10 +228,11 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						fill: "white"
 					});
 					backgroundLayer.add(toolbarBackground);
-
+*/
 					addImageToLayer("resources/images/bg/today_small.png", backgroundLayer, {
 						x: 0,
-						y: DRAWABLE_Y_MIN,
+						y:12,
+//						y: DRAWABLE_Y_MIN,
 						// width: 35,
 						// height: 835
 						width: 41,
@@ -229,30 +248,32 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 
 					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {
 						x: this.stage.getWidth() - 723,
-						y: DRAWABLE_Y_MIN,
+						y: 12,
+//						y: DRAWABLE_Y_MIN,
 						// width: 710,
 						width: 722,
 						// height: 835
 						height: 742
 					});
 
-					// Add button for History Dropdown
-					addImageToLayer("resources/images/button_History_off.png", controlsLayer, {
-						x: 660,
-						y: 0,
-						width: 80,
-						height: 44,
-						events: 'click touchstart',
-						handler: function() {
-							// Show visit history
-							Ext.getCmp('visitHistory').show();
-						}
-					});
+					// // Add button for History Dropdown
+					// addImageToLayer("resources/images/button_History_off.png", controlsLayer, {
+					// 	x: 660,
+					// 	y: 0,
+					// 	width: 80,
+					// 	height: 44,
+					// 	hidden: true,
+					// 	events: 'click touchstart',
+					// 	handler: function() {
+					// 		// Show visit history
+					// 		Ext.getCmp('visitHistory').show();
+					// 	}
+					// });
 
 					// Add Printer button
 					addImageToLayer("resources/images/icons/printer.png", controlsLayer, {
 						x: 680,
-						y: 60,
+						y: 20,
 						width: 44,
 						height: 44,
 						events: 'click touchstart',
@@ -277,6 +298,69 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 					stage.draw();
 				}
  			}, 
+ 			structuredDataOnCanvas: function () {
+ 			    var visitHistoryStore = Ext.getStore('visitHistoryStore');
+ 			    g_visitHistoryStore = visitHistoryStore;
+
+ 			    //TODO: Show these layers on repaint.
+ 			    if (this.stage.get('#textLayer')[0]) {
+ 			        this.stage.get('#textLayer')[0].hide();
+ 			    }
+ 			    if (this.stage.get('#linesLayer')[0]) {
+ 			        this.stage.get('#linesLayer')[0].hide();
+ 			    }
+
+ 			    if (!this.stage.get('#structuredDataLayer').length) {
+ 			        // Layers
+ 			        var structuredDataLayer = new Kinetic.Layer({
+ 			            id: 'structuredDataLayer'
+ 			        });
+ 			        this.stage.add(structuredDataLayer);
+ 			    }
+ 			    this.stage.get('#structuredDataLayer')[0].show();
+ 			    //TODO: Improve UI of structured view (similar to regular canvas)
+ 			    var EncounterText = '';
+
+ 			    for (var i = 0; i < visitHistoryStore.data.all.length; i++) {
+
+ 			        if (visitHistoryStore.data.all[i].data.structuredData) {
+
+ 			            EncounterText += visitHistoryStore.getAt(i).data.date;
+
+ 			            structuredData = JSON.parse(visitHistoryStore.data.all[i].data.structuredData);
+
+ 			            if (Ext.getCmp('DiagnosisHistoryView').isChecked()) {
+
+ 			                DiagnosisCount = structuredData.Diagnosis.length;
+ 			                console.log(DiagnosisCount);
+
+ 			                for (var j = 0; j < DiagnosisCount; j++) {
+ 			                    EncounterText += '\n' + structuredData.Diagnosis[j].name
+ 			                }
+
+ 			                EncounterText += '\n\n'
+
+ 			                var DiagnosisKinecticText = new Kinetic.Text({
+ 			                    x: DRAWABLE_X_MIN + 80,
+ 			                    y: 70,
+ 			                    text: EncounterText,
+ 			                    fontSize: 13,
+ 			                    fontFamily: 'Helvetica',
+ 			                    textFill: '#000',
+ 			                    align: 'left',
+ 			                });
+ 			                this.stage.get('#structuredDataLayer')[0].add(DiagnosisKinecticText);
+ 			            }
+ 			        }
+ 			        //TODO: Drugs are not coming in encounters now, need to make it consisten
+ 			        // if(Ext.getCmp('DrugsHistoryView').isChecked())
+ 			        // {
+
+
+ 			        // }
+ 			    }
+ 			    this.stage.draw();
+ 			}
 		},
 		layout: {
 			type: 'vbox'

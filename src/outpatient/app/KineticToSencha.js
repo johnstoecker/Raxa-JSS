@@ -148,7 +148,8 @@ Ext.define('KineticToSencha', {
 			// diagnosisCount: 0,
 			// treatmentCount: 0,
 			imgSrc: config.imgSrc,
-			json: config.json
+			json: config.json,
+			structuredData : config.structuredData
 		});
 	},
 
