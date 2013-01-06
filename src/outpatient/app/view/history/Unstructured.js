@@ -217,7 +217,14 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 						// width: 35,
 						// height: 835
 						width: 41,
-						height: 742
+						height: 742,
+						events: 'click touchstart',
+						handler: function() {
+							Ext.getCmp('treatment-panel').animateActiveItem(UNSTRUCTURED_HISTORY_VIEW , {
+									type: 'slide',
+								direction: 'left'
+							});
+						}
 					});
 
 					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {

@@ -44,6 +44,8 @@ var TOOLBAR_HEIGHT = 46;
 
 var HIGH_Y_OFFSET = 10; // a little extra space
 
+var UNSTRUCTURED_HISTORY_VIEW = 0;
+var HISTORY_OVERVIEW = 1;
 // TODO: Remove from global scope
 //	This is only being used in drawLogic.js (this file) so should be simple
 function isInDrawableArea(myX, myY) {
@@ -299,7 +301,14 @@ var setupCanvas = function() {
 		// width: 35,
 		// height: 835
 		width: 41,
-		height: 742
+		height: 742,
+		events: 'click touchstart',
+		handler: function() {
+			Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
+					type: 'slide',
+				direction: 'right'
+			});
+		}		
 	});
 
 	var controlItems = [{
@@ -451,7 +460,7 @@ var setupCanvas = function() {
 
 	// Creates a 'clickable' item with a touch handler.
 	// requires parameters for item: x,y,width,height,src,handler
-
+	//TODO use Kinetic.Group() to group stage items 
 	var	controlGroups = {};
 	function createControlItem(item) {
 		var imageObj = new Image();

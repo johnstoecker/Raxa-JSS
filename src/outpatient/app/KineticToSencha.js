@@ -116,11 +116,9 @@ Ext.define('KineticToSencha', {
 				// this automatically happens in the store, now
 
 				// Scroll to history view
-				var UNSTRUCTURED_HISTORY_VIEW = 0;
 				Ext.getCmp('history-panel').setActiveItem(UNSTRUCTURED_HISTORY_VIEW);
 
 				// TODO: Animation isn't showing in Chrome. On device?
-				var HISTORY_OVERVIEW = 1;
 				Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
    					type: 'slide',
 					direction: 'right'
