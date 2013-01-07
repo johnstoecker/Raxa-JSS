@@ -358,7 +358,7 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
 
     },
     //creating postlists for screener and opd lists
-    createList: function (list_scr, list_out, k) {
+    createList:function (list_scr, list_out, k) {
         var that = this;
 
         var store_scr = Ext.create('RaxaEmr.Outpatient.store.PostLists');
@@ -457,9 +457,9 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             var visitHistoryStore = this.getVisitHistory(patientEncounterStore);
             for (var i =0; i < visitHistoryStore.getCount(); i++) {
                 // TODO: Re-create from JSON instead of images
-                // var stageJSON = visitHistoryStore.getAt(i).getData().json;                
+                 var stageJSON = visitHistoryStore.getAt(i).getData().json;                
                 // Add to stage
-                // Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
+                 Kinetic.Node.create(stageJSON, 'unstructuredDataContainer');
             }
         }, this);
 
@@ -871,6 +871,10 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
             console.log('Encounter #', (i+1), display);        
             if(encounterData.encounterType.uuid == localStorage.outUuidencountertype) {
                 gloObs = obs;
+                var structuredDataArray =  { 
+                                                Diagnosis: new Array(),
+                                                DrugOrder: new Array()
+                                         }
                 // find vectorImage (json) and thumbnail Image (dataUrl)
                 // TODO: Handle multiple images or jsons per encounter.
                 var json = '';
@@ -884,17 +888,22 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
                         imgSrc = o.value;
                     } else if (conceptUuid == localStorage.patientRecordVectorImageUuidconcept) {
                         console.log('found vector image!');
-                        console.log(o);
                         json = o.value;
+                    } else {
+                            structuredDataArray.Diagnosis.push({
+                                    name: o.concept.display
+                                })
                     }
                 }   
+                structuredData = new Object(structuredDataArray);
 
                 k2s.addToVisitHistory({
                     // 'title': encounterData.display,
                     'date' : encounterData.encounterDatetime,
                     // 'uuid' : encounterData.uuid,
                     'imgSrc' : imgSrc,
-                    // 'json' : json
+                    'json' : json,
+                    'structuredData' : JSON.stringify(structuredDataArray),
                 });
             }
         }
