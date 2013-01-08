@@ -44,6 +44,8 @@ var TOOLBAR_HEIGHT = 46;
 
 var HIGH_Y_OFFSET = 10; // a little extra space
 
+var UNSTRUCTURED_HISTORY_VIEW = 0;
+var HISTORY_OVERVIEW = 1;
 // TODO: Remove from global scope
 //	This is only being used in drawLogic.js (this file) so should be simple
 function isInDrawableArea(myX, myY) {
@@ -64,10 +66,12 @@ function isInDrawableArea(myX, myY) {
 // 	This is being used in Unstructured.js view
 function addImageToLayer(file, layer, config) {
 	var imgObj = new Image();
+	imgObj.src = file;
 	imgObj.onload = function() {
 		config.image = imgObj;
-		var kineticImage = new Kinetic.Image(config);
 
+		var kineticImage = new Kinetic.Image(config);
+		kineticImage.setName(config.name);
 		if (config.handler && config.events) {
 			kineticImage.on(config.events, config.handler);
 		}
@@ -75,7 +79,6 @@ function addImageToLayer(file, layer, config) {
 		layer.add(kineticImage);
 		layer.draw();
 	}
-	imgObj.src = file;
 }
 
 var setupCanvas = function() {
@@ -150,6 +153,17 @@ var setupCanvas = function() {
 		Ext.getCmp('drugForm').hide();
 		drawTextAtLowPoint(PrintObject);
 	});
+	stage.on("paintDate", function() {
+		//Should be called at reset stage / clear stage
+		if(PrintObject)
+		{
+			PrintObject.TextGroupProperty.type = 'Date';
+			PrintObject.TextArray.splice(0, PrintObject.TextArray.length);
+			textForPrintObject = new TextProperty(new Date().toDateString(),'date');
+			PrintObject.TextArray.push(textForPrintObject);
+			drawTextAtLowPoint(PrintObject);
+		}
+	});
 
 	////////////////////////
 	// Event Handlers
@@ -175,7 +189,7 @@ var setupCanvas = function() {
 				stroke: "black",
 				strokeWidth: 1,
 				//lineJoin can be miter, round, or bevel
-				lineJoin: "round",
+//				lineJoin: "round",
 				//Other configs including lineCap, swadow, cornerRadius make the curves better
 				//but response time is not adequate.
 			});
@@ -240,9 +254,9 @@ var setupCanvas = function() {
 	// SAVING 
 	// Save - event handler
 
-	function onSaveCanvas() {
+	function onSaveCanvas(print) {
 		// Callback, since the stage toDataURL() method is asynchronous
-		k2s.saveDrawableCanvas();
+		k2s.saveDrawableCanvas(print);
 		// k2s.saveLoadMask();
 	}
 
@@ -268,7 +282,7 @@ var setupCanvas = function() {
 		width: stage.getWidth(),
 		// height: DRAWABLE_Y_MIN - 4,
 		height: TOOLBAR_HEIGHT,
-		fill: "#82b0e1" // Light Blue.
+		fill: "white"
 	});
 	backgroundLayer.add(toolbarBackground);
 
@@ -287,7 +301,14 @@ var setupCanvas = function() {
 		// width: 35,
 		// height: 835
 		width: 41,
-		height: 742
+		height: 742,
+		events: 'click touchstart',
+		handler: function() {
+			Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
+					type: 'slide',
+				direction: 'right'
+			});
+		}		
 	});
 
 	var controlItems = [{
@@ -332,6 +353,20 @@ var setupCanvas = function() {
 	// 		// mode = "keyboard";
 	// 	}
 	}, {
+		// Keyboard (typed text input)
+		image: 'resources/images/icons/text_off.png',
+		imageWhenToggledOn: 'resources/images/icons/text_on.png',
+		x: TOOLBAR_ITEM_BASE_X + 2 * (TOOLBAR_ITEM_DIM),
+		y: TOOLBAR_ITEM_BASE_Y,
+		width: TOOLBAR_ITEM_DIM,
+		height: TOOLBAR_ITEM_DIM,
+		controlGroup : 'drawingInput',
+		handler: function() {
+			console.log('KEYBOARD: TODO');
+			// mode = "keyboard";
+			Ext.getCmp('freetext-panel').show();
+		}
+	}, {
 		// New
 		image: 'resources/images/button_New_off.png',
 		x: stage.getWidth() - 120 - 58 - 80,
@@ -356,24 +391,53 @@ var setupCanvas = function() {
 		// height: 44
 		handler: function() {
 			console.log('sending Doctor Encounter');
-			Ext.Msg.confirm('Finalize', 'Save and complete this visit?', function(btn) {
-				if(btn == 'yes') {
-					// TODO: Saved image is wrong resolution
-					// TODO: Using Global Variable myRecord set in controller
-					// after selecting patient from patientlist and after every search/add patient 
-					if(!myRecord.data)
-					{
-						Ext.Msg.alert("Error","Please select/create a patient");
-					}
-					else{
-					// Saves image to localStore
-					// Scrolls directly to see the history item in history view
-					// Also saves via REST using k2s.sendDoctorOrderEncounter();
-					// Clear "today" canvas, after saving via REST
-					onSaveCanvas();
-					}
+			var messageBox = Ext.create('Ext.MessageBox');
+			messageBox.show({
+				title: "Finalize?",
+				buttons:  [{ 
+				itemId : 'no',  
+				text   : 'No',   
+				handler : function() {
+					//TODO: UI Response to make sure user know data is not saved.
+					this.hide();
+					} 
+				},{   
+					itemId : 'yes',   
+					text   : 'Yes',  
+					handler : function() {
+						this.hide();
+						savePatientRecord({print:false});
+					}    
+				},{   
+					itemId : 'yesAndPrint',   
+					text   : 'Yes & Print',
+					handler : function() {
+					this.hide();
+					var print=true;
+					savePatientRecord(print);	
+		          }   
+		      }], 
+		    });
+
+	function savePatientRecord(print) {
+				// TODO: Saved image is wrong resolution
+				// TODO: Using Global Variable myRecord set in controller
+				// after selecting patient from patientlist and after every search/add patient 
+				if(!myRecord.data)
+				{
+					Ext.Msg.alert("Error","Please select/create a patient");
+					Ext.getCmp('patientManagementDashboard').show();
 				}
-			});
+				else{
+				// Saves image to localStore
+				// Scrolls directly to see the history item in history view
+				// Also saves via REST using k2s.sendDoctorOrderEncounter();
+				// Clear "today" canvas, after saving via REST
+				onSaveCanvas(print);					
+				//TODO Record that print command has been given and alert should come if \
+				//new patient is selected without saving prev one
+				}
+		}
 		},
 	}, {
 		// Add diagnosis
@@ -410,7 +474,7 @@ var setupCanvas = function() {
 
 	// Creates a 'clickable' item with a touch handler.
 	// requires parameters for item: x,y,width,height,src,handler
-
+	//TODO use Kinetic.Group() to group stage items 
 	var	controlGroups = {};
 	function createControlItem(item) {
 		var imageObj = new Image();
@@ -608,6 +672,7 @@ var setupCanvas = function() {
 	// Temporary filler function called whenever a user adds a diagnosis
 	// If user chooses "Sinusitus" as their diagnosis, it will cause this alert to appear
 	function fakeDecisionSupport() {
+		//TODO: These settings changes default setting. should not change global setting. 
 		Ext.Msg.defaultAllowedConfig.maxHeight = 300;
 		Ext.Msg.defaultAllowedConfig.maxWidth = 400;
 
@@ -663,7 +728,8 @@ var setupCanvas = function() {
 			x: DRAWABLE_X_MIN + 20,
 			y: myHighY,
 			width: 14,
-			height: 14
+			height: 14,
+			name: type
 		});
 		for(var i = 0; i < TextArray.length; i++) {
 			var complexText = new Kinetic.Text({
@@ -706,7 +772,8 @@ var setupCanvas = function() {
 			x: DRAWABLE_X_MIN + 20,
 			y: handDrawnLineY,
 			width: 529,
-			height: 9
+			height: 9,
+			name: 'LineSeparator'
 		});
 
 		// += the height of the "hand drawn line" + "additional spacing"
@@ -719,6 +786,7 @@ var setupCanvas = function() {
 			fakeDecisionSupport();
 		}
 	}
+	stage.fire("paintDate");
 
 	publicAccessObject['methods'] = {};
 	publicAccessObject['methods']['setCanvasInteractionMode'] = setCanvasInteractionMode;

@@ -17,8 +17,8 @@
 //info about the patient when we click on a patient like weight, height etc. is shown by this grid
  
 // TODO: Move to CSS file and access here via "cls" tag in Sencha
-var VITALS_VIEW_TITLE_STYLE = 'color:#2e7ab8;font-weight:bold';
-var VITALS_VIEW_VALUE_STYLE = 'color:#000000;font-weight:bold';
+var VITALS_VIEW_TITLE_STYLE = 'color:#000000;font-weight:bold;line-height:.4';
+var VITALS_VIEW_VALUE_STYLE = 'color:#000000;';
 
 Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
     extend: 'Ext.Container',
@@ -94,11 +94,11 @@ Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
         store: 'Grid',
         scrollable: 'false',
         items: [{
-            html:  '<table align="top" border="0" cellpadding="0" cellspacing="0" style="width: 380px;height:20px;font-size:10px;">'+
+            html:  '<table align="top" border="0" cellpadding="0" cellspacing="0" style="width: 380px;line-height:1;font-size:13px;">'+
             '<tbody>'+
                 '<tr>'+
                     '<td>'+
-                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Temperature</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Temperature</span></td>'+
                     '<td>'+
                         '<span style="' + VITALS_VIEW_TITLE_STYLE + '">SaO2</span></td>'+
                     '<td>'+
@@ -114,9 +114,9 @@ Ext.define('RaxaEmr.Outpatient.view.today.Vitals', {
                 '</tr>'+
                 '<tr>'+
                     '<td>'+
-                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">BP</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">BP</span></td>'+
                     '<td>'+
-                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Respiratory Rate</strong></span></td>'+
+                        '<span style="' + VITALS_VIEW_TITLE_STYLE + '">Respiratory Rate</span></td>'+
                     '<td>'+
                         // "+Vitals" button
                 '</tr>'+

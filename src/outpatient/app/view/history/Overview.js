@@ -21,39 +21,97 @@ Ext.define('RaxaEmr.Outpatient.view.history.Overview', {
                 type: 'vbox'
             },
             items: [
-            // // List of navigation buttons
-            // {
-            //     xtype: 'container',
-            //     flex: 5,
-            //     layout: {
-            //         type: 'hbox'
-            //     },
-            //     items: [{
-            //         xtype: 'button',
-            //         text: 'Unstructured',
-            //         handler: function() {
-            //             Ext.getCmp('historyPanelMainView').setActiveItem(0);
-            //         }
-            //     }, {
-            //         xtype: 'button',
-            //         text: 'Investigations',
-            //         handler: function() {
-            //             Ext.getCmp('historyPanelMainView').setActiveItem(1);
-            //         }
-            //     }, {
-            //         xtype: 'button',
-            //         text: 'Diagnoses',
-            //         handler: function() {
-            //             Ext.getCmp('historyPanelMainView').setActiveItem(2);
-            //         }
-            //     }, {
-            //         xtype: 'button',
-            //         text: 'Medications',
-            //         handler: function() {
-            //             Ext.getCmp('historyPanelMainView').setActiveItem(3);
-            //         }
-            //     }, ]
-            // },
+            // List of navigation buttons
+            {
+                
+                xtype: 'container',
+                style: 'background-color: #FFFFFF;',
+                layout: {
+                    type: 'hbox'
+                },
+                items: [{
+                    xtype: 'button',
+                    text: 'View Past History',
+                    style: 'background:#FFFFFF;border:0',
+                    iconCls: 'arrow_down',
+                    iconMask: true,
+                    iconAlign: 'right',
+
+                    handler: function() {
+                        Ext.getCmp('visitHistory').showBy(this, "tc-bc?");
+                        }                        
+
+
+                },{
+                    xtype: 'spacer'
+                },
+                {
+                    xtype: 'checkboxfield',
+                    style: 'background:#FFFFFF;background-color:#FFFFFF',
+                    id : 'DrugsHistoryView',
+                    label: 'Structured View:&nbsp;Drugs',
+                    value: 'DrugsHistoryView',
+                    labelWidth: 180,
+                    checked: true,
+                    listeners: {
+                        check: function() {
+                            Ext.getCmp('history-unstructured-panel').fireEvent('structuredDataOnCanvas');
+                            },                        
+                        uncheck: function() {
+                            }  
+                        }
+                },{
+                    xtype: 'checkboxfield',
+                    id: 'DiagnosisHistoryView',
+                    label: 'Diagnosis',
+                    labelWidth: 100,
+                    checked: true,
+                    listeners: {
+                        check: function() {
+                            Ext.getCmp('history-unstructured-panel').fireEvent('structuredDataOnCanvas');
+                            },                        
+                        uncheck: function() {
+                            }  
+                        }                    
+                },{
+                    xtype: 'spacer'
+                },{
+                    xtype: 'button',
+                    text: 'History',
+                    hidden:true,
+                    handler: function() {
+                        Ext.getCmp('visitHistory').show();
+                    }
+                },{
+                    xtype: 'button',
+                    text: 'Unstructured',
+                    hidden: true,
+                    handler: function() {
+                        Ext.getCmp('historyPanelMainView').setActiveItem(0);
+                    }
+                }, {
+                    xtype: 'button',
+                    text: 'Investigations',
+                    hidden: true,
+                    handler: function() {
+                        Ext.getCmp('historyPanelMainView').setActiveItem(1);
+                    }
+                }, {
+                    xtype: 'button',
+                    text: 'Diagnoses',
+                    hidden: true,
+                    handler: function() {
+                        Ext.getCmp('historyPanelMainView').setActiveItem(2);
+                    }
+                }, {
+                    xtype: 'button',
+                    text: 'Medications',
+                    hidden: true,
+                    handler: function() {
+                        Ext.getCmp('historyPanelMainView').setActiveItem(3);
+                    }
+                }]
+            },
             // Main view
             {
                 id: 'historyPanelMainView',
