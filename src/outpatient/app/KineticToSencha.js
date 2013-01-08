@@ -40,7 +40,7 @@ Ext.define('KineticToSencha', {
 	},
 
 	// Saves just "drawable" portion of canvas
-	saveDrawableCanvas: function() {
+	saveDrawableCanvas: function(print) {
 		// Convert stage to image. From image, create KineticImage and crop to "drawable" portion
 		
 		// Disable interaction. E.g. this hides delete icons, if in erase mode. Interaction is restored below.
@@ -78,24 +78,47 @@ Ext.define('KineticToSencha', {
 					// width: 32
 				});
 				
+				if(print==true)
+					{
+						//TODO: Rather than storing in localStorage, event should be published (pubsub)
+						var printablePatientRecord = { 
+							DataUrl : kineticImage.toDataURL({
+									callback: function(dataUrl) {
+										console.log('callback for dataUrl');
+									},
+									mimeType: 'image/jpeg',
+									quality: 1
+								}),
+							patient: myRecord.raw,
+							canvasJSON: stage.toJSON({
+								x: DRAWABLE_X_MIN,
+								y: DRAWABLE_Y_MIN,
+								width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+								height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+							})
+						};	
+						
+						localStorage.setItem('printablePatientRecord',JSON.stringify(printablePatientRecord));
+						//TODO add print option in history as well. 
+						window.open("app/view/print/patientRecordPrint.html", "Patient Record");
+					}
 				// Delete temp layer
 				temp_layer.remove();
 
 				// Adds it to history store (list is visible in history view)
 				k2sContext.addToVisitHistory({
 					date: Date(),
-					imgSrc: dataUrl
+					imgSrc: dataUrl,
+					json: stage.toJSON()
 				});
 
 				// Show most recently added item, from store
 				// this automatically happens in the store, now
 
 				// Scroll to history view
-				var UNSTRUCTURED_HISTORY_VIEW = 0;
 				Ext.getCmp('history-panel').setActiveItem(UNSTRUCTURED_HISTORY_VIEW);
 
 				// TODO: Animation isn't showing in Chrome. On device?
-				var HISTORY_OVERVIEW = 1;
 				Ext.getCmp('treatment-panel').animateActiveItem(HISTORY_OVERVIEW, {
    					type: 'slide',
 					direction: 'right'
@@ -125,7 +148,8 @@ Ext.define('KineticToSencha', {
 			// diagnosisCount: 0,
 			// treatmentCount: 0,
 			imgSrc: config.imgSrc,
-			// json: config.json
+			json: config.json,
+			structuredData : config.structuredData
 		});
 	},
 
@@ -216,7 +240,7 @@ Ext.define('KineticToSencha', {
 		this.addObs();
 		// TODO: these are currently two special cases of Obs. can streamline to just the addObs fn
 		this.addDoctorRecordImage(dataUrl);
-		// this.addDoctorRecordVectorImage();
+		this.addDoctorRecordVectorImage();
 
 		this.addOrder();
 
@@ -293,5 +317,7 @@ Ext.define('KineticToSencha', {
 		}
 
 		eraseDrawableLayers();
+		//Prints Date on Page
+		stage.fire("paintDate");
 	}
 });

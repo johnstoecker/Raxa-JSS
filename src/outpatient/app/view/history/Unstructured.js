@@ -8,17 +8,10 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	stage: null,
 	showVisitInView: function(record) {
 		var me = Ext.getCmp('history-unstructured-panel');
-		var imgSrc = record.get('imgSrc');
-		addImageToLayer(imgSrc, me.loadedImageLayer, {
-			x: DRAWABLE_X_MIN + 35,
-			y: DRAWABLE_Y_MIN,
-			width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
-			height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
-		});
+		var imgSrc = record.get('imgSrc') || "";
+		var json =  record.get('json') || "" ;
+		Ext.getCmp('history-unstructured-panel').fireEvent('repaint',json);
 
-		// var img = Ext.getCmp('singleVisitHistoryImage');
-		// var imgSrc = record.get('imgSrc');
-		// img.setSrc('imgSrc');
 		// Close visit history list window, if open
 		Ext.getCmp('visitHistory').hide();
 
@@ -36,7 +29,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 			id: 'visitHistory',
 
 			// We give it a left and top property to make it floating by default
-			left: 364,
+			left: 100,
 			top: 60,
 
 			// Make it modal so you can click the mask to hide the overlay
@@ -81,7 +74,7 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 				itemTpl: '<img src="{imgSrc}" height="48" width="32" /> <span style="font-size:26px"> {date} </span>',
 				store: new Ext.data.ArrayStore({
 					id: 'visitHistoryStore',
-					fields: ['title', 'date', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc', 'json'],
+					fields: ['title', 'date', 'uuid', 'diagnosisCount', 'treatmentCount', 'imgSrc', 'json','structuredData'],
 					data: [],
 					sorters: [{
 						property: 'date',
@@ -122,89 +115,252 @@ Ext.define('RaxaEmr.Outpatient.view.history.Unstructured', {
 	},
 	config: {
 		listeners: {
+			repaint: function(stageJSONParam) {
+				//converts JSON to Kinetic Stage object
+				var RetrivedStage = Kinetic.Node.create(stageJSONParam, 'historyContainer');
+				
+				//Add children to textLayer is not present, otherwise pushes new Layer in stage
+				if(this.stage.get('#textLayer').length){
+					this.stage.get('#textLayer')[0].removeChildren();
+					this.stage.get('#textLayer')[0].children = RetrivedStage.get('#textLayer')[0].getChildren();
+				}
+				else{
+					this.stage.add(RetrivedStage.get('#textLayer')[0]);
+				}
+
+				//Add children to linesLayer is not present, otherwise pushes new Layer in stage
+				if(this.stage.get('#linesLayer').length){
+					this.stage.get('#linesLayer')[0].removeChildren();
+					this.stage.get('#linesLayer')[0].children = RetrivedStage.get('#linesLayer')[0].getChildren();
+				}
+				else{
+					this.stage.add(RetrivedStage.get('#linesLayer')[0]);
+				}
+
+				//TODO: Show this on repaint.
+				if(!this.stage.get('#textLayer').length){
+					this.stage.get('#textLayer')[0].show();
+				}
+				if(!this.stage.get('#linesLayer').length){
+					this.stage.get('#linesLayer')[0].show();
+				}
+				if(this.stage.get('#structuredDataLayer').length){
+					this.stage.get('#structuredDataLayer')[0].hide();
+				}
+
+                for (var i = 0; i < this.stage.get('#textLayer')[0].getChildren().length; i++) {
+	                if (this.stage.get('#textLayer')[0].getChildren()[i].shapeType === "Image" && this.stage.get('#textLayer')[0].getChildren()[i].getName()) {
+
+	                    var printImage = new Image();
+	                    
+	                    switch (this.stage.get('#textLayer')[0].getChildren()[i].getName()) {
+	                        case 'LineSeparator':
+	                            printImage.src = "resources/images/icons/line.png";
+	                            
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                        case 'DrugOrder':
+	                            printImage.src = "resources/images/icons/bullet_drug.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                        case 'Diagnosis':
+	                            printImage.src = "resources/images/icons/bullet_diagnosis.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                        case 'LabOrder':
+	                            printImage.src = "resources/images/icons/bullet_investigation.png";
+	                            this.stage.get('#textLayer')[0].getChildren()[i].setImage(printImage);
+	                            break;
+	                    }
+	                }
+	             if(i===(stage.get('#textLayer')[0].getChildren().length-1))
+				 {
+				 	this.stage.get('#textLayer')[0].draw(); 
+				 	this.stage.get('#linesLayer')[0].draw();
+				 }
+			}	
+				//Testing
+				setTimeout(function(){
+					Ext.getCmp('history-unstructured-panel').stage.draw();
+				 	//this.stage.get('#textLayer')[0].draw(); 
+				 	//this.stage.get('#linesLayer')[0].draw();
+				}, 500)
+			},
 			painted: function() {
 				if(!this.isCanvasSetup) {
-					var stage = new Kinetic.Stage({
+					stage = new Kinetic.Stage({
 						id: "unstructuredHistoryStage",
 						container: "historyContainer",
 						width: STAGE_X,
 						height: STAGE_Y
-					});
+					}); 
 					this.stage = stage;
 					this.isCanvasSetup = true;
 
 					// Layers
-					var backgroundLayer = new Kinetic.Layer({
+					var backgroundLayer =  new Kinetic.Layer({
 						id: 'backgroundLayer'
-					});
-					var loadedImageLayer = new Kinetic.Layer({
-						id: 'loadedImageLayer'
-					});
+					}); 
 					var controlsLayer = new Kinetic.Layer({
 						id: 'controlsLayer'
 					});
 
-					this.loadedImageLayer = loadedImageLayer;
-
-					stage.add(backgroundLayer);
-					stage.add(loadedImageLayer);
-					stage.add(controlsLayer);
+					this.stage.add(backgroundLayer);
+					this.stage.add(controlsLayer);
 
 					// Draw background.
 					// Background - blank white canvas
 					var background = new Kinetic.Rect({
 						x: 0,
 						y: 0,
-						width: stage.getWidth(),
-						height: stage.getHeight(),
+						width: this.stage.getWidth(),
+						height: this.stage.getHeight(),
 						fill: "white"
 					});
 					backgroundLayer.add(background);
 
-					// Background - toolbar background
+/*					// Background - toolbar background
 					var toolbarBackground = new Kinetic.Rect({
 						x: 0,
 						y: 0,
-						width: stage.getWidth(),
+						width: this.stage.getWidth(),
 						height: TOOLBAR_HEIGHT,
-						fill: "#82b0e1" // Light Blue.
+						fill: "white"
 					});
 					backgroundLayer.add(toolbarBackground);
-
+*/
 					addImageToLayer("resources/images/bg/today_small.png", backgroundLayer, {
 						x: 0,
-						y: DRAWABLE_Y_MIN,
+						y:12,
+//						y: DRAWABLE_Y_MIN,
 						// width: 35,
 						// height: 835
 						width: 41,
-						height: 742
+						height: 742,
+						events: 'click touchstart',
+						handler: function() {
+							Ext.getCmp('treatment-panel').animateActiveItem(UNSTRUCTURED_HISTORY_VIEW , {
+									type: 'slide',
+								direction: 'left'
+							});
+						}
 					});
 
 					addImageToLayer("resources/images/bg/history_big.png", backgroundLayer, {
-						x: stage.getWidth() - 723,
-						y: DRAWABLE_Y_MIN,
+						x: this.stage.getWidth() - 723,
+						y: 12,
+//						y: DRAWABLE_Y_MIN,
 						// width: 710,
 						width: 722,
 						// height: 835
 						height: 742
 					});
 
-					// Add button for History Dropdown
-					addImageToLayer("resources/images/button_History_off.png", controlsLayer, {
-						x: 660,
-						y: 0,
-						width: 80,
+					// // Add button for History Dropdown
+					// addImageToLayer("resources/images/button_History_off.png", controlsLayer, {
+					// 	x: 660,
+					// 	y: 0,
+					// 	width: 80,
+					// 	height: 44,
+					// 	hidden: true,
+					// 	events: 'click touchstart',
+					// 	handler: function() {
+					// 		// Show visit history
+					// 		Ext.getCmp('visitHistory').show();
+					// 	}
+					// });
+
+					// Add Printer button
+					addImageToLayer("resources/images/icons/printer.png", controlsLayer, {
+						x: 680,
+						y: 20,
+						width: 44,
 						height: 44,
 						events: 'click touchstart',
 						handler: function() {
-							// Show visit history
-							Ext.getCmp('visitHistory').show();
+
+						//TODO: Rather than storing in localStorage, event should be published (pubsub)
+						var printablePatientRecord = { 
+							patient: myRecord.raw,
+							canvasJSON: this.parent.parent.toJSON({
+								x: DRAWABLE_X_MIN,
+								y: DRAWABLE_Y_MIN,
+								width: DRAWABLE_X_MAX - DRAWABLE_X_MIN,
+								height: DRAWABLE_Y_MAX - DRAWABLE_Y_MIN
+							})
+						};	
+						
+						localStorage.setItem('printablePatientRecord',JSON.stringify(printablePatientRecord));
+						//open print window
+						window.open("app/view/print/patientRecordPrint.html", "Patient Record");
 						}
 					});
-
 					stage.draw();
 				}
-			},
+ 			}, 
+ 			structuredDataOnCanvas: function () {
+ 			    var visitHistoryStore = Ext.getStore('visitHistoryStore');
+ 			    g_visitHistoryStore = visitHistoryStore;
+
+ 			    //TODO: Show these layers on repaint.
+ 			    if (this.stage.get('#textLayer')[0]) {
+ 			        this.stage.get('#textLayer')[0].hide();
+ 			    }
+ 			    if (this.stage.get('#linesLayer')[0]) {
+ 			        this.stage.get('#linesLayer')[0].hide();
+ 			    }
+
+ 			    if (!this.stage.get('#structuredDataLayer').length) {
+ 			        // Layers
+ 			        var structuredDataLayer = new Kinetic.Layer({
+ 			            id: 'structuredDataLayer'
+ 			        });
+ 			        this.stage.add(structuredDataLayer);
+ 			    }
+ 			    this.stage.get('#structuredDataLayer')[0].show();
+ 			    //TODO: Improve UI of structured view (similar to regular canvas)
+ 			    var EncounterText = '';
+
+ 			    for (var i = 0; i < visitHistoryStore.data.all.length; i++) {
+
+ 			        if (visitHistoryStore.data.all[i].data.structuredData) {
+
+ 			            EncounterText += visitHistoryStore.getAt(i).data.date;
+
+ 			            structuredData = JSON.parse(visitHistoryStore.data.all[i].data.structuredData);
+
+ 			            if (Ext.getCmp('DiagnosisHistoryView').isChecked()) {
+
+ 			                DiagnosisCount = structuredData.Diagnosis.length;
+ 			                console.log(DiagnosisCount);
+
+ 			                for (var j = 0; j < DiagnosisCount; j++) {
+ 			                    EncounterText += '\n' + structuredData.Diagnosis[j].name
+ 			                }
+
+ 			                EncounterText += '\n\n'
+
+ 			                var DiagnosisKinecticText = new Kinetic.Text({
+ 			                    x: DRAWABLE_X_MIN + 80,
+ 			                    y: 70,
+ 			                    text: EncounterText,
+ 			                    fontSize: 13,
+ 			                    fontFamily: 'Helvetica',
+ 			                    textFill: '#000',
+ 			                    align: 'left',
+ 			                });
+ 			                this.stage.get('#structuredDataLayer')[0].add(DiagnosisKinecticText);
+ 			            }
+ 			        }
+ 			        //TODO: Drugs are not coming in encounters now, need to make it consisten
+ 			        // if(Ext.getCmp('DrugsHistoryView').isChecked())
+ 			        // {
+
+
+ 			        // }
+ 			    }
+ 			    this.stage.draw();
+ 			}
 		},
 		layout: {
 			type: 'vbox'

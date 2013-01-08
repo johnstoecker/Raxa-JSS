@@ -94,6 +94,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                     }, {
                         xtype: 'searchfield',
                         id: 'diagnosisfilterbysearchfield',
+                        placeHolder: 'Use Keyboard to start typing....'
                     }]
                 }, {
                     xtype: 'Diagnosis-List',
@@ -134,6 +135,7 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                         ui: 'confirm',
                         text: 'Add More',
                         id: 'addMoreDiagnosis',
+                        hidden: true,
                         handler: function() {
                             // TODO: fire event. move handling to controller
                             // TODO: Ideally, it should still group them together and only draw
@@ -147,10 +149,11 @@ Ext.define('RaxaEmr.Outpatient.view.today.diagnosis', {
                             Ext.getCmp('diagnosis-panel').show();                           
                         },
                         flex: 1
-                    }, {
-                        xtype: 'spacer',
-                        flex: 1
-                    }, {
+                    }, //{
+                       // xtype: 'spacer',
+                       // flex: 1
+                    //}, 
+                    {
                         xtype: 'button',
                         text: 'Done',
                         id: 'addDiagnosisInList',
