@@ -343,14 +343,14 @@ Ext.define('RaxaEmr.Outpatient.controller.patientlist', {
         var list_scrEncounter = Ext.create('RaxaEmr.Outpatient.model.PostList', {
             name: "Screener Encounter",
             description: "Patients encountered Screener on " + "startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d),
-            searchQuery: "?encounterType=" + localStorage.screenerUuidencountertype + "&startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d)
+            searchQuery: "?encounterType=" + localStorage.screenerUuidencountertype + "&startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d) + "&provider=" + Util.getLoggedInProviderUuid()
 
         });
         //fetching opd patient list
         var list_outEncounter = Ext.create('RaxaEmr.Outpatient.model.PostList', {
             name: "Outpatient Encounter",
             description: "Patients encountered Outpatient on " + "startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d),
-            searchQuery: "?encounterType=" + localStorage.outUuidencountertype + "&startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d)
+            searchQuery: "?encounterType=" + localStorage.outUuidencountertype + "&startDate=" + Util.Datetime(d, 24) + "&endDate=" + Util.Datetime(d) + "&provider=" + Util.getLoggedInProviderUuid()
 
         });
         var k = 0;
